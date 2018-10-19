@@ -18,7 +18,7 @@ def keep_url():
         else:
             try:
                 url = row['urls'][1: -1]
-                hostname = urlparse(res).hostname
+                hostname = urlparse(url).hostname
                 # short url
                 if hostname in short_url:
                     res = requests.head(url)
