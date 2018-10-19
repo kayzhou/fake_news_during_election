@@ -2,6 +2,7 @@ import pandas as pd
 from urllib.parse import urlparse
 import requests
 
+short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it'])
 
 def keep_url():
     tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv')
@@ -17,8 +18,11 @@ def keep_url():
         else:
             try:
                 url = row['urls'][1: -1]
-                res = requests.head(url)
-                hostname = urlparse(res.headers.get('location')).hostname
+                hostname = urlparse(res).hostname
+                # short url
+                if hostname in short_url:
+                    res = requests.head(url)
+                    hostname = urlparse(res.headers.get('location')).hostname
                 if hostname:
                     # print(i, hostname)
                     tweets['hostname'] = hostname
