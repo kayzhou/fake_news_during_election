@@ -4,8 +4,8 @@ import requests
 
 
 def keep_url():
-    tweets = pd.read_csv('data/ira_tweets_head.csv')
-    tweets['hostname'] = -1
+    tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv')
+    # tweets['hostname'] = -1
     print(len(tweets))
     for i, row in tweets.iterrows():
         if not isinstance(row['urls'], str):
@@ -27,10 +27,6 @@ def keep_url():
                 #     tweets.drop(i, inplace=True)
             except Exception as e:
                 print(i, e)
-
-
-    print(len(tweets))
-    tweets.to_csv("data/ira_tweets_url.csv")
 
 
 if __name__ == "__main__":
