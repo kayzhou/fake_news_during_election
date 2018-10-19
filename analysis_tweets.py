@@ -2,7 +2,7 @@ import pandas as pd
 from urllib.parse import urlparse
 import requests
 
-short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it'])
+short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
 def keep_url():
     tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv')
