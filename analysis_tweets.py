@@ -44,7 +44,7 @@ def task(_ids):
         if d['short']:
             res = requests.head(d['url'])
             hostname = urlparse(res.headers.get('location')).hostname
-            d['host'] = hostname
+            d['hostname'] = hostname
         print(d['id'], d['url'], d['hostname'], d['short'], sep='\t')
 
 
