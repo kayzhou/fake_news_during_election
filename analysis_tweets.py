@@ -45,7 +45,7 @@ def task(_ids):
             res = requests.head(d['url'])
             hostname = urlparse(res.headers.get('location')).hostname
             d['hostname'] = hostname
-        print(d['id'], d['url'], d['hostname'], d['short'], sep='\t')
+        print(json.dumps(d, ensure_ascii=False))
 
 
 def keep_url():
@@ -85,7 +85,7 @@ def keep_url():
             }
         dict_id_host.append(d)
 
-    print(cnt)
+    # print(cnt); exit(0)
 
     task_cnt = 10
     step = int(len(dict_id_host) / task_cnt)
@@ -96,6 +96,7 @@ def keep_url():
             _ids = dict_id_host[i * step: (i + 1) * step]
         t = multiprocessing.Process(target=task, args=(_ids,))
         t.start()
+
 
 def build_retweet_network():
     # userid_id = {}
