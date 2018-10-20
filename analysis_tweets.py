@@ -4,7 +4,7 @@ import requests
 import networkx as nx
 import json
 import sys, traceback
-from multiprocessing
+import multiprocessing
 
 # short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
