@@ -67,11 +67,8 @@ def keep_url():
     dict_id_host = []
     cnt = 0
     for line in open('id_host-20181021.txt'):
-        try:
-            _id, url, hostname = line.strip().split('\t')
-        except:
-            print('error =>', line)
-        if len(url) <= 10 and len(hostname) <=30:
+        _id, url, hostname = line.strip().split('\t')
+        if len(url) <= 30 and len(hostname) <= 10:
             cnt += 1
             d = {
                 'id': _id,
@@ -86,6 +83,7 @@ def keep_url():
                 'hostname': hostname,
                 'short': False
             }
+        dict_id_host.append(d)
 
     print(cnt)
 
