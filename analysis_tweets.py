@@ -5,6 +5,7 @@ import networkx as nx
 import json
 import sys, traceback
 import multiprocessing
+import time
 
 # short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
@@ -44,6 +45,7 @@ def task(_ids):
         if d['short']:
             res = requests.head(d['url'])
             hostname = urlparse(res.headers.get('location')).hostname
+            time.sleep(0.1)
             d['hostname'] = hostname
         print(json.dumps(d, ensure_ascii=False))
 
