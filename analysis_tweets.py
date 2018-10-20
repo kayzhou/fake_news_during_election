@@ -43,10 +43,13 @@ def task(_ids):
     #             # print(i, e)
     for d in _ids:
         if d['short']:
-            res = requests.head(d['url'])
-            hostname = urlparse(res.headers.get('location')).hostname
+            try:
+                res = requests.head(d['url'])
+                hostname = urlparse(res.headers.get('location')).hostname
+                d['hostname'] = hostname
+            except:
+                d['error'] = 1
             time.sleep(0.1)
-            d['hostname'] = hostname
         print(json.dumps(d, ensure_ascii=False))
 
 
