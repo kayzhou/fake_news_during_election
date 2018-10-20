@@ -49,9 +49,9 @@ def task(_ids):
 
 
 def keep_url():
-    tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', usecols=['urls', 'tweetid'])
-    # tweets['hostname'] = -1
-    print(len(tweets))
+    # tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', usecols=['urls', 'tweetid'])
+    # # tweets['hostname'] = -1
+    # print(len(tweets))
 
 
     # for i, row in tweets.iterrows():
@@ -65,12 +65,14 @@ def keep_url():
     #         print(i, url, hostname, sep='\t')
 
     dict_id_host = []
+    cnt = 0
     for line in open('id_host-20181021.txt'):
         try:
             _id, url, hostname = line.strip().split('\t')
         except:
             print('error =>', line)
-        if len(url) <= 10 and len(hostname) <=30 and len(hostname.split('.')[1]) == 2:
+        if len(url) <= 10 and len(hostname) <=30:
+            cnt += 1
             d = {
                 'id': _id,
                 'url': url,
@@ -85,11 +87,13 @@ def keep_url():
                 'short': False
             }
 
+    print(cnt)
+
     task_cnt = 10
     step = int(len(dict_id_host) / task_cnt)
     for i in range(task_cnt):
         if i == task_cnt - 1:
-            _ids = s[i * step:]
+            _ids = dict_id_host[i * step:]
         else:
             _ids = dict_id_host[i * step: (i + 1) * step]
         t = multiprocessing.Process(target=task, args=(_ids,))
