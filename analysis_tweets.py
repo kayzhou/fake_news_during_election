@@ -124,7 +124,6 @@ def temp():
                     out_file.write(w + '}\n')
     print("cnt:", cnt)
     exit(0)
-    """
 
     ids = set([])
     with open('id_host_short.txt') as f:
@@ -154,18 +153,42 @@ def temp():
             }
         dict_id_host.append(d)
     print(len(dict_id_host))
+    """
+    
+    """
+    dict_id_host = []
+    for line in open("id_host_short.txt"):
+        dict_id_host.append(json.loads(line.strip()))
 
-    with open('id_host_short.txt', 'a') as f:
+    hostname_type = json.load(open("data/host_label.json"))
+
+    i = 0
+    cnt = 0
+    with open('id_host_short_new.txt', 'w') as f:
         for d in dict_id_host:
-            if d['short']:
-                try:
-                    res = requests.head(d['url'])
-                    hostname = urlparse(res.headers.get('location')).hostname
-                    d['hostname'] = hostname
-                except:
-                    d['error'] = 1
-                time.sleep(0.1)
+            i += 1
+            if i % 50000 == 0:
+                print(i)
+            if d["hostname"] in hostname_type:
+                d["type"] = int(hostname_type[d["hostname"]])
+                if d["type"] == -2:
+                    cnt += 1
+            else:
+                d["type"] = 100
+
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
+
+    print("fake news:", cnt)
+    """
+
+    cnt = [0] * 7
+    for line in open("id_host_short_new.txt"):
+        d = json.loads(line.strip())
+        if d["type"] != 100:
+            cnt[d["type"] + 2] += 1
+
+    print(cnt)
+
 
 
 def build_retweet_network():
