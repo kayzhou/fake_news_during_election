@@ -46,13 +46,20 @@ def find_retweets(tweets_ids, out_name):
                     q.put(tid)
 
 
-if __name__ == "__main__":
-    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+def load_all_nodes():
     tweets_ids = set([])
     for line in open("data/network_fake.txt"):
         n1, n2 = line.strip().split("\t")
         tweets_ids.add(n1); tweets_ids.add(n2)
 
+    t2 = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    tweets_ids = tweets_ids | t2
+    return tweets_ids
+
+
+if __name__ == "__main__":
+    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    tweets_ids = load_all_nodes()
     find_retweets(tweets_ids, "data/retweet_network_2.txt")
 
     # union
