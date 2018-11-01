@@ -100,6 +100,7 @@ def union_retweet_line():
 
 if __name__ == "__main__":
     tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    print(len(tweets_ids))
     # tweets_ids = load_all_nodes_v1()
     find_retweets(tweets_ids, "data/retweet_network_1.txt")
 
