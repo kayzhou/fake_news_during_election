@@ -40,6 +40,7 @@ def find_retweets(tweets_ids, out_name):
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
             dealed.add(_id)
+
             for line in data:
                 tid = line[0]
                 edge_cnt += 1
@@ -56,7 +57,7 @@ def load_all_nodes_v1():
         tweets_ids.add(int(n2))
     print(len(tweets_ids))
 
-    t2 = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    t2 = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
     tweets_ids = tweets_ids | t2
     print(len(tweets_ids))
     return tweets_ids
@@ -64,17 +65,17 @@ def load_all_nodes_v1():
 
 def load_all_nodes():
 
-    tweets_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
+    tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
 
     for line in open("data/retweet_network_1.txt"):
         n1, n2 = line.strip().split("\t")
-        tweets_ids.add(n1)
-        tweets_ids.add(n2)
+        tweets_ids.add(int(n1))
+        tweets_ids.add(int(n2))
 
     for line in open("data/retweet_network_2.txt"):
         n1, n2 = line.strip().split("\t")
-        tweets_ids.add(n1)
-        tweets_ids.add(n2)
+        tweets_ids.add(int(n1))
+        tweets_ids.add(int(n2))
 
     return tweets_ids
 
