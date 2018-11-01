@@ -29,9 +29,13 @@ def find_retweets(tweets_ids):
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
 
-    with open("data/network_fake.txt", "w") as f:
+    cnt = 0
+    with open("data/network_fake_nov.txt", "w") as f:
         while not q.empty():
             _id = q.get()
+            cnt += 1
+            if cnt % 1000 == 0:
+                print(cnt)
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
             dealed.add(_id)
@@ -43,7 +47,13 @@ def find_retweets(tweets_ids):
 
 
 if __name__ == "__main__":
-    tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
+    # tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
+    tweets_id = set([])
+    for line in open("data/network_fake.txt"):
+        n1, n2 = line.strip().split("\t")
+        tweets_id.add(n1); tweets_id.add(n2)
+
+    tweets_ids = list(tweets_id)
     find_retweets(tweets_ids)
 
 
