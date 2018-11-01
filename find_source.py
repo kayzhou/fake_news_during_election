@@ -66,17 +66,17 @@ def load_all_nodes_v1():
 def load_all_nodes():
 
     tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
-
+    print(len(tweets_ids))
     for line in open("data/retweet_network_1.txt"):
         n1, n2 = line.strip().split("\t")
         tweets_ids.add(int(n1))
         tweets_ids.add(int(n2))
-
+    print(len(tweets_ids))
     for line in open("data/retweet_network_2.txt"):
         n1, n2 = line.strip().split("\t")
         tweets_ids.add(int(n1))
         tweets_ids.add(int(n2))
-
+    print(len(tweets_ids))
     return tweets_ids
 
 
