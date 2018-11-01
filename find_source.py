@@ -3,7 +3,8 @@ import json
 import queue
 
 
-def find_fake_tweets(): host_label = json.load(open('data/host_label.json'))
+def find_fake_tweets():
+    host_label = json.load(open('data/host_label.json'))
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
