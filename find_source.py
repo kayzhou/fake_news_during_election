@@ -26,7 +26,7 @@ def find_retweets(tweets_ids, out_name):
     for _id in tweets_ids:
         q.put(_id)
     dealed = set([])
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
 
     cnt = 0
@@ -91,9 +91,9 @@ def union_retweet_line():
 
 
 if __name__ == "__main__":
-    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
-    tweets_ids = load_all_nodes_v1()
-    find_retweets(tweets_ids, "data/retweet_network_2.txt")
+    tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    # tweets_ids = load_all_nodes_v1()
+    find_retweets(tweets_ids, "data/retweet_network_1.txt")
 
     # union
     # tweets_ids = load_all_nodes()
