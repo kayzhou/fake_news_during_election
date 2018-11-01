@@ -38,7 +38,7 @@ def find_retweets(tweets_ids, out_name):
             cnt += 1
             if cnt % 20000 == 0:
                 # print(_id, _id in dealed)
-                print("；边的数量：", edge_cnt, "；等待处理队列：", len(q))
+                print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", len(q))
 
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
 
