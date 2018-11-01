@@ -27,7 +27,7 @@ def find_retweets(tweets_ids, out_name):
     for _id in tweets_ids:
         q.add(_id)
 
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep_nov_db.sqlite")
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c = conn.cursor()
 
     cnt = 0
