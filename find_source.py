@@ -81,8 +81,8 @@ def union_retweet_line():
     for line in open("data/retweet_network_2.txt"):
         retween_lines.add(line)
     with open("data/edge-tid-fake-news.txt", "w") as f:
-        for tid in tweets_ids:
-            f.write(tid + "\n")
+        for line in retween_lines:
+            f.write(line)
 
 
 if __name__ == "__main__":
@@ -96,6 +96,7 @@ if __name__ == "__main__":
         for tid in tweets_ids:
             f.write(tid + "\n")
 
+    union_retweet_line()
 
 
 
