@@ -35,7 +35,7 @@ def find_retweets(tweets_ids, out_name):
         while not q.empty():
             _id = q.get()
             cnt += 1
-            if cnt % 1000 == 0:
+            if cnt % 10000 == 0:
                 print('已经处理的点：', len(dealed), "；边的数量：", edge_cnt)
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
@@ -54,9 +54,11 @@ def load_all_nodes_v1():
         n1, n2 = line.strip().split("\t")
         tweets_ids.add(int(n1))
         tweets_ids.add(int(n2))
+    print(len(tweets_ids))
 
     t2 = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
     tweets_ids = tweets_ids | t2
+    print(len(tweets_ids))
     return tweets_ids
 
 
