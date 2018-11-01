@@ -27,7 +27,7 @@ def find_retweets(tweets_ids, out_name):
     for _id in tweets_ids:
         q.add(_id)
 
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep_nov_db.sqlite")
     c = conn.cursor()
 
     cnt = 0
@@ -46,6 +46,7 @@ def find_retweets(tweets_ids, out_name):
                 tid = line[0]
                 edge_cnt += 1
                 f.write("{}\t{}\n".format(_id, tid))
+                # 新添加的之前肯定没有添加过，是唯一的
                 q.add(tid)
 
 def load_all_nodes_v1():
@@ -91,10 +92,10 @@ def union_retweet_line():
 
 
 if __name__ == "__main__":
-    tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
-    print(len(tweets_ids))
-    # tweets_ids = load_all_nodes_v1()
-    find_retweets(tweets_ids, "data/retweet_network_1.txt")
+    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    # print(len(tweets_ids))
+    tweets_ids = load_all_nodes_v1()
+    find_retweets(tweets_ids, "data/retweet_network_2.txt")
 
     # union
     # tweets_ids = load_all_nodes()
