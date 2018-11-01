@@ -22,9 +22,10 @@ def find_fake_tweets():
 
 
 def find_retweets(tweets_ids, out_name):
-    q = queue.Queue()
+    q = set()
     for _id in tweets_ids:
-        q.put(_id)
+        q.add(_id)
+
     dealed = set([])
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
@@ -32,22 +33,24 @@ def find_retweets(tweets_ids, out_name):
     cnt = 0
     edge_cnt = 0
     with open(out_name, "w") as f:
-        while not q.empty():
-            _id = q.get()
+        while q:
+            _id = q.pop()
+
             cnt += 1
-            if cnt % 10000 == 0:
-                print(_id, _id in dealed)
+            if cnt % 50000 == 0:
+                # print(_id, _id in dealed)
                 print('已经处理的点：', len(dealed), "；边的数量：", edge_cnt, "；等待处理队列：", q.qsize())
+            dealed.add(_id)
+
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
-            dealed.add(_id)
 
             for line in data:
                 tid = line[0]
                 edge_cnt += 1
                 f.write("{}\t{}\n".format(_id, tid))
                 if tid not in dealed:
-                    q.put(tid)
+                    q.add(tid)
 
 
 def load_all_nodes_v1():
