@@ -47,7 +47,7 @@ def find_retweets(tweets_ids, out_name):
 
 
 if __name__ == "__main__":
-    tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
+    tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
     # tweets_id = set([])
     # for line in open("data/network_fake.txt"):
     #     n1, n2 = line.strip().split("\t")
