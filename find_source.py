@@ -35,7 +35,7 @@ def find_retweets(tweets_ids, out_name):
             _id = q.get()
             cnt += 1
             if cnt % 1000 == 0:
-                print(cnt, q.size())
+                print(cnt, q.qsize())
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
             dealed.add(_id)
