@@ -1,6 +1,6 @@
 import sqlite3
 import json
-import Queue
+import queue
 
 
 def find_fake_tweets(): host_label = json.load(open('data/host_label.json'))
@@ -23,7 +23,7 @@ def find_fake_tweets(): host_label = json.load(open('data/host_label.json'))
 
 def find_retweets(tweets_ids):
 
-    q = Queue.Queue()
+    q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
     dealed = set([])
@@ -46,7 +46,8 @@ def find_retweets(tweets_ids):
 
 
 if __name__ == "__main__":
-    find_retweets
+    tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
+    find_retweets(tweets_ids)
 
 
 
