@@ -30,17 +30,19 @@ def find_retweets(tweets_ids, out_name):
     c = conn.cursor()
 
     cnt = 0
+    edge_cnt = 0
     with open(out_name, "w") as f:
         while not q.empty():
             _id = q.get()
             cnt += 1
             if cnt % 1000 == 0:
-                print(cnt, q.qsize())
+                print('已经处理的点：', len(dealed), "；边的数量：", edge_cnt)
             c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
             data = c.fetchall()
             dealed.add(_id)
             for line in data:
                 tid = line[0]
+                edge_cnt += 1
                 f.write("{}\t{}\n".format(_id, tid))
                 if tid not in dealed:
                     q.put(tid)
@@ -87,19 +89,14 @@ def union_retweet_line():
 
 
 if __name__ == "__main__":
-    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
     # tweets_ids = load_all_nodes_v1()
-    # find_retweets(tweets_ids, "data/retweet_network_2.txt")
+    find_retweets(tweets_ids, "data/retweet_network_1.txt")
 
     # union
-    tweets_ids = load_all_nodes()
-    with open("data/node-tid-fake-news.txt", "w") as f:
-        for tid in tweets_ids:
-            f.write(str(tid) + "\n")
+    # tweets_ids = load_all_nodes()
+    # with open("data/node-tid-fake-news.txt", "w") as f:
+    #     for tid in tweets_ids:
+    #         f.write(str(tid) + "\n")
 
-    union_retweet_line()
-
-
-
-
-
+    # union_retweet_line()
