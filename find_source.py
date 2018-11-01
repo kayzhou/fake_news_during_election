@@ -10,7 +10,6 @@ def find_fake_tweets(): host_label = json.load(open('data/host_label.json'))
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
 
-
     with open("fake.txt", "w") as f:
         for i, d in enumerate(data):
             if i % 10000 == 0:
@@ -22,13 +21,10 @@ def find_fake_tweets(): host_label = json.load(open('data/host_label.json'))
 
 
 def find_retweets(tweets_ids):
-
     q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
     dealed = set([])
-
-    # retweet_network = {}
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
 
