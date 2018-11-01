@@ -21,7 +21,7 @@ def find_fake_tweets():
                 f.write(json_d + '\n')
 
 
-def find_retweets(tweets_ids):
+def find_retweets(tweets_ids, out_name):
     q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
@@ -30,7 +30,7 @@ def find_retweets(tweets_ids):
     c = conn.cursor()
 
     cnt = 0
-    with open("data/network_fake_nov.txt", "w") as f:
+    with open(out_name, "w") as f:
         while not q.empty():
             _id = q.get()
             cnt += 1
@@ -47,14 +47,16 @@ def find_retweets(tweets_ids):
 
 
 if __name__ == "__main__":
-    # tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
-    tweets_id = set([])
-    for line in open("data/network_fake.txt"):
-        n1, n2 = line.strip().split("\t")
-        tweets_id.add(n1); tweets_id.add(n2)
+    tweets_ids = [json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")]
+    # tweets_id = set([])
+    # for line in open("data/network_fake.txt"):
+    #     n1, n2 = line.strip().split("\t")
+    #     tweets_id.add(n1); tweets_id.add(n2)
 
-    tweets_ids = list(tweets_id)
-    find_retweets(tweets_ids)
+    # tweets_ids = list(tweets_id)
+    find_retweets(tweets_ids, "data/retweet_network_1.txt")
+
+    # union
 
 
 
