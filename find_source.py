@@ -23,6 +23,7 @@ def find_fake_tweets():
 
 def find_retweets(tweets_ids, out_name):
     q = set()
+    new_nodes = set()
     for _id in tweets_ids:
         q.add(_id)
 
@@ -50,9 +51,10 @@ def find_retweets(tweets_ids, out_name):
                 edge_cnt += 1
                 f.write("{}\t{}\n".format(_id, tid))
                 if tid not in dealed:
+                    new_nodes.add(tid)
                     # print("终于添加新点了！", len(q))
                     q.add(tid)
-
+    print(len(new_nodes))
 
 def load_all_nodes_v1():
     tweets_ids = set([])
