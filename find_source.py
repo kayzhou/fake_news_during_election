@@ -94,13 +94,13 @@ def union_retweet_line():
 if __name__ == "__main__":
     # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
     # print(len(tweets_ids))
-    tweets_ids = load_all_nodes_v1()
-    find_retweets(tweets_ids, "data/retweet_network_2.txt")
+    # tweets_ids = load_all_nodes_v1()
+    # find_retweets(tweets_ids, "data/retweet_network_2.txt")
 
     # union
-    # tweets_ids = load_all_nodes()
-    # with open("data/node-tid-fake-news.txt", "w") as f:
-    #     for tid in tweets_ids:
-    #         f.write(str(tid) + "\n")
+    tweets_ids = load_all_nodes()
+    with open("data/node-tid-fake-news.txt", "w") as f:
+        for tid in tweets_ids:
+            f.write(str(tid) + "\n")
 
-    # union_retweet_line()
+    union_retweet_line()
