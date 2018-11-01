@@ -37,7 +37,7 @@ def find_retweets(tweets_ids, out_name):
             _id = q.pop()
 
             cnt += 1
-            if cnt % 20000 == 0:
+            if cnt % 10000 == 0:
                 # print(_id, _id in dealed)
                 print('已经处理的点：', len(dealed), "；边的数量：", edge_cnt, "；等待处理队列：", len(q))
             dealed.add(_id)
@@ -50,6 +50,7 @@ def find_retweets(tweets_ids, out_name):
                 edge_cnt += 1
                 f.write("{}\t{}\n".format(_id, tid))
                 if tid not in dealed:
+                    print("终于添加新点了！", len(q))
                     q.add(tid)
 
 
