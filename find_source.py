@@ -242,7 +242,7 @@ def get_tweets(tweets_ids):
         d = c.fetchone()
         if d:
             col_name = [t[0] for t in c.description]
-            print(d)
+            # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
 
