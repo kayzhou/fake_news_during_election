@@ -108,7 +108,7 @@ def find_all_links(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             # print(_id, _id in dealed)
-            print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", q.qsize())
+            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
@@ -123,6 +123,10 @@ def find_all_links(tweets_ids):
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c = conn.cursor()
 
+    q = queue.Queue()
+    for _id in tweets_ids:
+        q.put(_id)
+    retweet_link = {}
     for k, v in retweet_link.items():
         q.put(v)
 
@@ -131,7 +135,7 @@ def find_all_links(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             # print(_id, _id in dealed)
-            print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", q.qsize())
+            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
