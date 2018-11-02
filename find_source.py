@@ -106,7 +106,7 @@ def find_all_links(tweets_ids):
     while not q.empty():
         _id = q.get()
         cnt += 1
-        if cnt % 20000 == 0:
+        if cnt % 50000 == 0:
             # print(_id, _id in dealed)
             print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", q.qsize())
 
@@ -114,9 +114,10 @@ def find_all_links(tweets_ids):
         for next_d in c.fetchall():
             next_id = next_d[0]
             edge_cnt += 1
-            retweet_link[next_id] = _id
+            retweet_link[int(next_id)] = _id
             if next_id not in retweet_link:
                 q.put(next_id)
+    conn.close()
 
     # 下一个！
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
@@ -128,7 +129,7 @@ def find_all_links(tweets_ids):
     while not q.empty():
         _id = q.get()
         cnt += 1
-        if cnt % 20000 == 0:
+        if cnt % 50000 == 0:
             # print(_id, _id in dealed)
             print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", q.qsize())
 
@@ -136,13 +137,12 @@ def find_all_links(tweets_ids):
         for next_d in c.fetchall():
             next_id = next_d[0]
             edge_cnt += 1
-            retweet_link[next_id] = _id
+            retweet_link[int(next_id)] = _id
             if next_id not in retweet_link:
                 q.put(next_id)
+    conn.close()
 
-    json.dump(retweet_link, open("retweet_network_fake.json", "w"), ensure_ascii=False, indent=4)
-
-
+    json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
