@@ -102,7 +102,6 @@ def find_all_links(tweets_ids):
     c = conn.cursor()
 
     cnt = 0
-    edge_cnt = 0
 
     while not q.empty():
         _id = q.get()
@@ -115,7 +114,6 @@ def find_all_links(tweets_ids):
         have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
-            edge_cnt += 1
             retweet_link[int(next_id)] = _id
             if next_id not in have_dealed:
                 q.put(next_id)
@@ -128,7 +126,6 @@ def find_all_links(tweets_ids):
     q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
-    retweet_link = {}
     for k, v in retweet_link.items():
         q.put(v)
 
@@ -143,7 +140,6 @@ def find_all_links(tweets_ids):
         have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
-            edge_cnt += 1
             retweet_link[int(next_id)] = _id
             if next_id not in have_dealed:
                 q.put(next_id)
@@ -156,7 +152,6 @@ def find_all_links(tweets_ids):
     q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
-    retweet_link = {}
     for k, v in retweet_link.items():
         q.put(v)
 
@@ -171,7 +166,6 @@ def find_all_links(tweets_ids):
         have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
-            edge_cnt += 1
             retweet_link[int(next_id)] = _id
             if next_id not in have_dealed:
                 q.put(next_id)
