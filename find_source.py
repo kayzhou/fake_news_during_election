@@ -199,6 +199,7 @@ def find_all_links(tweets_ids):
             retweet_link[int(next_id)] = _id
             if next_id not in retweet_link:
                 q.put(next_id)
+                print("终于变化了！", q.qsize())
     conn.close()
 
     json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
