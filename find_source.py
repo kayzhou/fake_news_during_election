@@ -146,6 +146,61 @@ def find_all_links(tweets_ids):
                 q.put(next_id)
     conn.close()
 
+def find_all_links(tweets_ids):
+    q = queue.Queue()
+    for _id in tweets_ids:
+        q.put(_id)
+    retweet_link = {}
+
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    cnt = 0
+    edge_cnt = 0
+
+    while not q.empty():
+        _id = q.get()
+        cnt += 1
+        if cnt % 50000 == 0:
+            # print(_id, _id in dealed)
+            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+
+        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        for next_d in c.fetchall():
+            next_id = next_d[0]
+            edge_cnt += 1
+            retweet_link[int(next_id)] = _id
+            if next_id not in retweet_link:
+                q.put(next_id)
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    q = queue.Queue()
+    for _id in tweets_ids:
+        q.put(_id)
+    retweet_link = {}
+    for k, v in retweet_link.items():
+        q.put(v)
+
+    while not q.empty():
+        _id = q.get()
+        cnt += 1
+        if cnt % 50000 == 0:
+            # print(_id, _id in dealed)
+            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+
+        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        for next_d in c.fetchall():
+            next_id = next_d[0]
+            edge_cnt += 1
+            retweet_link[int(next_id)] = _id
+            if next_id not in retweet_link:
+                q.put(next_id)
+    conn.close()
+
     json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
 
 
