@@ -1,5 +1,5 @@
 import sqlite3
-import json
+import ujson as json
 import queue
 
 
@@ -91,16 +91,72 @@ def union_retweet_line():
             f.write(line)
 
 
+def find_all_links(tweets_ids):
+    q = queue.Queue()
+    for _id in tweets_ids:
+        q.put(_id)
+    retweet_link = {}
+
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    cnt = 0
+    edge_cnt = 0
+
+    while not q.empty:
+        _id = q.get()
+        cnt += 1
+        if cnt % 20000 == 0:
+            # print(_id, _id in dealed)
+            print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", len(q))
+
+        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        for next_d in c.fetchall():
+            next_id = next_d[0]
+            edge_cnt += 1
+            retweet_link[next_id] = _id
+            if next_id not in retweet_link:
+                q.put(next_id)
+
+    # 下一个！
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    for k, v in retweet_link.items():
+        q.put(v)
+
+    while not q.empty:
+        _id = q.get()
+        cnt += 1
+        if cnt % 20000 == 0:
+            # print(_id, _id in dealed)
+            print(cnt, "；边的数量：", edge_cnt, "；等待处理队列：", len(q))
+
+        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        for next_d in c.fetchall():
+            next_id = next_d[0]
+            edge_cnt += 1
+            retweet_link[next_id] = _id
+            if next_id not in retweet_link:
+                q.put(next_id)
+
+    json.dump(retweet_link, open("retweet_network_fake.json", "w"), ensure_ascii=False, indent=4)
+
+
+
+
 if __name__ == "__main__":
-    # tweets_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
     # print(len(tweets_ids))
     # tweets_ids = load_all_nodes_v1()
     # find_retweets(tweets_ids, "data/retweet_network_2.txt")
 
     # union
-    tweets_ids = load_all_nodes()
-    with open("data/node-tid-fake-news.txt", "w") as f:
-        for tid in tweets_ids:
-            f.write(str(tid) + "\n")
+    # tweets_ids = load_all_nodes()
+    # with open("data/node-tid-fake-news.txt", "w") as f:
+    #     for tid in tweets_ids:
+    #         f.write(str(tid) + "\n")
 
-    union_retweet_line()
+    # union_retweet_line()
+
+    find_all_links(t_ids)
