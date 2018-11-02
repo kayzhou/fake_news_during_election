@@ -103,7 +103,7 @@ def find_all_links(tweets_ids):
     cnt = 0
     edge_cnt = 0
 
-    while not q.empty:
+    while not q.empty():
         _id = q.get()
         cnt += 1
         if cnt % 20000 == 0:
@@ -125,7 +125,7 @@ def find_all_links(tweets_ids):
     for k, v in retweet_link.items():
         q.put(v)
 
-    while not q.empty:
+    while not q.empty():
         _id = q.get()
         cnt += 1
         if cnt % 20000 == 0:
