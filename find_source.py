@@ -238,7 +238,7 @@ def get_tweets(tweets_ids):
 
     for _id in tweets_ids:
         what_the_fuck = False
-        if cnt % 2000 == 0:
+        if cnt % 10000 == 0:
             print(cnt)
         new_d = {}
         cnt += 1
@@ -261,7 +261,7 @@ def get_tweets(tweets_ids):
                 for k, v in zip(col_name, d):
                     new_d[k] = v
             else:
-                print("两个库里面都没有该tweet！", _id)
+                print("两个库里面都没有该tweet！~~~~~~~~~~~~~", _id)
                 what_the_fuck = True
 
         if not what_the_fuck:
@@ -277,13 +277,13 @@ def get_tweets(tweets_ids):
                 c2.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
                 d = c2.fetchone()
                 if d:
-                    new_d = {}
                     col_name = [t[0] for t in c1.description]
                     # print(d)
                     for k, v in zip(col_name, d):
                         new_d[k] = v
                 else:
                     print("两个库里面都没有该user！", new_d["user_id"])
+        tweet_data[_id] = new_d
 
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
