@@ -152,21 +152,28 @@ def find_all_links(tweets_ids):
             # print(_id, _id in dealed)
             print(cnt, len(have_dealed), "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
+        have_next = False
+        have_last = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         have_dealed.add(str(_id))
         for next_d in c.fetchall():
+            have_next = True
             next_id = str(next_d[0])
-            retweet_link[str(next_id)] = str(_id)
+            retweet_link[next_id] = str(_id)
             if next_id not in have_dealed:
                 q.put(next_id)
 
         c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
         have_dealed.add(str(_id))
-        for next_d in c.fetchall():
-            last_id = str(next_d[0])
+        for last_d in c.fetchall():
+            have_last = True
+            last_id = str(last_d[0])
             retweet_link[str(_id)] = last_id
             if last_id not in have_dealed:
                 q.put(last_id)
+
+        if have_next and have_last:
+            print("我找到了！")
     conn.close()
 
     # 下一个！
@@ -186,24 +193,31 @@ def find_all_links(tweets_ids):
             # print(_id, _id in dealed)
             print(cnt, len(have_dealed), "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
+        have_next = False
+        have_last = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         have_dealed.add(str(_id))
         for next_d in c.fetchall():
+            have_next = True
             next_id = str(next_d[0])
-            retweet_link[str(next_id)] = str(_id)
+            retweet_link[next_id] = str(_id)
             if next_id not in have_dealed:
                 q.put(next_id)
 
         c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
         have_dealed.add(str(_id))
-        for next_d in c.fetchall():
-            last_id = str(next_d[0])
+        for last_d in c.fetchall():
+            have_last = True
+            last_id = str(last_d[0])
             retweet_link[str(_id)] = last_id
             if last_id not in have_dealed:
                 q.put(last_id)
+
+        if have_next and have_last:
+            print("我找到了！")
     conn.close()
 
-    json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
+    # json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
