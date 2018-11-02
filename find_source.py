@@ -109,7 +109,7 @@ def find_all_links(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             # print(_id, _id in dealed)
-            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+            print(cnt, have_dealed, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         have_dealed.add(_id)
@@ -138,7 +138,7 @@ def find_all_links(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             # print(_id, _id in dealed)
-            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+            print(cnt, have_dealed, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         have_dealed.add(_id)
@@ -167,7 +167,7 @@ def find_all_links(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             # print(_id, _id in dealed)
-            print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+            print(cnt, have_dealed, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         have_dealed.add(_id)
