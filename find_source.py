@@ -265,7 +265,7 @@ def get_tweets(tweets_ids):
                 what_the_fuck = True
 
         if not what_the_fuck:
-            c1.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+            c1.execute('''SELECT * FROM users WHERE user_id={};'''.format(new_d["user_id"]))
             d = c1.fetchone()
             if d:
                 col_name = [t[0] for t in c1.description]
@@ -274,7 +274,7 @@ def get_tweets(tweets_ids):
                     new_d[k] = v
 
             else:
-                c2.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+                c2.execute('''SELECT * FROM users WHERE user_id={};'''.format(new_d["user_id"]))
                 d = c2.fetchone()
                 if d:
                     new_d = {}
