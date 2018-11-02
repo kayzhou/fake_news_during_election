@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import queue
+from tqdm import tqdm
 
 
 def find_fake_tweets():
@@ -219,9 +220,84 @@ def find_all_links(tweets_ids):
 
     # json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
 
+def load_fake_news_source():
+    data = json.load(open("data/retweet_network_fake.json"))
+    sources = [v for v in data.values()]
+    return sources
+
+
+def get_tweets(tweets_ids):
+
+    tweet_data = {}
+
+    cnt = 0
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+    for _id in tweets_ids:
+        new_d = {}
+        if cnt % 2000 == 0:
+            print(cnt)
+        cnt += 1
+        c.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        d = c.fetchone()
+        if d:
+            col_name = [t[0] for t in c.description]
+            d = c.fetchone()
+            for k, v in zip(col_name, d):
+                new_d[k] = v
+
+            c.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+
+            col_name = [t[0] for t in c.description]
+            d = c.fetchone()
+            for k, v in zip(col_name, d):
+                new_d[k] = v
+            tweet_data[_id] = new_d
+
+    conn.close()
+
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov-db.sqlite")
+    c = conn.cursor()
+    for _id in tweets_ids:
+        new_d = {}
+        if cnt % 2000 == 0:
+            print(cnt)
+        cnt += 1
+        c.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        d = c.fetchone()
+        if d:
+            col_name = [t[0] for t in c.description]
+            d = c.fetchone()
+            for k, v in zip(col_name, d):
+                new_d[k] = v
+
+            c.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+
+            col_name = [t[0] for t in c.description]
+            d = c.fetchone()
+            for k, v in zip(col_name, d):
+                new_d[k] = v
+            tweet_data[_id] = new_d
+    conn.close()
+
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+    c = conn.cursor()
+    for _id in tqdm(tweets_ids):
+        c.execute("select * from urls where tweet_id={}".format(_id))
+        col_name = [t[0] for t in c.description]
+        d = c.fetchone()
+        for k, v in zip(col_name, d):
+            tweet_data[_id][k] = v
+
+
+    with open("source_tweets.txt", "w") as f:
+        for _id in tweets_ids:
+            line = json.dumps(tweet_data[_id], ensure_ascii=False)
+            f.write(line + "\n")
+
 
 if __name__ == "__main__":
-    t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
+    # t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
     # print(len(tweets_ids))
     # tweets_ids = load_all_nodes_v1()
     # find_retweets(tweets_ids, "data/retweet_network_2.txt")
@@ -234,4 +310,8 @@ if __name__ == "__main__":
 
     # union_retweet_line()
 
-    find_all_links(t_ids)
+    # ----------------~~~-------------------
+    # find_all_links(t_ids)
+
+    tids = load_fake_news_source()
+    get_tweets(tids)
