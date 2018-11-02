@@ -92,6 +92,7 @@ def union_retweet_line():
 
 
 def find_all_links(tweets_ids):
+    have_dealed = set()
     q = queue.Queue()
     for _id in tweets_ids:
         q.put(_id)
@@ -111,11 +112,12 @@ def find_all_links(tweets_ids):
             print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
             edge_cnt += 1
             retweet_link[int(next_id)] = _id
-            if next_id not in retweet_link:
+            if next_id not in have_dealed:
                 q.put(next_id)
                 print("终于变化了！", q.qsize())
     conn.close()
@@ -139,11 +141,12 @@ def find_all_links(tweets_ids):
             print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
             edge_cnt += 1
             retweet_link[int(next_id)] = _id
-            if next_id not in retweet_link:
+            if next_id not in have_dealed:
                 q.put(next_id)
                 print("终于变化了！", q.qsize())
     conn.close()
@@ -167,11 +170,12 @@ def find_all_links(tweets_ids):
             print(cnt, "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
 
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        have_dealed.add(_id)
         for next_d in c.fetchall():
             next_id = next_d[0]
             edge_cnt += 1
             retweet_link[int(next_id)] = _id
-            if next_id not in retweet_link:
+            if next_id not in have_dealed:
                 q.put(next_id)
                 print("终于变化了！", q.qsize())
     conn.close()
