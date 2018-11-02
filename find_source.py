@@ -231,53 +231,59 @@ def get_tweets(tweets_ids):
     tweet_data = {}
 
     cnt = 0
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    c = conn.cursor()
+    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov-db.sqlite")
+    c1 = conn1.cursor()
+    c2 = conn2.cursor()
+
     for _id in tweets_ids:
-        new_d = {}
+        what_the_fuck = False
         if cnt % 2000 == 0:
             print(cnt)
+        new_d = {}
         cnt += 1
-        c.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-        d = c.fetchone()
+
+        c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        d = c1.fetchone()
         if d:
-            col_name = [t[0] for t in c.description]
+            col_name = [t[0] for t in c1.description]
             # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
 
-            c.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+        else:
+            c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+            d = c2.fetchone()
+            if d:
+                new_d = {}
+                col_name = [t[0] for t in c1.description]
+                # print(d)
+                for k, v in zip(col_name, d):
+                    new_d[k] = v
+            else:
+                print("两个库里面都没有该tweet！", _id)
+                what_the_fuck = True
 
-            col_name = [t[0] for t in c.description]
-            d = c.fetchone()
-            for k, v in zip(col_name, d):
-                new_d[k] = v
-            tweet_data[_id] = new_d
+        if not what_the_fuck:
+            c1.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+            d = c1.fetchone()
+            if d:
+                col_name = [t[0] for t in c1.description]
+                # print(d)
+                for k, v in zip(col_name, d):
+                    new_d[k] = v
 
-    conn.close()
-
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov-db.sqlite")
-    c = conn.cursor()
-    for _id in tweets_ids:
-        new_d = {}
-        if cnt % 2000 == 0:
-            print(cnt)
-        cnt += 1
-        c.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-        d = c.fetchone()
-        if d:
-            col_name = [t[0] for t in c.description]
-            for k, v in zip(col_name, d):
-                new_d[k] = v
-
-            c.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
-
-            col_name = [t[0] for t in c.description]
-            d = c.fetchone()
-            for k, v in zip(col_name, d):
-                new_d[k] = v
-            tweet_data[_id] = new_d
-    conn.close()
+            else:
+                c2.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+                d = c2.fetchone()
+                if d:
+                    new_d = {}
+                    col_name = [t[0] for t in c1.description]
+                    # print(d)
+                    for k, v in zip(col_name, d):
+                        new_d[k] = v
+                else:
+                    print("两个库里面都没有该user！", new_d["user_id"])
 
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
