@@ -1,5 +1,5 @@
 import sqlite3
-import ujson as json
+import json
 import queue
 
 
@@ -146,7 +146,7 @@ def find_all_links(tweets_ids):
 
 
 if __name__ == "__main__":
-    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake.txt")])
+    t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
     # print(len(tweets_ids))
     # tweets_ids = load_all_nodes_v1()
     # find_retweets(tweets_ids, "data/retweet_network_2.txt")
