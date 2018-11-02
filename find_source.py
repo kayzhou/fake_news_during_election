@@ -281,8 +281,8 @@ def get_tweets(tweets_ids):
                     # print(d)
                     for k, v in zip(col_name, d):
                         new_d[k] = v
-                else:
-                    print("两个库里面都没有该user！", new_d["user_id"])
+                # else:
+                    # print("两个库里面都没有该user！", new_d["user_id"])
         tweet_data[_id] = new_d
 
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
@@ -291,8 +291,11 @@ def get_tweets(tweets_ids):
         c.execute("select * from urls where tweet_id={}".format(_id))
         col_name = [t[0] for t in c.description]
         d = c.fetchone()
-        for k, v in zip(col_name, d):
-            tweet_data[_id][k] = v
+        if d:
+            for k, v in zip(col_name, d):
+                tweet_data[_id][k] = v
+        else:
+            print("居然没有这条tweet的信息！", _id)
 
 
     with open("source_tweets.txt", "w") as f:
