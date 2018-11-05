@@ -334,6 +334,6 @@ if __name__ == "__main__":
     # get_tweets(tids)
 
     # 获取所有fake news相关的信息
-    # tids = load_fake_news()
+    tids = load_fake_news()
     print(len(tids))
-    get_tweets(tids)
+    # get_tweets(tids)
