@@ -55,7 +55,6 @@ def find_links(tweets_ids):
 
         have_next = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
-        have_dealed.add(str(_id))
         for next_d in c.fetchall():
             have_next = True
             next_id = str(next_d[0])
@@ -77,7 +76,6 @@ def find_links(tweets_ids):
 
         have_next = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
-        have_dealed.add(str(_id))
         for next_d in c.fetchall():
             have_next = True
             next_id = str(next_d[0])
