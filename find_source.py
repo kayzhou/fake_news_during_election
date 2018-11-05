@@ -226,6 +226,15 @@ def load_fake_news_source():
     return sources
 
 
+def load_fake_news():
+    fake_news = set()
+    data = json.load(open("data/retweet_network_fake.json"))
+    for k, v in data.items():
+        fake_news.add(k)
+        fake_news.add(v)
+    return list(fake_news)
+
+
 def get_tweets(tweets_ids):
 
     tweet_data = {}
@@ -261,7 +270,7 @@ def get_tweets(tweets_ids):
                 for k, v in zip(col_name, d):
                     new_d[k] = v
             else:
-                print("两个库里面都没有该tweet！~~~~~~~~~~~~~", _id)
+                print("两个库里面都没有该tweet？？", _id)
                 what_the_fuck = True
 
         if not what_the_fuck:
@@ -295,10 +304,10 @@ def get_tweets(tweets_ids):
             for k, v in zip(col_name, d):
                 tweet_data[_id][k] = v
         else:
-            print("居然没有这条tweet的信息！", _id)
+            print("居然没有这条tweet的信息！说明这条tweet并没有入库？", _id)
 
 
-    with open("source_tweets.txt", "w") as f:
+    with open("fake_news_tweets.txt", "w") as f:
         for _id in tweets_ids:
             line = json.dumps(tweet_data[_id], ensure_ascii=False)
             f.write(line + "\n")
@@ -321,5 +330,8 @@ if __name__ == "__main__":
     # ----------------~~~-------------------
     # find_all_links(t_ids)
 
-    tids = load_fake_news_source()
+    # tids = load_fake_news_source()
+    # get_tweets(tids)
+
+    tids = load_fake_news()
     get_tweets(tids)
