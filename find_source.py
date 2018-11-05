@@ -12,7 +12,7 @@ def find_fake_tweets():
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
 
-    with open("fake.txt", "w") as f:
+    with open("data/tweets_fake_news.txt", "w") as f:
         for i, d in enumerate(data):
             if i % 10000 == 0:
                 print(i, d)
@@ -189,21 +189,13 @@ def get_tweets(tweets_ids):
 
 
 if __name__ == "__main__":
+
+    # 找出所有fake_news
+    find_fake_tweets()
+
     t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake_news.txt")])
     print(len(t_ids))
-    # tweets_ids = load_all_nodes_v1()
     find_links(t_ids)
-
-    # union
-    # tweets_ids = load_all_nodes()
-    # with open("data/node-tid-fake-news.txt", "w") as f:
-    #     for tid in tweets_ids:
-    #         f.write(str(tid) + "\n")
-
-    # union_retweet_line()
-
-    # ----------------~~~-------------------
-    # find_all_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
