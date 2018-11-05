@@ -40,10 +40,7 @@ def load_all_nodes():
 
 
 def find_links(tweets_ids):
-    have_dealed = set()
-    q = queue.Queue()
-    for _id in tweets_ids:
-        q.put(_id)
+
     retweet_link = {}
 
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
@@ -51,11 +48,10 @@ def find_links(tweets_ids):
 
     cnt = 0
 
-    while not q.empty():
-        _id = q.get()
+    for _id in tweets_ids:
         cnt += 1
         if cnt % 50000 == 0:
-            print(cnt, len(have_dealed), "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+            print(cnt, "；边的数量：", len(retweet_link))
 
         have_next = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
@@ -64,9 +60,6 @@ def find_links(tweets_ids):
             have_next = True
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
-            if next_id not in have_dealed:
-                q.put(next_id)
-
     conn.close()
 
     # 下一个！
@@ -77,11 +70,10 @@ def find_links(tweets_ids):
     for _id in tweets_ids:
         q.put(_id)
 
-    while not q.empty():
-        _id = q.get()
+    for _id in tweets_ids:
         cnt += 1
         if cnt % 50000 == 0:
-            print(cnt, len(have_dealed), "；边的数量：", len(retweet_link), "；等待处理队列：", q.qsize())
+            print(cnt, "；边的数量：", len(retweet_link))
 
         have_next = False
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
@@ -90,9 +82,6 @@ def find_links(tweets_ids):
             have_next = True
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
-            if next_id not in have_dealed:
-                q.put(next_id)
-
     conn.close()
 
     json.dump(retweet_link, open("data/retweet_network_fake.json", "w"), ensure_ascii=False, indent=2)
@@ -203,9 +192,9 @@ def get_tweets(tweets_ids):
 
 if __name__ == "__main__":
     t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake_news.txt")])
-    print(len(tweets_ids))
+    print(len(t_ids))
     # tweets_ids = load_all_nodes_v1()
-    find_links(tweets_ids)
+    find_links(t_ids)
 
     # union
     # tweets_ids = load_all_nodes()
