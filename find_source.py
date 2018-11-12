@@ -128,6 +128,8 @@ def get_tweets(tweets_ids):
         cnt += 1
 
         c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+
         d = c1.fetchone()
         if d:
             col_name = [t[0] for t in c1.description]
@@ -137,6 +139,8 @@ def get_tweets(tweets_ids):
 
         else:
             c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+            c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+
             d = c2.fetchone()
             if d:
                 new_d = {}
