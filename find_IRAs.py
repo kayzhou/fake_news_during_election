@@ -68,7 +68,7 @@ def find_retweeted(_id):
             for k, v in zip(col_name, d):
                 new_d[k] = v
         else:
-            print("没有找到原创tweet", _id)
+            print("没有找到原创tweet (retweet)", _id)
 
     conn1.close()
     conn2.close()
@@ -78,4 +78,8 @@ def find_retweeted(_id):
 
 data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"])
 for row in data.iterrows():
-    print(row[0], row[1])
+    tweet = find_tweet(row[0])
+    if not tweet:
+        tweet = find_retweeted(row[0])
+    print(tweet)
+
