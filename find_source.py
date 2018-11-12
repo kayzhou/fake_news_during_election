@@ -1,3 +1,10 @@
+#-*- coding: utf-8 -*-
+
+"""
+Created on 2018-11-12 16:09:49
+@author: https://kayzhou.github.io/
+"""
+
 import sqlite3
 import json
 import queue
@@ -21,7 +28,7 @@ def find_fake_tweets():
                 json_d = json.dumps(json_d, ensure_ascii=False)
                 f.write(json_d + '\n')
 
-
+kkkk
 def load_all_nodes():
 
     tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
