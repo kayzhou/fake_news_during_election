@@ -40,8 +40,8 @@ def find_tweet(_id):
     if not new_d:
         new_d = find_retweeted(_id)
 
-    if not new_d:
-        print("找不到该tweet：", _id)
+    # if not new_d:
+    #     print("找不到该tweet：", _id)
 
     return new_d
 
@@ -69,8 +69,8 @@ def find_retweeted(_id):
             # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
-        else:
-            print("没有找到原创tweet (retweet)", _id)
+        # else:
+        #     print("没有找到原创tweet (retweet)", _id)
 
     conn1.close()
     conn2.close()
