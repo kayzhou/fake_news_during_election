@@ -7,6 +7,8 @@ Created on 2018-11-12 15:55:59
 
 import pandas as pd
 import sqlite3
+import json
+from tqdm import tqdm
 
 def find_tweet(_id):
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
@@ -76,10 +78,10 @@ def find_retweeted(_id):
     return new_d
 
 
-data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"])
-for row in data.iterrows():
-    tweet = find_tweet(row[0])
-    if not tweet:
-        tweet = find_retweeted(row[0])
-    print(tweet)
-
+with open("data/IRAs_be_found.json", "w") as f:
+    for i, row in tqdm(data.iterrows()):
+        tid = row["tweetid"]
+        tweet = find_tweet(tid)
+        if tweet:
+            # tweet["bingo"] = True
+            f.write(json.dumps(tweet, ensure_ascii=False) + "\n")
