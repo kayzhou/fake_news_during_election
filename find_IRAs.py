@@ -78,6 +78,8 @@ def find_retweeted(_id):
     return new_d
 
 
+data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"])
+
 with open("data/IRAs_be_found.json", "w") as f:
     for i, row in tqdm(data.iterrows()):
         tid = row["tweetid"]
