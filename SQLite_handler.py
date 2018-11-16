@@ -84,6 +84,7 @@ def get_hashtag_tweet_user():
 
     c1.execute('''SELECT * FROM hashtag_tweet_user''')
     cnt = 0
+    print(c1.fetchone())
     for d in c1.fetchall():
         print(d)
         cnt += 1
