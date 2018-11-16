@@ -78,17 +78,21 @@ def find_retweeted(_id):
 
 def get_hashtag_tweet_user():
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c1 = conn1.cursor()
-    c2 = conn2.cursor()
 
     c1.execute('''SELECT * FROM hashtag_tweet_user''')
+    col_name = [t[0] for t in c1.description]
+    print(col_name)
     cnt = 0
-    for d in c1.fetchall():
-        print(d)
-        cnt += 1
-        if cnt > 100:
-            break
+    print(c1.fetchone())
+    # for d in c1.fetchall():
+    #     print(d)
+    #     cnt += 1
+    #     if cnt > 100:
+    #         break
+
+    # conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    # c2 = conn2.cursor()
 
 
 if __name__ == "__main__":
