@@ -80,6 +80,13 @@ def get_hashtag_tweet_user():
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
 
+    '''
+    ['tweet_id', 'hashtag', 'user_id',
+     'ht_group', 'ht_group_filt', 'ht_group_labprop', 'ht_group_labprop_filt',
+     'ht_signi_initial', 'ht_signi_final', 'ht_signi_final_rnd09_1',
+     'ht_signi_final_rnd09_2', 'ht_signi_final_rnd09_3']
+    '''
+
     c1.execute('''SELECT * FROM hashtag_tweet_user''')
     col_name = [t[0] for t in c1.description]
     print(col_name)
