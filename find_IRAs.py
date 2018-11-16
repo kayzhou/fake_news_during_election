@@ -19,11 +19,11 @@ user_match ={}
 with open("data/IRAs_be_found.json", "w") as f:
     for i, row in tqdm(data.iterrows()):
         tid = row["tweetid"]
-        uid = int(row["userid"])
+        uid = str(row["userid"])
         tweet = find_tweet(tid)
         if tweet:
             f.write(json.dumps(tweet, ensure_ascii=False) + "\n")
-            real_uid = int(tweet["user_id"])
+            real_uid = str(tweet["user_id"])
             if uid != real_uid:
                 user_match[uid] = real_uid
 
