@@ -6,6 +6,7 @@ Created on 2018-11-16 09:03:07
 """
 
 import sqlite3
+from tqdm import tqdm
 
 
 def find_tweet(_id):
@@ -166,7 +167,9 @@ def find_source(_id):
 
 def get_hashtag_tweet_user():
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c1 = conn1.cursor()
+    c2 = conn2.cursor()
 
     '''
     ['tweet_id', 'hashtag', 'user_id',
@@ -175,16 +178,17 @@ def get_hashtag_tweet_user():
      'ht_signi_final_rnd09_2', 'ht_signi_final_rnd09_3']
     '''
 
-    c1.execute('''SELECT tweet_id, hashtag, user_id, ht_signi_fina FROM hashtag_tweet_user'''.format())
-    print(c1.fetchone())
-    # for d in c1.fetchall():
-    #     print(d)
-    #     cnt += 1
-    #     if cnt > 100:
-    #         break
+    with open("data/train.csv", "w") as f:
+        c1.execute('''SELECT tweet_id, hashtag, user_id, ht_signi_final FROM hashtag_tweet_user WHERE ht_signi_final is not null''')
+        for d in tqdm(c1.fetchall()):
+            f.write(",".join([str(v) for v in d]) + "\n")
 
-    # conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-    # c2 = conn2.cursor()
+        c2.execute('''SELECT tweet_id, hashtag, user_id, ht_signi_final FROM hashtag_tweet_user WHERE ht_signi_final is not null''')
+        for d in tqdm(c2.fetchall()):
+            f.write(",".join([str(v) for v in d]) + "\n")
+
+    conn1.close()
+    conn2.close()
 
 
 if __name__ == "__main__":
