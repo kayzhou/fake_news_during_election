@@ -175,10 +175,7 @@ def get_hashtag_tweet_user():
      'ht_signi_final_rnd09_2', 'ht_signi_final_rnd09_3']
     '''
 
-    c1.execute('''SELECT * FROM hashtag_tweet_user''')
-    col_name = [t[0] for t in c1.description]
-    print(col_name)
-    cnt = 0
+    c1.execute('''SELECT tweet_id, hashtag, user_id, ht_signi_fina FROM hashtag_tweet_user'''.format())
     print(c1.fetchone())
     # for d in c1.fetchall():
     #     print(d)
