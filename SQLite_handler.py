@@ -27,7 +27,7 @@ def find_tweet(_id):
         c2.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
         d = c2.fetchone()
         if d:
-            col_name = [t[0] for t in c1.description]
+            col_name = [t[0] for t in c2.description]
             # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
@@ -63,7 +63,7 @@ def find_retweeted(_id):
         c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
         d = c2.fetchone()
         if d:
-            col_name = [t[0] for t in c1.description]
+            col_name = [t[0] for t in c2.description]
             # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
