@@ -60,10 +60,9 @@ def find_links(tweets_ids):
         if cnt % 50000 == 0:
             print(cnt, "；边的数量：", len(retweet_link))
 
-        have_next = False
+        # 找到谁转发了我？
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
-            have_next = True
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
     conn.close()
@@ -81,10 +80,9 @@ def find_links(tweets_ids):
         if cnt % 50000 == 0:
             print(cnt, "；边的数量：", len(retweet_link))
 
-        have_next = False
+        # 找到谁转发了我？
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
-            have_next = True
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
     conn.close()
@@ -114,7 +112,6 @@ def load_fake_news_not_original():
         fake_news.add(k)
         fake_news.add(v)
     return list(fake_news)
-
 
 
 def get_tweets(tweets_ids):
@@ -202,7 +199,7 @@ def get_tweets(tweets_ids):
 if __name__ == "__main__":
 
     # 找出所有fake_news
-    find_fake_tweets()
+    # find_fake_tweets()
 
     t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake_news.txt")])
     print(len(t_ids))
