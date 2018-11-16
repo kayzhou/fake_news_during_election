@@ -53,13 +53,7 @@ def find_links(tweets_ids):
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
 
-    cnt = 0
-
     for _id in tqdm(tweets_ids):
-        cnt += 1
-        if cnt % 50000 == 0:
-            print(cnt, "；边的数量：", len(retweet_link))
-
         # 找到谁转发了我？
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
@@ -72,10 +66,6 @@ def find_links(tweets_ids):
     c = conn.cursor()
 
     for _id in tqdm(tweets_ids):
-        cnt += 1
-        if cnt % 50000 == 0:
-            print(cnt, "；边的数量：", len(retweet_link))
-
         # 找到谁转发了我？
         c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
