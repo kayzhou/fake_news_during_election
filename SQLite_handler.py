@@ -81,6 +81,8 @@ def get_hashtag_tweet_user():
     c1 = conn1.cursor()
 
     c1.execute('''SELECT * FROM hashtag_tweet_user''')
+    col_name = [t[0] for t in c1.description]
+    print(col_name)
     cnt = 0
     print(c1.fetchone())
     # for d in c1.fetchall():
