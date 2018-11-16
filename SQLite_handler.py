@@ -10,18 +10,18 @@ import sqlite3
 
 def find_tweet(_id):
     new_d = {}
-    
+
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
     c1.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
-    
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
             # print(d)
         for k, v in zip(col_name, d):
             new_d[k] = v
-    conn1.close()
+        conn1.close()
+        return new_d
 
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
@@ -38,12 +38,13 @@ def find_tweet(_id):
     if not new_d:
         new_d = find_retweeted(_id)
 
+
     return new_d
 
 
 def find_retweeted(_id):
     new_d = {}
-        
+
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
     c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
@@ -52,7 +53,6 @@ def find_retweeted(_id):
         col_name = [t[0] for t in c1.description]
         for k, v in zip(col_name, d):
             new_d[k] = v
-    conn1.close()
 
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
@@ -66,12 +66,13 @@ def find_retweeted(_id):
                 new_d[k] = v
         conn2.close()
 
+    conn1.close()
     return new_d
 
 
 def find_user(uid):
     new_d = {}
-        
+
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
     c1.execute('''SELECT * FROM user WHERE user_id={}'''.format(_id))
@@ -80,7 +81,7 @@ def find_user(uid):
         col_name = [t[0] for t in c1.description]
         for k, v in zip(col_name, d):
             new_d[k] = v
-    conn1.close()
+
 
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
@@ -94,9 +95,10 @@ def find_user(uid):
                 new_d[k] = v
         conn2.close()
 
+    conn1.close()
     return new_d
-    
-    
+
+
 def find_original_tweetid(_id):
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
@@ -122,11 +124,11 @@ def find_original_tweetid(_id):
                 new_d[k] = v
         else:
             print("没有转发关系！", _id)
-            
+
     conn1.close()
     conn2.close()
 
-    return new_d 
+    return new_d
 
 
 def find_source(_id):
@@ -152,13 +154,13 @@ def find_source(_id):
             # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
-    
+
     conn1.close()
     conn2.close()
-    
+
     if not new_d:
         print("找不到该source：", _id)
-        
+
     return new_d
 
 
