@@ -55,7 +55,7 @@ def find_links(tweets_ids):
 
     cnt = 0
 
-    for _id in tweets_ids:
+    for _id in tqdm(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             print(cnt, "；边的数量：", len(retweet_link))
@@ -71,11 +71,7 @@ def find_links(tweets_ids):
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c = conn.cursor()
 
-    q = queue.Queue()
-    for _id in tweets_ids:
-        q.put(_id)
-
-    for _id in tweets_ids:
+    for _id in tqdm(tweets_ids):
         cnt += 1
         if cnt % 50000 == 0:
             print(cnt, "；边的数量：", len(retweet_link))
@@ -202,7 +198,7 @@ if __name__ == "__main__":
     # find_fake_tweets()
 
     t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake_news.txt")])
-    print(len(t_ids))
+    # print(len(t_ids))
     find_links(t_ids)
 
     # tids = load_fake_news_source()
