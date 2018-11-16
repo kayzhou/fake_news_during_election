@@ -197,7 +197,7 @@ if __name__ == "__main__":
     # 找出所有fake_news
     # find_fake_tweets()
 
-    t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake_news.txt")])
+    t_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/tweets_fake.txt")])
     # print(len(t_ids))
     find_links(t_ids)
 
