@@ -166,6 +166,9 @@ def find_source(_id):
 
 
 def get_hashtag_tweet_user():
+    """
+    获取训练数据
+    """
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c1 = conn1.cursor()
