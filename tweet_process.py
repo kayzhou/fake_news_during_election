@@ -65,11 +65,11 @@ if __name__ == "__main__":
 
     for tid, opinion in tqdm(data_label.items()):
         line = find_tweet(tid)["text"].strip()
-        if tweet.startswith("RT "):
+        if line.startswith("RT "):
             continue
         tweet = tw.process_tweet(line)
 
-        if writen_line:
+        if tweet:
             if opinion == 1:
                 f1.write(" ".join(tweet) + "\n")
             if opinion == 0:
