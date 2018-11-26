@@ -111,3 +111,5 @@ report/
 *.dat
 *.csv
 alex/
+log/
+model/
