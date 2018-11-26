@@ -7,6 +7,7 @@ Created on 2018-11-16 09:03:07
 
 import sqlite3
 from tqdm import tqdm
+import pendulum
 
 
 def find_tweet(_id):
@@ -194,5 +195,69 @@ def get_hashtag_tweet_user():
     conn2.close()
 
 
+def create_db():
+    conn = sqlite3.connect("tweets.db")
+    c = conn.cursor()
+    c.execute("CREATE TABLE user (tweet_id INT, user_id INT PRIMARY KEY, info text)")
+    conn.commit()
+    conn.close()
+
+
+def get_user(user_id):
+    """
+    获取用户
+    """
+    conn = sqlite3.connect("tweets.db")
+    c = conn.cursor()
+    c.execute("SELECT tweet_id from user WHERE user_id={}".format(user_id))
+    d = c.fetchone()
+    conn.close()
+    # print(d)
+    if d:
+        return d[0]
+    else:
+        return 0
+
+
+def insert_user(tweet_id, user_id, info_json):
+    '''
+    插入用户
+    '''
+    conn = sqlite3.connect("tweets.db")
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO user VALUES (?, ?, ?)", (tweet_id, user_id, info_json))
+    except sqlite3.IntegrityError:
+        print('"{}" exists in the list.'.format(user_id))
+    conn.commit()
+    conn.close()
+
+
+def insert_many_users(user_list):
+    '''
+    插入用户
+    '''
+    conn = sqlite3.connect("tweets.db")
+    c = conn.cursor()
+    try:
+        c.executemany("INSERT INTO user VALUES (?, ?, ?)", user_list)
+    except sqlite3.IntegrityError:
+        print('"{}" exists in the list.'.format(user_id))
+    conn.commit()
+    conn.close()
+
+
+def update_user(tweet_id, user_id, info_json):
+    '''
+    更新用户
+    '''
+    conn = sqlite3.connect("tweets.db")
+    c = conn.cursor()
+    c.execute("UPDATE user SET tweet_id=?, info=? WHERE user_id=?", (tweet_id, info_json, user_id))
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
-    get_hashtag_tweet_user()
+    # get_hashtag_tweet_user()
+    create_db()
