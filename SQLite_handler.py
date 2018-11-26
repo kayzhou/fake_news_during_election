@@ -72,7 +72,7 @@ def find_retweeted(_id):
     return new_d
 
 
-def find_user(uid):
+def find_user(_id):
     new_d = {}
 
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
@@ -164,6 +164,25 @@ def find_source(_id):
         print("找不到该source：", _id)
 
     return new_d
+
+
+def get_class_proba(_id):
+    """
+    >= 0.5 支持希拉里
+    """
+    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c1 = conn1.cursor()
+    c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+    d = c1.fetchone()
+    return d[0]
+
+
+    else:
+        conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        c2 = conn2.cursor()
+        c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        d = c2.fetchone()
+        return d[0]
 
 
 def get_hashtag_tweet_user():
