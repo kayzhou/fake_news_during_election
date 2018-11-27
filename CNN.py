@@ -87,7 +87,7 @@ class Dataset:
     def _fill_buffer(self, size):
         # global cnt
 
-        if self._buff_count == 0:
+        if self._buff_count < 128:
             print("buffer空了，补充数据 ...")
             for line in self._file:
                 try:
@@ -118,13 +118,13 @@ class Dataset:
         # global cnt
         label_batch = []
         sequence_batch = []
+
         for label, sequence in self._buffer_iter:
             self._buff_count -= 1
             label_batch.append(label)
             sequence_batch.append(sequence)
             if len(label_batch) == self._batch_size:
                 break
-
 
         return {"sequences": np.array(sequence_batch), "labels": label_batch, }
 
@@ -197,7 +197,7 @@ def train():
                 probs, classes = model(sequences)
             except:
                 print(sequences.size(), labels.size())
-                exit(-1)
+                print("发生致命错误！")
 
             # Backpropagation
             optimizer.zero_grad()
