@@ -1,5 +1,6 @@
 # 向量化（vectorize）
 
+import sys
 from my_weapon import *
 from gensim.models import Word2Vec
 import word2vecReader
@@ -8,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import autograd, optim
 import logging
-logging.basicConfig(format="%(levelname)s\t%(asctime)s\t%(message)s", level=logging.INFO)
+logging.basicConfig(filename="log/train.log", format="%(levelname)s\t%(asctime)s\t%(message)s", level=logging.INFO)
 
 from tensorboardX import SummaryWriter
 from sklearn.metrics import classification_report
@@ -17,63 +18,59 @@ from sklearn.metrics import classification_report
 class Config:
     def __init__(self):
         self.train_file = "data/train_dataset.txt"
-        self.train_batch_size = 128
+        self.train_batch_size = 16
 
         self.learning_rate = 0.001
         self.window_size = 3
         self.num_classes = 2
 
-        self.num_epochs = 10
+        self.num_epochs = 3
         self.train_steps = None
 
-        self.summary_interval = 100
-
-# def read_wv1():
-#     print("Loading wv1 ...")
-#     return Word2Vec.load("model/word2vec.mod")
-
-# def read_wv2():
-#     print("Loading wv2 ...")
-#     return word2vecReader.Word2Vec.load_word2vec_format(
-#         "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
-
-# _wv1 = read_wv1()
-# _wv2 = read_wv2()
+        self.summary_interval = 1000
 
 
-# cnt = 0
+def read_wv1():
+    print("Loading wv1 ...")
+    return Word2Vec.load("model/word2vec.mod")
+    
+def read_wv2():
+    print("Loading wv2 ...")
+    return word2vecReader.Word2Vec.load_word2vec_format(
+        "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
 
 class Dataset:
     def __init__(self, filepath, batch_size):
         self._file = open(filepath)
-        # self._wv1 = _wv1
-        # self._wv2 = _wv2
+        self._batch_size = batch_size
+        self._count = 0
+        self._file_num = 1
         self._batch_size = batch_size
         self._reset()
 
-    # def wv1(self, line):
-    #     v = np.zeros(40 * 400).reshape(40, 400)
-    #     words = line.strip().split(" ")
-    #     _index = 0
-    #     for w in words:
-    #         if _index >= 40:
-    #             break
-    #         if w in self._wv1.wv:
-    #             v[_index] = self._wv1.wv[w]
-    #             _index += 1
-    #     return v
+    def wv1(self, line):
+        v = np.zeros(40 * 400).reshape(40, 400)
+        words = line.strip().split(" ")
+        _index = 0
+        for w in words:
+            if _index >= 40:
+                break
+            if w in self._wv1.wv:
+                v[_index] = self._wv1.wv[w]
+                _index += 1
+        return v
 
-    # def wv2(self, line):
-    #         v = np.zeros(40 * 400).reshape(40, 400)
-    #         words = line.strip().split(" ")
-    #         _index = 0
-    #         for w in words:
-    #             if _index >= 40:
-    #                 break
-    #             if w in self._wv2:
-    #                 v[_index] = self._wv2[w]
-    #                 _index += 1
-    #         return v
+    def wv2(self, line):
+            v = np.zeros(40 * 400).reshape(40, 400)
+            words = line.strip().split(" ")
+            _index = 0
+            for w in words:
+                if _index >= 40:
+                    break
+                if w in self._wv2:
+                    v[_index] = self._wv2[w]
+                    _index += 1
+            return v
 
     # 迭代时候每次先调用__iter__，初始化
     # 接着调用__next__返回数据
@@ -84,60 +81,75 @@ class Dataset:
         self._reset()
         return self
 
-    def _fill_buffer(self, size):
-        # global cnt
+    def _save(self):
+        self._wv1 = read_wv1()
+        self._wv2 = read_wv2()
+        self._reset()
+        count = 0
+        
+        labels = []
+        X = []
+        for line in self._file:
+            try:
+                label, sentence = line.strip().split("\t")
+            except ValueError:
+                continue
 
-        if self._buff_count < self._batch_size:
-            print("buffer空了，补充数据 ...")
-            for line in self._file:
-                try:
-                    label, sentence = line.strip().split("\t")
-                except ValueError:
-                    continue
-                label = int(label.strip())
-                # sequence1 = self.wv1(sentence)
-                # sequence2 = self.wv2(sentence)
+            label = int(label.strip())
+            sequence1 = self.wv1(sentence)
+            sequence2 = self.wv2(sentence)
+            labels.append(label)
+            X.append([sequence1, sequence2])
+            count += 1
+            if count % (self._batch_size * 100) == 0:
+                np.save("/media/alex/data/train_data/X_{}.npy".format(int(count /
+                self._batch_size / 100)), np.array(X))
+                np.save("/media/alex/data/train_data/Y_{}.npy".format(int(count /
+                self._batch_size / 100)), np.array(labels))
+                labels = []
+                X = []
+                print(count)
 
-                sequence1 = np.zeros(40 * 400).reshape(40, 400)
-                sequence2 = np.zeros(40 * 400).reshape(40, 400)
-                self._buff_count += 1
-                self._buffer.append((label, [sequence1, sequence2]))
-                ## 直到满足size
-
-                if self._buff_count >= size:
-                    break
-
-                # cnt += 1
-                # if cnt % 10000 == 0:
-                #    print(cnt)
+    def _fill_buffer(self):
+        if self._count == 0 and self._file_num <= 189:
+            self._buffer = []
+            # print("load file {} ...".format(self._file_num))
+            X = np.load("/media/alex/data/train_data/X_{}.npy".format(self._file_num))
+            Y = np.load("/media/alex/data/train_data/Y_{}.npy".format(self._file_num))
+            self._file_num += 1
+            self._count += Y.shape[0] 
+            for i in range(Y.shape[0]):
+                self._buffer.append((Y[i], X[i]))
             self._buffer_iter = iter(self._buffer)
+            # print("loading finished.")
 
     def __next__(self):
-        self._fill_buffer(self._batch_size * 1000) # 每次读1024个batch作为buffer
-
-        if self._buff_count == 0: # After filling, still empty, stop iter!
+        self._fill_buffer() # 每次读1024个batch作为buffer
+        if self._count == 0: # After filling, still empty, stop iter!
             raise StopIteration
 
-        # global cnt
         label_batch = []
         sequence_batch = []
 
         for label, sequence in self._buffer_iter:
-            self._buff_count -= 1
+            self._count -= 1
             label_batch.append(label)
             sequence_batch.append(sequence)
             if len(label_batch) == self._batch_size:
                 break
-
-        return {"sequences": np.array(sequence_batch), "labels": label_batch, }
+        return {"sequences": torch.Tensor(sequence_batch), "labels": torch.LongTensor(label_batch)}    
 
     def _reset(self):
-        self._file.seek(0)
+        self._buffer = None 
+        self._count = 0
+        self._file_num = 1
         self._buffer = []
         self._buffer_iter = None
-        self._buff_count = 0
 
-    def get_testdata(self):
+    def save_testdata(self):
+        self._wv1 = read_wv1()
+        self._wv2 = read_wv2()
+
         labels = []
         sequences = []
         for line in open("data/0-test.txt"):
@@ -146,7 +158,11 @@ class Dataset:
         for line in open("data/1-test.txt"):
             labels.append(1)
             sequences.append([self.wv1(line), self.wv2(line)])
-        return torch.LongTensor(labels), torch.Tensor(sequences)
+        np.save("/media/alex/data/train_data/X_test.npy", np.array(sequences))
+        np.save("/media/alex/data/train_data/Y_test.npy", np.array(labels))
+
+    def get_testdata(self):
+        return {"sequences": torch.Tensor(np.load("/media/alex/data/train_data/X_test.npy")), "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}    
 
 
 class CNNClassifier(nn.Module):
@@ -177,7 +193,7 @@ class CNNClassifier(nn.Module):
         return probs, classes
 
 
-def train():
+def train(model, train_set, test_set):
 
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -192,8 +208,8 @@ def train():
         running_losses = []
         for batch in train_set:
 
-            sequences = torch.Tensor(batch["sequences"])
-            labels = torch.LongTensor(batch["labels"])
+            sequences = batch["sequences"]
+            labels = batch["labels"]
 
             # Predict
             try:
@@ -207,7 +223,7 @@ def train():
             losses = loss_function(probs, labels)
             losses.backward()
             optimizer.step()
-
+            
             # Log summary
             running_losses.append(losses.data.item())
             if step % config.summary_interval == 0:
@@ -219,17 +235,23 @@ def train():
             step += 1
 
         # Classification report
+        test_X = test_set["sequences"]
+        test_labels = test_set["labels"]
         probs, y_pred = model(test_X)
         target_names = ['pro-hillary', 'pro-trump']
-        print(classification_report(test_labels, y_pred, target_names=target_names))
+        logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names))
+
+        # Save
+        torch.save(model, "model-epoch-{}.pkl".format(epoch))
 
         epoch += 1
+        
 
 config = Config()
-train_set = Dataset(config.train_file, config.train_batch_size)
-test_labels, test_X = train_set.get_testdata()
 
-model = CNNClassifier()
-train()
-
+if __name__ == "__main__":
+    train_set = Dataset(config.train_file, config.train_batch_size)
+    test_set = train_set.get_testdata() 
+    model = CNNClassifier()
+    train(model, train_set, test_set)
 
