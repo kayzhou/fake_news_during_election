@@ -87,7 +87,7 @@ class Dataset:
     def _fill_buffer(self, size):
         # global cnt
 
-        if self._buff_count < 128:
+        if self._buff_count < self._batch_size:
             print("buffer空了，补充数据 ...")
             for line in self._file:
                 try:
