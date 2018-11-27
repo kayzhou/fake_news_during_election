@@ -30,14 +30,7 @@ class Config:
         self.summary_interval = 1000
 
 
-def read_wv1():
-    print("Loading wv1 ...")
-    return Word2Vec.load("model/word2vec.mod")
-    
-def read_wv2():
-    print("Loading wv2 ...")
-    return word2vecReader.Word2Vec.load_word2vec_format(
-        "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
+
 
 class Dataset:
     def __init__(self, filepath, batch_size):
@@ -47,6 +40,15 @@ class Dataset:
         self._file_num = 1
         self._batch_size = batch_size
         self._reset()
+
+    def read_wv1():
+        print("Loading wv1 ...")
+        return Word2Vec.load("model/word2vec.mod")
+
+    def read_wv2():
+        print("Loading wv2 ...")
+        return word2vecReader.Word2Vec.load_word2vec_format(
+            "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
 
     def wv1(self, line):
         v = np.zeros(40 * 400).reshape(40, 400)
@@ -86,7 +88,7 @@ class Dataset:
         self._wv2 = read_wv2()
         self._reset()
         count = 0
-        
+
         labels = []
         X = []
         for line in self._file:
@@ -117,7 +119,7 @@ class Dataset:
             X = np.load("/media/alex/data/train_data/X_{}.npy".format(self._file_num))
             Y = np.load("/media/alex/data/train_data/Y_{}.npy".format(self._file_num))
             self._file_num += 1
-            self._count += Y.shape[0] 
+            self._count += Y.shape[0]
             for i in range(Y.shape[0]):
                 self._buffer.append((Y[i], X[i]))
             self._buffer_iter = iter(self._buffer)
@@ -137,10 +139,10 @@ class Dataset:
             sequence_batch.append(sequence)
             if len(label_batch) == self._batch_size:
                 break
-        return {"sequences": torch.Tensor(sequence_batch), "labels": torch.LongTensor(label_batch)}    
+        return {"sequences": torch.Tensor(sequence_batch), "labels": torch.LongTensor(label_batch)}
 
     def _reset(self):
-        self._buffer = None 
+        self._buffer = None
         self._count = 0
         self._file_num = 1
         self._buffer = []
@@ -162,7 +164,7 @@ class Dataset:
         np.save("/media/alex/data/train_data/Y_test.npy", np.array(labels))
 
     def get_testdata(self):
-        return {"sequences": torch.Tensor(np.load("/media/alex/data/train_data/X_test.npy")), "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}    
+        return {"sequences": torch.Tensor(np.load("/media/alex/data/train_data/X_test.npy")), "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}
 
 
 class CNNClassifier(nn.Module):
@@ -223,7 +225,7 @@ def train(model, train_set, test_set):
             losses = loss_function(probs, labels)
             losses.backward()
             optimizer.step()
-            
+
             # Log summary
             running_losses.append(losses.data.item())
             if step % config.summary_interval == 0:
@@ -239,19 +241,19 @@ def train(model, train_set, test_set):
         test_labels = test_set["labels"]
         probs, y_pred = model(test_X)
         target_names = ['pro-hillary', 'pro-trump']
-        logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names))
+        logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names)))
 
         # Save
         torch.save(model, "model-epoch-{}.pkl".format(epoch))
 
         epoch += 1
-        
+
 
 config = Config()
 
 if __name__ == "__main__":
     train_set = Dataset(config.train_file, config.train_batch_size)
-    test_set = train_set.get_testdata() 
+    test_set = train_set.get_testdata()
     model = CNNClassifier()
     train(model, train_set, test_set)
 
