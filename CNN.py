@@ -28,17 +28,17 @@ class Config:
 
         self.summary_interval = 100
 
-def read_wv1():
-    print("Loading wv1 ...")
-    return Word2Vec.load("model/word2vec.mod")
+# def read_wv1():
+#     print("Loading wv1 ...")
+#     return Word2Vec.load("model/word2vec.mod")
 
-def read_wv2():
-    print("Loading wv2 ...")
-    return word2vecReader.Word2Vec.load_word2vec_format(
-        "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
+# def read_wv2():
+#     print("Loading wv2 ...")
+#     return word2vecReader.Word2Vec.load_word2vec_format(
+#         "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
 
-_wv1 = read_wv1()
-_wv2 = read_wv2()
+# _wv1 = read_wv1()
+# _wv2 = read_wv2()
 
 
 # cnt = 0
@@ -46,34 +46,34 @@ _wv2 = read_wv2()
 class Dataset:
     def __init__(self, filepath, batch_size):
         self._file = open(filepath)
-        self._wv1 = _wv1
-        self._wv2 = _wv2
+        # self._wv1 = _wv1
+        # self._wv2 = _wv2
         self._batch_size = batch_size
         self._reset()
 
-    def wv1(self, line):
-        v = np.zeros(40 * 400).reshape(40, 400)
-        words = line.strip().split(" ")
-        _index = 0
-        for w in words:
-            if _index >= 40:
-                break
-            if w in self._wv1.wv:
-                v[_index] = self._wv1.wv[w]
-                _index += 1
-        return v
+    # def wv1(self, line):
+    #     v = np.zeros(40 * 400).reshape(40, 400)
+    #     words = line.strip().split(" ")
+    #     _index = 0
+    #     for w in words:
+    #         if _index >= 40:
+    #             break
+    #         if w in self._wv1.wv:
+    #             v[_index] = self._wv1.wv[w]
+    #             _index += 1
+    #     return v
 
-    def wv2(self, line):
-            v = np.zeros(40 * 400).reshape(40, 400)
-            words = line.strip().split(" ")
-            _index = 0
-            for w in words:
-                if _index >= 40:
-                    break
-                if w in self._wv2:
-                    v[_index] = self._wv2[w]
-                    _index += 1
-            return v
+    # def wv2(self, line):
+    #         v = np.zeros(40 * 400).reshape(40, 400)
+    #         words = line.strip().split(" ")
+    #         _index = 0
+    #         for w in words:
+    #             if _index >= 40:
+    #                 break
+    #             if w in self._wv2:
+    #                 v[_index] = self._wv2[w]
+    #                 _index += 1
+    #         return v
 
     # 迭代时候每次先调用__iter__，初始化
     # 接着调用__next__返回数据
@@ -95,8 +95,11 @@ class Dataset:
                 except ValueError:
                     continue
                 label = int(label.strip())
-                sequence1 = self.wv1(sentence)
-                sequence2 = self.wv2(sentence)
+                # sequence1 = self.wv1(sentence)
+                # sequence2 = self.wv2(sentence)
+
+                sequence1 = np.zeros(40 * 400).reshape(40, 400)
+                sequence2 = np.zeros(40 * 400).reshape(40, 400)
                 self._buff_count += 1
                 self._buffer.append((label, [sequence1, sequence2]))
                 ## 直到满足size
