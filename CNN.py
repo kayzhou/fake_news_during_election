@@ -18,27 +18,27 @@ class Config:
     def __init__(self):
         self.train_file = "data/train_dataset.txt"
         self.train_batch_size = 128
-        
+
         self.learning_rate = 0.001
         self.window_size = 3
         self.num_classes = 2
-        
+
         self.num_epochs = 10
         self.train_steps = None
-        
+
         self.summary_interval = 100
 
 def read_wv1():
     print("Loading wv1 ...")
     return Word2Vec.load("model/word2vec.mod")
-        
+
 def read_wv2():
     print("Loading wv2 ...")
     return word2vecReader.Word2Vec.load_word2vec_format(
         "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
-    
-%time _wv1 = read_wv1()
-%time _wv2 = read_wv2()
+
+_wv1 = read_wv1()
+_wv2 = read_wv2()
 
 
 # cnt = 0
@@ -50,7 +50,7 @@ class Dataset:
         self._wv2 = _wv2
         self._batch_size = batch_size
         self._reset()
-        
+
     def wv1(self, line):
         v = np.zeros(40 * 400).reshape(40, 400)
         words = line.strip().split(" ")
@@ -83,7 +83,7 @@ class Dataset:
     def __iter__(self):
         self._reset()
         return self
-    
+
     def _fill_buffer(self, size):
         # global cnt
 
@@ -100,21 +100,21 @@ class Dataset:
                 self._buff_count += 1
                 self._buffer.append((label, [sequence1, sequence2]))
                 ## 直到满足size
-                
+
                 if self._buff_count >= size:
                     break
-                    
+
                 # cnt += 1
                 # if cnt % 10000 == 0:
                 #    print(cnt)
             self._buffer_iter = iter(self._buffer)
-    
+
     def __next__(self):
         self._fill_buffer(self._batch_size * 1000) # 每次读1024个batch作为buffer
-        
+
         if self._buff_count == 0: # After filling, still empty, stop iter!
             raise StopIteration
-                
+
         # global cnt
         label_batch = []
         sequence_batch = []
@@ -133,7 +133,7 @@ class Dataset:
         self._buffer = []
         self._buffer_iter = None
         self._buff_count = 0
-        
+
     def get_testdata(self):
         labels = []
         sequences = []
@@ -145,13 +145,13 @@ class Dataset:
             sequences.append([self.wv1(line), self.wv2(line)])
         return torch.LongTensor(labels), torch.Tensor(sequences)
 
-    
+
 class CNNClassifier(nn.Module):
     def __init__(self):
         super(CNNClassifier, self).__init__()
 
         # 2 in- channels, 32 out- channels, 3 * 400 windows size
-        self.conv = torch.nn.Conv2d(2, 64, kernel_size=(3, 400), groups=2) 
+        self.conv = torch.nn.Conv2d(2, 64, kernel_size=(3, 400), groups=2)
         self.f1 = nn.Linear(1216, 64)
         self.f2 = nn.Linear(64, 32)
         self.f3 = nn.Linear(32, 2)
@@ -166,14 +166,12 @@ class CNNClassifier(nn.Module):
         out = F.relu(self.f2(out))
         out = self.f3(out)
         # print(out.size())
-        
+
         probs = F.softmax(out, dim=1)
         # print(probs)
         classes = torch.max(probs, 1)[1]
 
         return probs, classes
-    
-
 
 
 def train():
@@ -182,7 +180,7 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
     writer = SummaryWriter(log_dir="log")
-    
+
     epoch = 0
     step = 0
 
@@ -214,21 +212,21 @@ def train():
                 writer.add_scalar("train/loss", loss, step)
                 logging.info("step = {}, loss = {}".format(step, loss))
                 running_losses = []
-            
+
             step += 1
-        
+
         # Classification report
         probs, y_pred = model(test_X)
         target_names = ['pro-hillary', 'pro-trump']
         print(classification_report(test_labels, y_pred, target_names=target_names))
 
         epoch += 1
-        
-model = CNNClassifier()
-train()
-    
-train_set = Dataset(config.train_file, config.train_batch_size)
-%time test_labels, test_X = train_set.get_testdata()
-
 
 config = Config()
+train_set = Dataset(config.train_file, config.train_batch_size)
+test_labels, test_X = train_set.get_testdata()
+
+model = CNNClassifier()
+train()
+
+
