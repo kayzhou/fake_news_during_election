@@ -18,18 +18,16 @@ from sklearn.metrics import classification_report
 class Config:
     def __init__(self):
         self.train_file = "data/train_dataset.txt"
-        self.train_batch_size = 16
+        self.train_batch_size = 64
 
-        self.learning_rate = 0.001
+        self.learning_rate = 0.0001
         self.window_size = 3
         self.num_classes = 2
 
-        self.num_epochs = 3
+        self.num_epochs = 5
         self.train_steps = None
 
         self.summary_interval = 1000
-
-
 
 
 class Dataset:
@@ -173,9 +171,10 @@ class CNNClassifier(nn.Module):
 
         # 2 in- channels, 32 out- channels, 3 * 400 windows size
         self.conv = torch.nn.Conv2d(2, 64, kernel_size=(3, 400), groups=2)
-        self.f1 = nn.Linear(1216, 64)
-        self.f2 = nn.Linear(64, 32)
-        self.f3 = nn.Linear(32, 2)
+        self.f1 = nn.Linear(1216, 128)
+        self.f2 = nn.Linear(128, 64)
+        self.f3 = nn.Linear(64, 32)
+        self.f4 = nn.Linear(32, 2)
 
     def forward(self, x):
         out = self.conv(x)
@@ -185,7 +184,8 @@ class CNNClassifier(nn.Module):
         out = out.view(-1, 2 * 32 * 19) # 9 is after pooling
         out = F.relu(self.f1(out))
         out = F.relu(self.f2(out))
-        out = self.f3(out)
+        out = F.relu(self.f3(out))
+        out = F.relu(self.f4(out))
         # print(out.size())
 
         probs = F.softmax(out, dim=1)

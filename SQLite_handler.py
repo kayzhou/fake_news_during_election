@@ -171,23 +171,27 @@ def get_class_proba(_id):
     >= 0.5 支持希拉里
     """
     
+    re = -1
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
     c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
     d = c1.fetchone()
-    
+    conn1.close()
     if d:
-        return d[0]
+        re = d[0]
 
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
         c2 = conn2.cursor()
         c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
         d = c2.fetchone()
+        conn2.close()
         if d:
-            return d[0]
-        else:
-            return -1
+            re = d[0]
+        conn2.close()
+    
+    conn1.close()
+    return re
 
 
 def get_hashtag_tweet_user():
