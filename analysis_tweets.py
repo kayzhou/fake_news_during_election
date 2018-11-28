@@ -6,8 +6,9 @@ import json
 import sys, traceback
 import multiprocessing
 import time
+from unshortenit import UnshortenIt
 
-# short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
+short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
 
 
@@ -41,21 +42,21 @@ def task(_ids):
     #             # pass
     #             traceback.print_exc(file=sys.stdout)
     #             # print(i, e)
+
+    unshortener = UnshortenIt()
     for d in _ids:
+        # print("input", d)
         if d['short']:
-            try:
-                res = requests.head(d['url'])
-                hostname = urlparse(res.headers.get('location')).hostname
-                d['hostname'] = hostname
-            except:
-                d['error'] = 1
-            time.sleep(0.1)
-        print(json.dumps(d, ensure_ascii=False))
+            url = unshortener.unshorten(d["url"])
+            d["real_url"] = url
+            hostname = urlparse(url).hostname
+            d['hostname'] = hostname
+        print(json.dumps(d, ensure_ascii=False) + "\n\n")
 
 
 def keep_url():
     # tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', usecols=['urls', 'tweetid'])
-    # # tweets['hostname'] = -1
+    # tweets['hostname'] = -1
     # print(len(tweets))
 
 
@@ -71,14 +72,15 @@ def keep_url():
 
     dict_id_host = []
     cnt = 0
-    for line in open('id_host-20181021.txt'):
+    for line in open('data/id_host-20181021.txt'):
         _id, url, hostname = line.strip().split('\t')
-        if len(url) <= 30 and len(hostname) <= 10:
+        if len(hostname) <= 10:
             cnt += 1
             d = {
                 'id': _id,
                 'url': url,
                 'hostname': hostname,
+                'real_url': url,
                 'short': True
             }
         else:
@@ -86,11 +88,11 @@ def keep_url():
                 'id': _id,
                 'url': url,
                 'hostname': hostname,
+                'real_url': url,
                 'short': False
             }
         dict_id_host.append(d)
-
-    # print(cnt); exit(0)
+    task(dict_id_host)
 
     task_cnt = 10
     step = int(len(dict_id_host) / task_cnt)
@@ -131,7 +133,7 @@ def temp():
             if line != ' ':
                 # print(i, line)
                 ids.add(json.loads(line.strip())['id'])
- 
+
     dict_id_host = []
     for line in open('id_host-20181021.txt'):
         _id, url, hostname = line.strip().split('\t')
@@ -154,7 +156,7 @@ def temp():
         dict_id_host.append(d)
     print(len(dict_id_host))
     """
-    
+
     """
     dict_id_host = []
     for line in open("id_host_short.txt"):
@@ -208,7 +210,7 @@ def build_retweet_network():
 
 
 if __name__ == "__main__":
-    # keep_url()
-    temp()
+    keep_url()
+    # temp()
     # build_retweet_network()
 
