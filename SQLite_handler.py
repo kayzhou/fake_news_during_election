@@ -166,11 +166,49 @@ def find_source(_id):
     return new_d
 
 
+def opinion(_id):
+    """
+    1 是支持trump
+    """
+
+    def get_class_proba(_id):
+        """
+        >= 0.5 支持希拉里
+        """
+
+        re = -1
+        conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+        c1 = conn1.cursor()
+        c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        d = c1.fetchone()
+        if d:
+            re = d[0]
+
+        else:
+            conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+            c2 = conn2.cursor()
+            c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+            d = c2.fetchone()
+            if d:
+                re = d[0]
+            conn2.close()
+
+        conn1.close()
+        return re
+
+    v = get_class_proba(_id)
+    if v == -1:
+        print("LOST tweet: ", _id)
+        exit(-1)
+        return -1
+    return 1 if v < 0.5 else 0
+
+
 def get_class_proba(_id):
     """
     >= 0.5 支持希拉里
     """
-    
+
     re = -1
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
@@ -189,7 +227,7 @@ def get_class_proba(_id):
         if d:
             re = d[0]
         conn2.close()
-    
+
     conn1.close()
     return re
 
