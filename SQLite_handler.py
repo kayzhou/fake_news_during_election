@@ -181,6 +181,7 @@ def opinion(_id):
         c1 = conn1.cursor()
         c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
         d = c1.fetchone()
+        # print(d)
         if d:
             re = d[0]
 
@@ -189,6 +190,7 @@ def opinion(_id):
             c2 = conn2.cursor()
             c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
             d = c2.fetchone()
+            # print(d)
             if d:
                 re = d[0]
             conn2.close()
@@ -198,38 +200,10 @@ def opinion(_id):
 
     v = get_class_proba(_id)
     if v == -1:
-        print("LOST tweet: ", _id)
-        exit(-1)
+        # print("LOST tweet: ", _id)
+        # exit(-1)
         return -1
     return 1 if v < 0.5 else 0
-
-
-def get_class_proba(_id):
-    """
-    >= 0.5 支持希拉里
-    """
-
-    re = -1
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    c1 = conn1.cursor()
-    c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
-    d = c1.fetchone()
-    conn1.close()
-    if d:
-        re = d[0]
-
-    else:
-        conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-        c2 = conn2.cursor()
-        c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
-        d = c2.fetchone()
-        conn2.close()
-        if d:
-            re = d[0]
-        conn2.close()
-
-    conn1.close()
-    return re
 
 
 def get_hashtag_tweet_user():
@@ -326,4 +300,6 @@ def update_user(tweet_id, user_id, info_json):
 
 if __name__ == "__main__":
     # get_hashtag_tweet_user()
-    create_db()
+    # create_db()
+    print(find_tweet("742417158429233152"))
+    opinion("742417158429233152")
