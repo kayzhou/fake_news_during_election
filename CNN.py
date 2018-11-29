@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import autograd, optim
 import logging
-logging.basicConfig(filename="log/train.log", format="%(levelname)s\t%(asctime)s\t%(message)s", level=logging.INFO)
+logging.basicConfig(filename="log/train-11302018.log", format="%(levelname)s\t%(asctime)s\t%(message)s", level=logging.INFO)
 
 from tensorboardX import SummaryWriter
 from sklearn.metrics import classification_report
@@ -18,13 +18,13 @@ from sklearn.metrics import classification_report
 class Config:
     def __init__(self):
         self.train_file = "data/train_dataset.txt"
-        self.train_batch_size = 64
+        self.train_batch_size = 128
 
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.001
         self.window_size = 3
         self.num_classes = 2
 
-        self.num_epochs = 5
+        self.num_epochs = 10
         self.train_steps = None
 
         self.summary_interval = 1000
@@ -244,7 +244,7 @@ def train(model, train_set, test_set):
         logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names)))
 
         # Save
-        torch.save(model, "model-epoch-{}.pkl".format(epoch))
+        torch.save(model, "model/11292018-model-epoch-{}.pkl".format(epoch))
 
         epoch += 1
 

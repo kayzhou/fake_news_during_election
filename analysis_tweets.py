@@ -47,11 +47,14 @@ def task(_ids):
     for d in _ids:
         # print("input", d)
         if d['short']:
-            url = unshortener.unshorten(d["url"])
-            d["real_url"] = url
-            hostname = urlparse(url).hostname
-            d['hostname'] = hostname
-        print(json.dumps(d, ensure_ascii=False) + "\n\n")
+            try:
+                url = unshortener.unshorten(d["url"])
+                d["real_url"] = url
+                hostname = urlparse(url).hostname
+                d['hostname'] = hostname
+            except Exception as e:
+                d['error'] = True
+        print(json.dumps(d, ensure_ascii=False) + "-!over!-")
 
 
 def keep_url():
@@ -94,7 +97,7 @@ def keep_url():
         dict_id_host.append(d)
     task(dict_id_host)
 
-    task_cnt = 10
+    task_cnt = 5
     step = int(len(dict_id_host) / task_cnt)
     for i in range(task_cnt):
         if i == task_cnt - 1:
