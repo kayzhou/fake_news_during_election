@@ -11,38 +11,40 @@ from unshortenit import UnshortenIt
 short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
 
+def get_urls():
+    tweets = pd.read_csv('data/ira.csv', nrows=100)
+    tweets["2016-06-01 00:00" <= tweet["tweet_time"] < "2016-11-09 00:00"]
+    tweets['']
+    print(len(tweets))
+    for i, row in tweets.iterrows():
+        # print(i, row, type(row), row['urls'], type(row['urls']))
+        if not isinstance(row['urls'], str):
+            # tweets.drop(i, inplace=True)
+            pass
+        elif row['urls'][1: -1] == '':
+            # tweets.drop(i, inplace=True)
+            pass
+        else:
+            try:
+                url = row['urls'][1: -1]
+                hostname = urlparse(url).hostname
+                # short url
+                if len(hostname) <= 7:
+                    res = requests.head(url)
+                    hostname = urlparse(res.headers.get('location')).hostname
+                if hostname:
+                    # print(i, hostname)
+                    tweets['hostname'] = hostname
+                    print(i, url, hostname, sep='\t')
+                # else:
+                #     tweets.drop(i, inplace=True)
+            except Exception as e:
+                # pass
+                traceback.print_exc(file=sys.stdout)
+                # print(i, e)
+
 
 def task(_ids):
-    # tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', usecols=['urls', 'tweetid'], nrows=100)
-    # # tweets['hostname'] = -1
-    # print(len(tweets))
-    # for i, row in tweets.iterrows():
-    #     # print(i, row, type(row), row['urls'], type(row['urls']))
-    #     if not isinstance(row['urls'], str):
-    #         # tweets.drop(i, inplace=True)
-    #         pass
-    #     elif row['urls'][1: -1] == '':
-    #         # tweets.drop(i, inplace=True)
-    #         pass
-    #     else:
-    #         try:
-    #             url = row['urls'][1: -1]
-    #             hostname = urlparse(url).hostname
-    #             # short url
-    #             if len(hostname) <= 7:
-    #                 res = requests.head(url)
-    #                 hostname = urlparse(res.headers.get('location')).hostname
-    #             if hostname:
-    #                 # print(i, hostname)
-    #                 tweets['hostname'] = hostname
-    #                 print(i, url, hostname, sep='\t')
-    #             # else:
-    #             #     tweets.drop(i, inplace=True)
-    #         except Exception as e:
-    #             # pass
-    #             traceback.print_exc(file=sys.stdout)
-    #             # print(i, e)
-
     unshortener = UnshortenIt()
     for d in _ids:
         # print("input", d)
@@ -213,7 +215,8 @@ def build_retweet_network():
 
 
 if __name__ == "__main__":
-    keep_url()
+    get_urls()
+    # keep_url()
     # temp()
     # build_retweet_network()
 
