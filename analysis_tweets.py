@@ -13,8 +13,6 @@ short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.
 
 def get_urls():
     tweets = pd.read_csv('data/ira.csv', nrows=100)
-    tweets["2016-06-01 00:00" <= tweet["tweet_time"] < "2016-11-09 00:00"]
-    tweets['']
     print(len(tweets))
     for i, row in tweets.iterrows():
         # print(i, row, type(row), row['urls'], type(row['urls']))
@@ -28,16 +26,7 @@ def get_urls():
             try:
                 url = row['urls'][1: -1]
                 hostname = urlparse(url).hostname
-                # short url
-                if len(hostname) <= 7:
-                    res = requests.head(url)
-                    hostname = urlparse(res.headers.get('location')).hostname
-                if hostname:
-                    # print(i, hostname)
-                    tweets['hostname'] = hostname
-                    print(i, url, hostname, sep='\t')
-                # else:
-                #     tweets.drop(i, inplace=True)
+                print(i, url, hostname, sep='\t')
             except Exception as e:
                 # pass
                 traceback.print_exc(file=sys.stdout)
