@@ -101,6 +101,18 @@ def find_user(_id):
     return new_d
 
 
+def find_user_info(_id):
+    conn1 = sqlite3.connect("/media/alex/data/election_data/users.db")
+    c1 = conn1.cursor()
+    c1.execute('''SELECT info FROM user WHERE user_id={}'''.format(_id))
+    d = c1.fetchone()
+    conn1.close()
+    if d:
+        return json.loads(d[0])
+    else:
+        {}
+
+
 def find_original_tweetid(_id):
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
