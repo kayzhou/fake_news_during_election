@@ -12,7 +12,7 @@ short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.
 
 
 def get_urls():
-    tweets = pd.read_csv('data/ira.csv', nrows=100)
+    tweets = pd.read_csv('data/ira-tweets-jun-nov.csv', nrows=100)
     print(len(tweets))
     for i, row in tweets.iterrows():
         # print(i, row, type(row), row['urls'], type(row['urls']))
