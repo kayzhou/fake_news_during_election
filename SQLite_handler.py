@@ -8,6 +8,7 @@ Created on 2018-11-16 09:03:07
 import sqlite3
 from tqdm import tqdm
 import pendulum
+import json
 
 
 def find_tweet(_id):

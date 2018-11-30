@@ -12,7 +12,7 @@ short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.
 
 
 def get_urls():
-    tweets = pd.read_csv('data/ira-tweets-jun-nov.csv', nrows=100)
+    tweets = pd.read_csv('data/ira-tweets-jun-nov.csv')
     print(len(tweets))
     for i, row in tweets.iterrows():
         # print(i, row, type(row), row['urls'], type(row['urls']))
@@ -26,7 +26,7 @@ def get_urls():
             try:
                 url = row['urls'][1: -1]
                 hostname = urlparse(url).hostname
-                print(i, url, hostname, sep='\t')
+                print(i, row["tweetid"], url, hostname, sep='\t')
             except Exception as e:
                 # pass
                 traceback.print_exc(file=sys.stdout)
@@ -49,29 +49,15 @@ def task(_ids):
 
 
 def keep_url():
-    # tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', usecols=['urls', 'tweetid'])
-    # tweets['hostname'] = -1
-    # print(len(tweets))
-
-
-    # for i, row in tweets.iterrows():
-    #     if not isinstance(row['urls'], str):
-    #         continue
-    #     elif row['urls'][1: -1] == '':
-    #         continue
-    #     else:
-    #         url = row['urls'][1: -1]
-    #         hostname = urlparse(url).hostname
-    #         print(i, url, hostname, sep='\t')
-
     dict_id_host = []
     cnt = 0
-    for line in open('data/id_host-20181021.txt'):
-        _id, url, hostname = line.strip().split('\t')
+    for line in open('data/id_url_hostname.csv'):
+        _id, tweetid, url, hostname = line.strip().split('\t')
         if len(hostname) <= 10:
             cnt += 1
             d = {
                 'id': _id,
+                'tweetid': tweetid,
                 'url': url,
                 'hostname': hostname,
                 'real_url': url,
@@ -81,6 +67,7 @@ def keep_url():
             d = {
                 'id': _id,
                 'url': url,
+                'tweetid': tweetid,
                 'hostname': hostname,
                 'real_url': url,
                 'short': False
@@ -204,8 +191,8 @@ def build_retweet_network():
 
 
 if __name__ == "__main__":
-    get_urls()
-    # keep_url()
+    # get_urls()
+    keep_url()
     # temp()
     # build_retweet_network()
 
