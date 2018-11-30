@@ -12,7 +12,7 @@ short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.
 
 
 def get_urls():
-    tweets = pd.read_csv('data/ira-tweets-jun-nov.csv')
+    tweets = pd.read_csv('data/ira-tweets.csv')
     print(len(tweets))
     for i, row in tweets.iterrows():
         # print(i, row, type(row), row['urls'], type(row['urls']))
@@ -191,8 +191,8 @@ def build_retweet_network():
 
 
 if __name__ == "__main__":
-    # get_urls()
-    keep_url()
+    get_urls()
+    # keep_url()
     # temp()
     # build_retweet_network()
 
