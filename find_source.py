@@ -16,23 +16,23 @@ def get_fake_host_label():
     c = conn.cursor()
     c.execute('''SELECT * FROM hosts_fake''')
     for d in c.fetchall():
-        print(d)
+        print(d[1].lower())
 
 
 def find_fake_tweets():
-    host_label = json.load(open('data/host_label.json'))
+    fake_hostnames = set([line.strip() for line in open("data/fake_hostname.txt")])
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
 
-    with open("data/tweets_fake_news.txt", "w") as f:
+    with open("data/fake_tweets.json", "w") as f:
         for i, d in enumerate(data):
             if i % 10000 == 0:
                 print(i, d)
-            hostname =
-            if d[8] in host_label and host_label[d[8]] == "fake":
+            hostname = d[8].lower()
+            if hostname in fake_hostnames:
                 json_d = {k: v for k, v in zip(col_names, d)}
                 json_d = json.dumps(json_d, ensure_ascii=False)
                 f.write(json_d + '\n')
@@ -209,10 +209,10 @@ def get_tweets(tweets_ids):
 if __name__ == "__main__":
 
     # 找出所有的fake_hostname
-    get_fake_host_label()
+    # get_fake_host_label()
 
     # 找出所有fake_news
-    # find_fake_tweets()
+    find_fake_tweets()
 
     # t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets.json")])
     # print(len(t_ids))
