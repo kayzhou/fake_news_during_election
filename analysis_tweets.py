@@ -191,8 +191,8 @@ def build_retweet_network():
 
 
 if __name__ == "__main__":
-    get_urls()
-    # keep_url()
+    # get_urls()
+    keep_url()
     # temp()
     # build_retweet_network()
 
