@@ -173,7 +173,6 @@ def temp():
     print(cnt)
 
 
-
 def build_retweet_network():
     # userid_id = {}
     # users = pd.read_csv('data/ira_users_csv_hashed.csv')

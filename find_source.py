@@ -11,6 +11,14 @@ import queue
 from tqdm import tqdm
 
 
+def get_fake_host_label():
+    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+    c = conn.cursor()
+    c.execute('''SELECT * FROM hosts_fake''')
+    for d in c.fetchall():
+        print(d)
+
+
 def find_fake_tweets():
     host_label = json.load(open('data/host_label.json'))
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
@@ -23,6 +31,7 @@ def find_fake_tweets():
         for i, d in enumerate(data):
             if i % 10000 == 0:
                 print(i, d)
+            hostname =
             if d[8] in host_label and host_label[d[8]] == "fake":
                 json_d = {k: v for k, v in zip(col_names, d)}
                 json_d = json.dumps(json_d, ensure_ascii=False)
@@ -199,12 +208,15 @@ def get_tweets(tweets_ids):
 
 if __name__ == "__main__":
 
+    # 找出所有的fake_hostname
+    get_fake_host_label()
+
     # 找出所有fake_news
     # find_fake_tweets()
 
-    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets.json")])
-    print(len(t_ids))
-    find_links(t_ids)
+    # t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets.json")])
+    # print(len(t_ids))
+    # find_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
