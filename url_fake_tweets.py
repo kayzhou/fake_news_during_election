@@ -54,7 +54,7 @@ class URL_TWEET:
                     "URL": d["real_url"].lower(),
                     "hostname": d["hostname"].lower()
                 }
-                self.url_tweets[str(d["tweet_id"])] = tweet
+                self.url_tweets[str(d["tweetid"])] = tweet
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
