@@ -7,6 +7,7 @@ import sys, traceback
 import multiprocessing
 import time
 from unshortenit import UnshortenIt
+from tqdm import tqdm
 
 short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
@@ -35,17 +36,19 @@ def get_urls():
 
 def task(_ids):
     unshortener = UnshortenIt()
-    for d in _ids:
-        # print("input", d)
-        if d['short']:
-            try:
-                url = unshortener.unshorten(d["url"])
-                d["real_url"] = url
-                hostname = urlparse(url).hostname
-                d['hostname'] = hostname
-            except Exception as e:
-                d['error'] = True
-        print(json.dumps(d, ensure_ascii=False) + "-!over!-")
+
+    with open("IRA-final-url.json", "w") as f:
+        for d in tqdm(_ids):
+            # print("input", d)
+            if d['short']:
+                try:
+                    url = unshortener.unshorten(d["url"])
+                    d["real_url"] = url
+                    hostname = urlparse(url).hostname
+                    d['hostname'] = hostname
+                except Exception as e:
+                    d['error'] = True
+            f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 
 def keep_url():
@@ -75,6 +78,7 @@ def keep_url():
         dict_id_host.append(d)
     task(dict_id_host)
 
+    """
     task_cnt = 5
     step = int(len(dict_id_host) / task_cnt)
     for i in range(task_cnt):
@@ -84,7 +88,7 @@ def keep_url():
             _ids = dict_id_host[i * step: (i + 1) * step]
         t = multiprocessing.Process(target=task, args=(_ids,))
         t.start()
-
+    """
 
 def temp():
     """

@@ -114,3 +114,4 @@ alex/
 log/
 model/
 *.pkl
+*.json
