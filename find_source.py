@@ -7,12 +7,14 @@ Created on 2018-11-12 16:09:49
 
 import sqlite3
 import json
-import queue
+# import queue
+import pandas as pd
 from tqdm import tqdm
 
 
 def get_fake_host_label():
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM hosts_fake''')
     for d in c.fetchall():
@@ -21,17 +23,19 @@ def get_fake_host_label():
 
 def find_fake_tweets():
     # Geroge
-    fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"] ])
+    fake_hostnames = set([k.lower() for k, v in json.load(
+        open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"]])
 
     # Alex
     # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
-    # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
+    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
 
     print(len(fake_hostnames))
 
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
     col_names = [t[0] for t in c.description]
@@ -57,7 +61,8 @@ def find_IRA_fake_tweets():
                             # if v[1] == "LOW" or v[1] == "VERY LOW" ])
 
     # Alex
-    fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
+    fake_hostnames = set([line.strip().lower()
+                          for line in open("data/fake_hostname.txt")])
 
     # Mine
     # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
@@ -75,7 +80,8 @@ def find_IRA_fake_tweets():
 
 
 def load_all_nodes():
-    tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
+    tweets_ids = set([int(json.loads(line.strip())["tweet_id"])
+                      for line in open("data/fake.txt")])
     print(len(tweets_ids))
     for line in open("data/retweet_network_1.txt"):
         n1, n2 = line.strip().split("\t")
@@ -94,12 +100,14 @@ def find_links(tweets_ids):
 
     retweet_link = {}
 
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
 
     for _id in tqdm(tweets_ids):
         # 找到谁转发了我？
-        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        c.execute(
+            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
@@ -113,12 +121,14 @@ def find_links(tweets_ids):
     conn.close()
 
     # 下一个！
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c = conn.cursor()
 
     for _id in tqdm(tweets_ids):
         # 找到谁转发了我？
-        c.execute('''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+        c.execute(
+            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
         for next_d in c.fetchall():
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
@@ -131,8 +141,17 @@ def find_links(tweets_ids):
 
     conn.close()
 
+    data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "retweet_tweetid"], dtype=str)
+    for i, row in data_ira.iterrow():
+        tid, re_tid = row
+        if re_tid in tweets_ids:
+           retweet_link[next_id] = str(re_tid)
 
-    json.dump(retweet_link, open("data/fake_retweet_network.json", "w"), ensure_ascii=False, indent=2)
+
+
+
+    json.dump(retweet_link, open("data/fake_retweet_network.json",
+                                 "w"), ensure_ascii=False, indent=2)
 
 
 def load_fake_news_source():
@@ -164,8 +183,10 @@ def get_tweets(tweets_ids):
     tweet_data = {}
 
     cnt = 0
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn2 = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -176,8 +197,10 @@ def get_tweets(tweets_ids):
         new_d = {}
         cnt += 1
 
-        c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-        c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        c1.execute(
+            '''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        c1.execute(
+            '''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
 
         d = c1.fetchone()
         if d:
@@ -187,8 +210,10 @@ def get_tweets(tweets_ids):
                 new_d[k] = v
 
         else:
-            c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-            c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+            c2.execute(
+                '''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+            c2.execute(
+                '''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
 
             d = c2.fetchone()
             if d:
@@ -202,7 +227,8 @@ def get_tweets(tweets_ids):
                 what_the_fuck = True
 
         if not what_the_fuck:
-            c1.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+            c1.execute(
+                '''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
             d = c1.fetchone()
             if d:
                 col_name = [t[0] for t in c1.description]
@@ -211,7 +237,8 @@ def get_tweets(tweets_ids):
                     new_d[k] = v
 
             else:
-                c2.execute('''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
+                c2.execute(
+                    '''SELECT * FROM user WHERE user_id={};'''.format(new_d["user_id"]))
                 d = c2.fetchone()
                 if d:
                     col_name = [t[0] for t in c1.description]
@@ -222,7 +249,8 @@ def get_tweets(tweets_ids):
                     # print("两个库里面都没有该user！", new_d["user_id"])
         tweet_data[_id] = new_d
 
-    conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     for _id in tqdm(tweets_ids):
         c.execute("select * from urls where tweet_id={}".format(_id))
@@ -233,7 +261,6 @@ def get_tweets(tweets_ids):
                 tweet_data[_id][k] = v
         else:
             print("居然没有这条tweet的信息！说明这条tweet并没有入库？", _id)
-
 
     with open("fake_news_tweets.txt", "w") as f:
         for _id in tweets_ids:
