@@ -88,7 +88,7 @@ class URL_TWEET:
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
 
-                self.url_tweets[str(d["tweet_id"])] = tweet
+                self.url_tweets[tweetid] = tweet
 
             # 原来就有，而且原来推特就是fake news
             elif tweetid in self.url_tweets and origin_tweetdid in self.url_tweets:
