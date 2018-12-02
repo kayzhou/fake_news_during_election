@@ -284,8 +284,7 @@ if __name__ == "__main__":
     t_ids = t_ids | ira_t_ids
     print(len(t_ids))
 
-    # print(len(t_ids))
-    # find_links(t_ids)
+    find_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
