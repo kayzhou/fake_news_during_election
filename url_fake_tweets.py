@@ -78,7 +78,7 @@ class URL_TWEET:
                 self.url_tweets[str(d["tweet_id"])] = tweet
 
             # 原来就有，而且原来推特就是fake news
-            elif tweetid in self.url_tweets:
+            elif tweetid in self.url_tweets and origin_tweetdid in self.url_tweet:
                 self.url_tweets[tweetid].update({
                         "is_first": False,
                         "is_source": False,
