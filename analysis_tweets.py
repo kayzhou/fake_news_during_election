@@ -37,11 +37,13 @@ def get_urls():
 def task(_ids):
     unshortener = UnshortenIt()
 
-    with open("IRA-final-url.json", "w") as f:
+    with open("IRA-final-url-v3.json", "w") as f:
         for d in tqdm(_ids):
             # print("input", d)
-            if d['short']:
+            # if d['short']:
+            if "error" in d and d["error"]:
                 try:
+                    d["error"] = False
                     url = unshortener.unshorten(d["url"])
                     d["real_url"] = url
                     hostname = urlparse(url).hostname
@@ -49,6 +51,14 @@ def task(_ids):
                 except Exception as e:
                     d['error'] = True
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
+
+
+def again():
+    dict_id_host = []
+    for line in open("IRA-final-url-v2.json"):
+        d = json.loads(line.strip())
+        dict_id_host.append(d)
+    task(dict_id_host)
 
 
 def keep_url():
@@ -195,7 +205,8 @@ def build_retweet_network():
 
 if __name__ == "__main__":
     # get_urls()
-    keep_url()
+    # keep_url()
+    again()
     # temp()
     # build_retweet_network()
 
