@@ -147,7 +147,7 @@ def find_links(tweets_ids):
         tid = row["tweetid"]
         re_tid = row["retweet_tweetid"]
 
-        if re_tid in tweets_ids or tid in tweet_ids:
+        if re_tid in tweets_ids or tid in tweets_ids:
             retweet_link[tid] = re_tid
             cnt += 1
 

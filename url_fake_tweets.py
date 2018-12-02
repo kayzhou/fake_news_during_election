@@ -61,7 +61,7 @@ class URL_TWEET:
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
 
             # 新扩展进来的
-            if tweetid not in self.url_tweets:
+            if tweetid not in self.url_tweets and origin_tweetdid in self.url_tweets:
                 d = find_tweet(tweetid)
                 tweet = {
                     "tweet_id": str(d["tweet_id"]),
@@ -84,16 +84,17 @@ class URL_TWEET:
                         "hostname": "[retweet]:" + origin_tweetdid
                 })
 
-            # else: # 我需要看你转发前是不是fake news，如果不是的话，我就不要了！
-            #     # 这个情况很特殊，转发了别人的信息，然后附带了fake news URL，需要特别处理；这里不考虑
-            #     del self.url_tweets[tweetid]
-
-            # 需要最后处理，如果不是source但是本身is_retweet是True，则不要！
+            else: # 我需要看你转发前是不是fake news，如果不是的话，我就不要了！
+                  # 这个情况很特殊，转发了别人的信息，然后附带了fake news URL，需要特别处理；这里不考虑
+                del self.url_tweets[tweetid]
 
         # 什么是source？没有转发别人的！
         for url, values in self.url_tweets.items():
             if self.url_tweets[url]["is_source"] == -1:
                 self.url_tweets[url]["is_source"] = True
+
+
+    def fill_IRA_info()
 
 
 
