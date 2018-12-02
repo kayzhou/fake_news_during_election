@@ -63,9 +63,9 @@ def find_IRA_fake_tweets():
 
     print(len(fake_hostnames))
 
-    for line in open("data/IRA-final-url-v3.json"):
-        d = json.loads(line.strip())
-        with open("IRA_fake_tweets.json", "w") as f:
+    with open("IRA_fake_tweets.json", "w") as f:
+        for line in open("data/IRA-final-url-v3.json"):
+            d = json.loads(line.strip())
             hostname = d["hostname"].lower()
             # print(hostname)
             if hostname in fake_hostnames:
