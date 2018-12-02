@@ -114,7 +114,7 @@ class URL_TWEET:
         IRA_match = json.load(open("data/IRA_match.json"))
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"])
         for i, row in IRA_info.iterrows():
-            uid = row["user_id"]
+            uid = row["userid"]
             if uid in IRA_match:
                 uid = IRA_match[uid]
             if row["tweetid"] in self.url_tweets:
