@@ -53,10 +53,11 @@ def find_fake_tweets():
 
 def find_IRA_fake_tweets():
     # Geroge
-    fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"] ])
+    # fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items()
+                            # if v[1] == "LOW" or v[1] == "VERY LOW" ])
 
     # Alex
-    # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
+    fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
     # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
