@@ -82,10 +82,10 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        last_id = c.fetchone()
-        if last_id:
-            retweet_link[str(_id)] = str(last_id[0])
+        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        # last_id = c.fetchone()
+        # if last_id:
+        #     retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
@@ -101,10 +101,10 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        last_id = c.fetchone()
-        if last_id:
-            retweet_link[str(_id)] = str(last_id[0])
+        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        # last_id = c.fetchone()
+        # if last_id:
+        #     retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
@@ -224,11 +224,11 @@ if __name__ == "__main__":
     # get_fake_host_label()
 
     # 找出所有fake_news
-    find_fake_tweets()
+    # find_fake_tweets()
 
-    # t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets.json")])
-    # print(len(t_ids))
-    # find_links(t_ids)
+    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets_mbfc.json")])
+    print(len(t_ids))
+    find_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
