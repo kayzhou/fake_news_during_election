@@ -217,7 +217,7 @@ def find_IRA_real_name():
         if len(uid) < 60 or uid in users_mapping:
             continue
 
-        c.execute("SELECT user_id FROM user_tweetid WHERE tweet_id=? LIMIT 1", tid)
+        c.execute("SELECT user_id FROM user_tweetid WHERE tweet_id='{}' LIMIT 1".format(tid))
         d = c.fetchone()
         if d:
             users_mapping[uid] = str(d[0])

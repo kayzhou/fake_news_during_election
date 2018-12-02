@@ -13,7 +13,7 @@ class URL_TWEET:
     1. 根据URL获取传播fake news的tweets；(fake-tweets.json)
     2. 若转发了之上tweets，则添加到url_tweets中；(属于key则说明是转发推特，retweet_network_fake.json)
     3. 将IRAs数据中的存在于选举时间且包括相关关键词的数据筛选出，若URL为fake news则添加到url_tweets中；IRAs = True
-    4. 若IRAs数据中转发了智商tweets，则添加到url_tweets中；IRA = True
+    4. 若IRAs数据中转发了以上的tweets，则添加到url_tweets中；IRA = True
     5. 整理数据结构，URL为key；
     6. url_tweets中tweets按时间排序；
 
@@ -24,23 +24,38 @@ class URL_TWEET:
         # self.set_tweets = set()
 
     def fill_url_tweets(self):
-        for line in tqdm(open("data/fake_tweets_mbfc.json")):
+        for line in tqdm(open("data/fake_tweets.json")):
             d = json.loads(line)
-            if "final_url" in d:
+            tweet = {
+                "tweet_id": str(d["tweet_id"]),
+                "user_id": str(d["user_id"]),
+                "dt": d["datetime_EST"],
+                "is_first": -1,
+                "is_source": -1,
+                "is_IRA": -1,
+                "URL": d["final_url"].lower(),
+                "hostname": d["final_hostname"].lower()
+            }
+            self.url_tweets[str(d["tweet_id"])] = tweet
+
+        for line in tqdm(open("data/IRA_fake_tweets.json")):
+            d = json.loads(line)
+            if d["tweetid"] in self.url_tweets:
+                self.url_tweets[d["tweetid"]]["is_IRA"] = True
+            else:
                 tweet = {
-                    "tweet_id": str(d["tweet_id"]),
-                    "user_id": str(d["user_id"]),
-                    "dt": d["datetime_EST"],
+                    "tweet_id": str(d["tweetid"]),
+                    "user_id": -1,
+                    "dt": -1,
                     "is_first": -1,
                     "is_source": -1,
-                    "is_IRA": -1,
-                    "URL": d["final_url"].lower(),
-                    "hostname": d["final_hostname"].lower()
+                    "is_IRA": True,
+                    "URL": d["real_url"].lower(),
+                    "hostname": d["hostname"].lower()
                 }
                 self.url_tweets[str(d["tweet_id"])] = tweet
 
-
-    def file_retweets(self):
+    def fill_retweets(self):
         fake_retweets_links = json.load(open("data/fake_retweet_network.json"))
         for tweet_id, retweetd_id in tqdm(fake_retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
@@ -72,6 +87,8 @@ class URL_TWEET:
             # else: # 我需要看你转发前是不是fake news，如果不是的话，我就不要了！
             #     # 这个情况很特殊，转发了别人的信息，然后附带了fake news URL，需要特别处理；这里不考虑
             #     del self.url_tweets[tweetid]
+
+            # 需要最后处理，如果不是source但是本身is_retweet是True，则不要！
 
         # 什么是source？没有转发别人的！
         for url, values in self.url_tweets.items():

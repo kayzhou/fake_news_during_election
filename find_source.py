@@ -112,10 +112,10 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        # last_id = c.fetchone()
-        # if last_id:
-        #     retweet_link[str(_id)] = str(last_id[0])
+        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        last_id = c.fetchone()
+        if last_id:
+            retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
@@ -133,20 +133,24 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        # last_id = c.fetchone()
-        # if last_id:
-        #     retweet_link[str(_id)] = str(last_id[0])
+        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        last_id = c.fetchone()
+        if last_id:
+            retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
     cnt = 0
     data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "retweet_tweetid"], dtype=str)
+    data_ira = data_ira.dropna()
     for i, row in data_ira.iterrows():
-        tid, re_tid = row
-        if re_tid in tweets_ids:
-           retweet_link[next_id] = str(re_tid)
-           cnt += 1
+        tid = row["tweetid"]
+        re_tid = row["retweet_tweetid"]
+
+        if re_tid in tweets_ids or tid in tweet_ids:
+            retweet_link[tid] = re_tid
+            cnt += 1
+
     print("IRA -> ", cnt)
 
     json.dump(retweet_link, open("data/fake_retweet_network.json",
@@ -279,7 +283,7 @@ if __name__ == "__main__":
     # 获取转发关系
     t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
     print(len(t_ids))
-    ira_t_ids = set([json.loads(line.strip())["tweetid"] for line in open("data/IRA_fake_tweets.json")])
+    ira_t_ids = set(str([json.loads(line.strip())["tweetid"]) for line in open("data/IRA_fake_tweets.json")])
     print(len(ira_t_ids))
     t_ids = t_ids | ira_t_ids
     print(len(t_ids))
