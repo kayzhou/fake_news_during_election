@@ -23,14 +23,14 @@ def get_fake_host_label():
 
 def find_fake_tweets():
     # Geroge
-    fake_hostnames = set([k.lower() for k, v in json.load(
-        open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"]])
+    # fake_hostnames = set([k.lower() for k, v in json.load(
+    #     open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"]])
 
     # Alex
     # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
-    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
+    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
 
     print(len(fake_hostnames))
 
@@ -41,7 +41,7 @@ def find_fake_tweets():
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
     cnt = 0
-    with open("fake_tweets_alex.json", "w") as f:
+    with open("fake_tweets_mine.json", "w") as f:
         for d in data:
             if cnt % 500000 == 0:
                 print(cnt)
@@ -57,19 +57,18 @@ def find_fake_tweets():
 
 def find_IRA_fake_tweets():
     # Geroge
-    # fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items()
-                            # if v[1] == "LOW" or v[1] == "VERY LOW" ])
+    # fake_hostnames = set([k.lower() for k, v in json.load(
+    #     open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"]])
 
     # Alex
-    fake_hostnames = set([line.strip().lower()
-                          for line in open("data/fake_hostname.txt")])
+    # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
-    # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
+    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
 
     print(len(fake_hostnames))
 
-    with open("IRA_fake_tweets.json", "w") as f:
+    with open("IRA_fake_tweets_mine.json", "w") as f:
         for line in open("data/IRA-final-url-v3.json"):
             d = json.loads(line.strip())
             hostname = d["hostname"].lower()
@@ -274,7 +273,7 @@ if __name__ == "__main__":
     # get_fake_host_label()
 
     # 找出所有fake_news
-    # find_fake_tweets()
+    find_fake_tweets()
     find_IRA_fake_tweets()
 
     # 获取转发关系
