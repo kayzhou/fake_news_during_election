@@ -277,7 +277,7 @@ if __name__ == "__main__":
     # find_IRA_fake_tweets()
 
     # 获取转发关系
-    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets.json")])
+    t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
     print(len(t_ids))
     ira_t_ids = set([json.loads(line.strip())["tweetid"] for line in open("data/IRA_fake_tweets.json")])
     print(len(ira_t_ids))
