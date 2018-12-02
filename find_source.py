@@ -30,7 +30,7 @@ def find_fake_tweets():
     # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
-    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
+    fake_hostnames = set([k.lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
 
     print(len(fake_hostnames))
 
@@ -64,7 +64,7 @@ def find_IRA_fake_tweets():
     # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
-    fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
+    fake_hostnames = set([k.lower() for k, v in json.load(open("data/my_hostnames.json")).items() if v == "fake"])
 
     print(len(fake_hostnames))
 
