@@ -51,6 +51,28 @@ def find_fake_tweets():
                     f.write(json_d + '\n')
 
 
+def find_IRA_fake_tweets():
+    # Geroge
+    fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"] ])
+
+    # Alex
+    # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
+
+    # Mine
+    # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
+
+    print(len(fake_hostnames))
+
+    for line in open("data/IRA-final-url-v3.json"):
+        d = json.loads(line.strip())
+        with open("IRA_fake_tweets.json", "w") as f:
+            hostname = d["hostname"].lower()
+            # print(hostname)
+            if hostname in fake_hostnames:
+                json_d = json.dumps(d, ensure_ascii=False)
+                f.write(json_d + '\n')
+
+
 def load_all_nodes():
     tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
     print(len(tweets_ids))
@@ -225,10 +247,12 @@ if __name__ == "__main__":
 
     # 找出所有fake_news
     # find_fake_tweets()
+    find_IRA_fake_tweets()
 
-    t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets_mbfc.json")])
-    print(len(t_ids))
-    find_links(t_ids)
+    # 获取转发关系
+    # t_ids = set([json.loads(line.strip())["tweet_id"] for line in open("data/fake_tweets_mbfc.json")])
+    # print(len(t_ids))
+    # find_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
