@@ -140,14 +140,14 @@ def find_links(tweets_ids):
 
     conn.close()
 
+    cnt = 0
     data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "retweet_tweetid"], dtype=str)
     for i, row in data_ira.iterrow():
         tid, re_tid = row
         if re_tid in tweets_ids:
            retweet_link[next_id] = str(re_tid)
-
-
-
+           cnt += 1
+    print("IRA -> ", cnt)
 
     json.dump(retweet_link, open("data/fake_retweet_network.json",
                                  "w"), ensure_ascii=False, indent=2)
