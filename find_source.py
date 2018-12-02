@@ -20,7 +20,7 @@ def get_fake_host_label():
 
 
 def find_fake_tweets():
-    fake_hostnames = set([line.strip() for line in open("data/fake_hostname.txt")])
+    fake_hostnames = [line.strip() for line in open("data/fake_hostname.txt")]
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
