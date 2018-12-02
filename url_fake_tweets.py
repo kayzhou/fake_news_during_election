@@ -24,6 +24,7 @@ class URL_TWEET:
         # self.set_tweets = set()
 
     def fill_url_tweets(self):
+        print("原始数据处理中 ...")
         for line in tqdm(open("data/fake_tweets.json")):
             d = json.loads(line)
             tweet = {
@@ -56,6 +57,7 @@ class URL_TWEET:
                 self.url_tweets[str(d["tweet_id"])] = tweet
 
     def fill_retweets(self):
+        print("扩展转发处理中 ...")
         fake_retweets_links = json.load(open("data/fake_retweet_network.json"))
         for tweet_id, retweetd_id in tqdm(fake_retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
@@ -70,8 +72,8 @@ class URL_TWEET:
                     "is_first": False,
                     "is_source": False,
                     "is_IRA": -1,
-                    "URL": "[retweet]:" + origin_tweetdid,
-                    "hostname": "[retweet]:" + origin_tweetdid
+                    "URL": self.url_tweets[origin_tweetdid]["URL"],
+                    "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                 }
                 self.url_tweets[str(d["tweet_id"])] = tweet
 
@@ -80,8 +82,8 @@ class URL_TWEET:
                 self.url_tweets["tweetid"].update({
                         "is_first": False,
                         "is_source": False,
-                        "URL": "[retweet]:" + origin_tweetdid,
-                        "hostname": "[retweet]:" + origin_tweetdid
+                        "URL": self.url_tweets[origin_tweetdid]["URL"],
+                        "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                 })
 
             else: # 我需要看你转发前是不是fake news，如果不是的话，我就不要了！
@@ -94,8 +96,38 @@ class URL_TWEET:
                 self.url_tweets[url]["is_source"] = True
 
 
-    def fill_IRA_info()
+    def fill_IRA_info(self):
+        print("补充IRA数据处理中 ...")
+        IRA_match = json.load(open("data/IRA_match.json"))
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"])
+        for i, row in IRA_info.iterrows():
+            uid = row["user_id"]
+            if uid in IRA_match:
+                uid = IRA_match[uid]
+            if row["tweetid"] in self.url_tweets:
+                self.url_tweets[row["tweetid"]].update(
+                    {
+                        "user_id": uid,
+                        "is_IRA": True,
+                        "dt": row["tweet_time"] + ":00"
+                    }
+                )
 
+    def convert_to_csv(self):
+        tweets = [info for info in self.url_tweets.values()]
+        pd.DataFrame(tweets).to_csv("data/url-fake-tweets.csv")
+
+
+    def run(self):
+        self.fill_url_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
+        self.convert_to_csv()
+
+
+if __name__ == "__main__":
+    LeBron = URL_TWEET()
+    LeBron.run()
 
 
 
