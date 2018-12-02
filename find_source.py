@@ -20,26 +20,30 @@ def get_fake_host_label():
 
 
 def find_fake_tweets():
-    fake_hostnames = [line.strip() for line in open("data/fake_hostname.txt")]
+    fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items()
+                            if v[1] in ["LOW", "VERY LOW"] ])
     conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/urls_db.sqlite")
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
 
-    with open("data/fake_tweets.json", "w") as f:
-        for i, d in enumerate(data):
-            if i % 10000 == 0:
-                print(i, d)
-            hostname = d[8].lower()
-            if hostname in fake_hostnames:
-                json_d = {k: v for k, v in zip(col_names, d)}
-                json_d = json.dumps(json_d, ensure_ascii=False)
-                f.write(json_d + '\n')
+    cnt = 0
+    with open("fake_tweets_v2.json", "w") as f:
+        for d in data:
+            if cnt % 100000 == 0:
+                print(cnt)
+            cnt += 1
+            if d[8]:
+                hostname = d[8].lower()
+                # print(hostname)
+                if hostname in fake_hostnames:
+                    json_d = {k: v for k, v in zip(col_names, d)}
+                    json_d = json.dumps(json_d, ensure_ascii=False)
+                    f.write(json_d + '\n')
 
 
 def load_all_nodes():
-
     tweets_ids = set([int(json.loads(line.strip())["tweet_id"]) for line in open("data/fake.txt")])
     print(len(tweets_ids))
     for line in open("data/retweet_network_1.txt"):
