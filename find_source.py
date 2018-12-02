@@ -21,10 +21,10 @@ def get_fake_host_label():
 
 def find_fake_tweets():
     # Geroge
-    # fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"] ])
+    fake_hostnames = set( [k.lower() for k, v in json.load(open("data/mbfc_host_label.json")).items() if v[1] in ["LOW", "VERY LOW"] ])
 
     # Alex
-    fake_hostnames = (line.strip().lower() for line in open("data/fake_hostname.txt"))
+    # fake_hostnames = set([line.strip().lower() for line in open("data/fake_hostname.txt")])
 
     # Mine
     # fake_hostnames = set([line.strip().lower() for k, v in json.load(open("data/host_label.json")).items() if v == "fake"])
@@ -37,7 +37,7 @@ def find_fake_tweets():
     col_names = [t[0] for t in c.description]
     data = c.fetchall()
     cnt = 0
-    with open("fake_tweets_v3.json", "w") as f:
+    with open("fake_tweets_alex.json", "w") as f:
         for d in data:
             if cnt % 500000 == 0:
                 print(cnt)
