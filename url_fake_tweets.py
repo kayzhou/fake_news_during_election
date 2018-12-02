@@ -65,16 +65,29 @@ class URL_TWEET:
             # 新扩展进来的
             if tweetid not in self.url_tweets and origin_tweetdid in self.url_tweets:
                 d = find_tweet(tweetid)
-                tweet = {
-                    "tweet_id": str(d["tweet_id"]),
-                    "user_id": str(d["user_id"]),
-                    "dt": d["datetime_EST"],
-                    "is_first": False,
-                    "is_source": False,
-                    "is_IRA": -1,
-                    "URL": self.url_tweets[origin_tweetdid]["URL"],
-                    "hostname": self.url_tweets[origin_tweetdid]["hostname"]
-                }
+                if d:
+                    tweet = {
+                        "tweet_id": tweetid,
+                        "user_id": str(d["user_id"]),
+                        "dt": d["datetime_EST"],
+                        "is_first": False,
+                        "is_source": False,
+                        "is_IRA": -1,
+                        "URL": self.url_tweets[origin_tweetdid]["URL"],
+                        "hostname": self.url_tweets[origin_tweetdid]["hostname"]
+                    }
+                else: # IRA
+                    tweet = {
+                        "tweet_id": tweetid,
+                        "user_id": -1,
+                        "dt": -1,
+                        "is_first": False,
+                        "is_source": False,
+                        "is_IRA": -1,
+                        "URL": self.url_tweets[origin_tweetdid]["URL"],
+                        "hostname": self.url_tweets[origin_tweetdid]["hostname"]
+                    }
+
                 self.url_tweets[str(d["tweet_id"])] = tweet
 
             # 原来就有，而且原来推特就是fake news
