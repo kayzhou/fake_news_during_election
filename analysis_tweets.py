@@ -8,6 +8,8 @@ import multiprocessing
 import time
 from unshortenit import UnshortenIt
 from tqdm import tqdm
+import sqlite3
+
 
 short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
@@ -203,10 +205,34 @@ def build_retweet_network():
     #     print(i, row)
 
 
+def find_IRA_real_name():
+    cnt = 0
+    users_mapping = {}
+    conn = sqlite3.connect("/Volumes/My Passport 1/alex_avocado/data/users.db")
+    c = conn.cursor()
+    tweets = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"])
+    for i, row in tweets.iterrows():
+        tid = row["tweetid"]
+        uid = row["userid"]
+        if len(uid) < 60 or uid in users_mapping:
+            continue
+
+        c.execute("SELECT user_id FROM user_tweetid WHERE tweet_id=? LIMIT 1", tid)
+        d = c.fetchone()
+        if d:
+            users_mapping[uid] = str(d[0])
+            cnt += 1
+            if cnt % 100 == 0:
+                print(cnt)
+    json.dump(users_mapping, open("IRA_uids.json", "w"), indent=2, ensure_ascii=False)
+    conn.close()
+
 if __name__ == "__main__":
     # get_urls()
     # keep_url()
-    again()
+    # again()
     # temp()
     # build_retweet_network()
+
+    find_IRA_real_name()
 
