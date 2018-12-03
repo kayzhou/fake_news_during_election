@@ -146,7 +146,17 @@ class URL_TWEET:
     def load(self):
         self.tweets = pd.read_csv("data/url-fake-tweets.csv")
         for i, row in tqdm(self.tweets.iterrows()):
-            self.url_timeseries[row["tweet_id"]].append(row)
+            tweet = {
+                "tweet_id": row["tweet_id"],
+                "user_id": row["user_id"],
+                "dt": row["dt"],
+                "is_first": row["is_first"],
+                "is_source": row["is_source"],
+                "is_IRA": row["is_IRA"],
+                "URL": row["URL"],
+                "hostname": row["hostname"]
+            }
+            self.url_timeseries[row["tweet_id"]].append(tweet)
         sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
         url_tweets = []
