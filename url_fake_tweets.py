@@ -164,7 +164,7 @@ class URL_TWEET:
         self.url_timeseries = url_tweets
 
 
-    def save_url_ts():
+    def save_url_ts(self):
         if self.url_timeseries:
             json.dump(self.url_timeseries, open("data/url_tweets.txt", "w"), ensure_ascii=False, indent=2)
 
