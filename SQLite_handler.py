@@ -198,15 +198,14 @@ def opinion(_id):
 
         re = -1
 
-        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_db.sqlite")
+        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_class_proba_final_htgs_db.sqlite")
         c = conn.cursor()
-        c.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        c.execute("SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}".format(_id))
         d = c.fetchone()
-        # print(d)
         if d:
             re = float(d[0])
         else:
-            c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
+            c.execute("SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}".format(_id))
             d = c.fetchone()
             if d:
                 re = float(d[0])
@@ -217,13 +216,12 @@ def opinion(_id):
 
         conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_june_sep_db.sqlite")
         c = conn.cursor()
-        c.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        c.execute("SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}".format(_id))
         d = c.fetchone()
-        # print(d)
         if d:
             re = float(d[0])
         else:
-            c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
+            c.execute("SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}".format(_id))
             d = c.fetchone()
             if d:
                 re = float(d[0])
