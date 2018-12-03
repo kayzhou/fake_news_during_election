@@ -156,7 +156,7 @@ class URL_TWEET:
                 "URL": row["URL"],
                 "hostname": row["hostname"]
             }
-            self.url_timeseries[row["tweet_id"]].append(tweet)
+            self.url_timeseries[row["URL"]].append(tweet)
         sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
         url_tweets = []
