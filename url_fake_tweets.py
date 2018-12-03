@@ -33,7 +33,7 @@ class URL_TWEET:
                 "dt": d["datetime_EST"],
                 "is_first": -1,
                 "is_source": -1,
-                "is_IRA": -1,
+                "is_IRA": False,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower()
             }
@@ -72,7 +72,7 @@ class URL_TWEET:
                         "dt": d["datetime_EST"],
                         "is_first": False,
                         "is_source": False,
-                        "is_IRA": -1,
+                        "is_IRA": False,
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
@@ -83,7 +83,7 @@ class URL_TWEET:
                         "dt": -1,
                         "is_first": False,
                         "is_source": False,
-                        "is_IRA": -1,
+                        "is_IRA": False,
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
