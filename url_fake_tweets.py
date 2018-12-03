@@ -22,7 +22,7 @@ class URL_TWEET:
     """
     def __init__(self):
         self.url_tweets = {}
-        self.tweets = None
+        # self.tweets = None
         self.tweets_csv = None
         self.url_timeseries = defaultdict(list)
         # self.set_tweets = set()
@@ -30,7 +30,7 @@ class URL_TWEET:
     def fill_url_tweets(self):
         print("原始数据处理中 ...")
         for line in tqdm(open("data/fake_tweets.json")):
-            d = json.loads(line)
+            d = json.loads(line.strip())
             tweet = {
                 "tweet_id": str(d["tweet_id"]),
                 "user_id": str(d["user_id"]),
@@ -44,8 +44,8 @@ class URL_TWEET:
             self.url_tweets[str(d["tweet_id"])] = tweet
 
         for line in tqdm(open("data/IRA_fake_tweets.json")):
-            d = json.loads(line)
-            if d["tweetid"] in self.url_tweets:
+            d = json.loads(line.strip())
+            if str(d["tweetid"]) in self.url_tweets:
                 self.url_tweets[d["tweetid"]]["is_IRA"] = 1
             else:
                 tweet = {
@@ -91,14 +91,13 @@ class URL_TWEET:
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
-
                 self.url_tweets[tweetid] = tweet
 
             # 原来就有，而且原来推特就是fake news
             elif tweetid in self.url_tweets and origin_tweetdid in self.url_tweets:
                 self.url_tweets[tweetid].update({
-                        "is_first": False,
-                        "is_source": False,
+                        "is_first": 0,
+                        "is_source": 0,
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                 })
@@ -115,12 +114,14 @@ class URL_TWEET:
 
     def fill_IRA_info(self):
         print("补充IRA数据处理中 ...")
+        cnt = 0
         IRA_match = json.load(open("data/IRA_match.json"))
-        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"])
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
         for i, row in tqdm(IRA_info.iterrows()):
             uid = row["userid"]
             if uid in IRA_match:
-                uid = IRA_match[uid]
+                uid = str(IRA_match[uid])
+    
             if row["tweetid"] in self.url_tweets:
                 self.url_tweets[row["tweetid"]].update(
                     {
@@ -129,11 +130,13 @@ class URL_TWEET:
                         "dt": row["tweet_time"] + ":00"
                     }
                 )
+                cnt += 1
+        print("Count of IRA tweets:", cnt)
+
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
-        self.tweets_csv = [info for info in self.url_tweets.values()]
-        pd.DataFrame(self.tweets_csv).to_csv("data/url-fake-tweets.csv", index_label="tweet_id")
+        pd.DataFrame(self.tweets_csv).to_csv("data/url-fake-tweets.csv", index=None)
 
 
     def save_url_ts(self):
@@ -143,8 +146,10 @@ class URL_TWEET:
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
+        print(len(self.url_tweets))
         for tweet_id, tweet in tqdm(self.url_tweets.items()):
-            self.url_timeseries[tweet["URL"]].append(tweet)
+            if tweet["dt"]:
+                self.url_timeseries[tweet["URL"]].append(tweet)
 
         sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
@@ -161,11 +166,12 @@ class URL_TWEET:
             self.url_timeseries.append({"url": url, "tweets": sorted_tweets_list})
         self.save_url_ts()
 
-        self.tweets = []
+        self.tweets_csv = []
         # for csv
-        for url, tweet_list in self.url_timeseries.items():
-            for tweet in tweet_list:
-                self.tweets.append(tweet)
+        for url_ts in self.url_timeseries:
+            for tweet in url_ts["tweets"]:
+                self.tweets_csv.append(tweet)
+        print(len(self.tweets_csv))
 
 
     def run(self):
