@@ -113,7 +113,7 @@ class URL_TWEET:
         print("补充IRA数据处理中 ...")
         IRA_match = json.load(open("data/IRA_match.json"))
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"])
-        for i, row in IRA_info.iterrows():
+        for i, row in tqdm(IRA_info.iterrows()):
             uid = row["userid"]
             if uid in IRA_match:
                 uid = IRA_match[uid]
@@ -127,6 +127,7 @@ class URL_TWEET:
                 )
 
     def convert_to_csv(self):
+        print("*.csv文件保存中 ...")
         tweets = [info for info in self.url_tweets.values()]
         pd.DataFrame(tweets).to_csv("data/url-fake-tweets.csv")
 
