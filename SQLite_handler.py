@@ -204,12 +204,12 @@ def opinion(_id):
         d = c.fetchone()
         # print(d)
         if d:
-            re = d[0]
+            re = float(d[0])
         else:
             c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
             d = c.fetchone()
             if d:
-                re = d[0]
+                re = float(d[0])
 
         conn.close()
         if re != -1:
@@ -221,12 +221,12 @@ def opinion(_id):
         d = c.fetchone()
         # print(d)
         if d:
-            re = d[0]
+            re = float(d[0])
         else:
             c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
             d = c.fetchone()
             if d:
-                re = d[0]
+                re = float(d[0])
 
         conn.close()
 
