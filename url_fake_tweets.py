@@ -18,11 +18,12 @@ class URL_TWEET:
     5. 整理数据结构，URL为key；
     6. url_tweets中tweets按时间排序；
 
-    每行必要数据：tweet_id, user_id, dt, first, source, URL, hostname, IRA
+    每行必要数据：tweet_id, user_id, dt, is_first, is_source, URL, hostname, is_IRA
     """
     def __init__(self):
         self.url_tweets = {}
         self.tweets = None
+        self.tweets_csv = None
         self.url_timeseries = defaultdict(list)
         # self.set_tweets = set()
 
@@ -34,9 +35,9 @@ class URL_TWEET:
                 "tweet_id": str(d["tweet_id"]),
                 "user_id": str(d["user_id"]),
                 "dt": d["datetime_EST"],
-                "is_first": -1,
-                "is_source": -1,
-                "is_IRA": False,
+                "is_first": None,
+                "is_source": None,
+                "is_IRA": 0,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower()
             }
@@ -45,15 +46,15 @@ class URL_TWEET:
         for line in tqdm(open("data/IRA_fake_tweets.json")):
             d = json.loads(line)
             if d["tweetid"] in self.url_tweets:
-                self.url_tweets[d["tweetid"]]["is_IRA"] = True
+                self.url_tweets[d["tweetid"]]["is_IRA"] = 1
             else:
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
-                    "user_id": -1,
-                    "dt": -1,
-                    "is_first": -1,
-                    "is_source": -1,
-                    "is_IRA": True,
+                    "user_id": None,
+                    "dt": None,
+                    "is_first": None,
+                    "is_source": None,
+                    "is_IRA": 1,
                     "URL": d["real_url"].lower(),
                     "hostname": d["hostname"].lower()
                 }
@@ -73,20 +74,20 @@ class URL_TWEET:
                         "tweet_id": tweetid,
                         "user_id": str(d["user_id"]),
                         "dt": d["datetime_EST"],
-                        "is_first": False,
-                        "is_source": False,
-                        "is_IRA": False,
+                        "is_first": 0,
+                        "is_source": 0,
+                        "is_IRA": 0,
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
-                else: # IRA
+                else: # 找不到？IRA来补充，否则没救！
                     tweet = {
                         "tweet_id": tweetid,
-                        "user_id": -1,
-                        "dt": -1,
-                        "is_first": False,
-                        "is_source": False,
-                        "is_IRA": False,
+                        "user_id": None,
+                        "dt": None,
+                        "is_first": 0,
+                        "is_source": 0,
+                        "is_IRA": 0,
                         "URL": self.url_tweets[origin_tweetdid]["URL"],
                         "hostname": self.url_tweets[origin_tweetdid]["hostname"]
                     }
@@ -108,8 +109,8 @@ class URL_TWEET:
 
         # 什么是source？没有转发别人的！
         for url, values in self.url_tweets.items():
-            if self.url_tweets[url]["is_source"] == -1:
-                self.url_tweets[url]["is_source"] = True
+            if self.url_tweets[url]["is_source"] == None:
+                self.url_tweets[url]["is_source"] = 1
 
 
     def fill_IRA_info(self):
@@ -124,66 +125,65 @@ class URL_TWEET:
                 self.url_tweets[row["tweetid"]].update(
                     {
                         "user_id": uid,
-                        "is_IRA": True,
+                        "is_IRA": 1,
                         "dt": row["tweet_time"] + ":00"
                     }
                 )
 
-    def convert_to_csv(self):
+    def save_csv(self):
         print("*.csv文件保存中 ...")
-        tweets = [info for info in self.url_tweets.values()]
-        pd.DataFrame(tweets).to_csv("data/url-fake-tweets.csv", index=False,
-                       index_label=["tweet_id", "user_id", "dt", "is_first", "is_source", "is_IRA", "URL", "hostname"])
+        self.tweets_csv = [info for info in self.url_tweets.values()]
+        pd.DataFrame(self.tweets_csv).to_csv("data/url-fake-tweets.csv", index_label="tweet_id")
+
+
+    def save_url_ts(self):
+        if self.url_timeseries:
+            json.dump(self.url_timeseries, open("data/url-tweets.txt", "w"), ensure_ascii=False, indent=2)
+
+
+    def convert_url_timeseries(self):
+        print("转换成时间序列 ...")
+        for tweet_id, tweet in tqdm(self.url_tweets.items()):
+            self.url_timeseries[tweet["URL"]].append(tweet)
+
+        sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
+
+        self.url_timeseries = []
+        for v in tqdm(sorted_url):
+            url = v[0]
+            tweet_list = v[1]
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
+            for i in range(len(sorted_tweets_list)):
+                if i == 0:
+                    sorted_tweets_list[0]["is_first"] = 1
+                else:
+                    sorted_tweets_list[i]["is_first"] = 0
+            self.url_timeseries.append({"url": url, "tweets": sorted_tweets_list})
+        self.save_url_ts()
+
+        self.tweets = []
+        # for csv
+        for url, tweet_list in self.url_timeseries.items():
+            for tweet in tweet_list:
+                self.tweets.append(tweet)
 
 
     def run(self):
         self.fill_url_tweets()
         self.fill_retweets()
         self.fill_IRA_info()
-        self.convert_to_csv()
 
+        # 补充is_first
+        self.convert_url_timeseries()
 
-    def load(self):
-        self.tweets = pd.read_csv("data/url-fake-tweets.csv")
-        for i, row in tqdm(self.tweets.iterrows()):
-            tweet = {
-                "tweet_id": row["tweet_id"],
-                "user_id": row["user_id"],
-                "dt": row["dt"],
-                "is_first": row["is_first"],
-                "is_source": row["is_source"],
-                "is_IRA": row["is_IRA"],
-                "URL": row["URL"],
-                "hostname": row["hostname"]
-            }
-            self.url_timeseries[row["URL"]].append(tweet)
-        sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
+        # 保存
+        self.save_csv()
 
-        url_tweets = []
-        for v in tqdm(sorted_url):
-            url = v[0]
-            tweet_list = v[1]
-
-            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
-            for i in range(len(sorted_tweets_list)):
-                if i == 0:
-                    sorted_tweets_list[0]["is_first"] = True
-                else:
-                    sorted_tweets_list[i]["is_first"] = False
-            url_tweets.append({"url": url, "tweets": sorted_tweets_list})
-        self.url_timeseries = url_tweets
-
-
-    def save_url_ts(self):
-        if self.url_timeseries:
-            json.dump(self.url_timeseries, open("data/url_tweets.txt", "w"), ensure_ascii=False, indent=2)
 
 
 if __name__ == "__main__":
     LeBron = URL_TWEET()
-    # LeBron.run()
-    LeBron.load()
-    LeBron.save_url_ts()
+    LeBron.run()
 
 
 

@@ -20,7 +20,6 @@ def find_tweet(_id):
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
-            # print(d)
         for k, v in zip(col_name, d):
             new_d[k] = v
         conn1.close()
@@ -33,14 +32,17 @@ def find_tweet(_id):
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
-            # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
-        conn2.close()
+            conn1.close()
+            conn2.close()
+            return new_d
+
+    conn1.close()
+    conn2.close()
 
     if not new_d:
         new_d = find_retweeted(_id)
-
 
     return new_d
 
@@ -57,6 +59,9 @@ def find_retweeted(_id):
         for k, v in zip(col_name, d):
             new_d[k] = v
 
+        conn1.close()
+        return new_d
+
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
         c2 = conn2.cursor()
@@ -64,12 +69,14 @@ def find_retweeted(_id):
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
-            # print(d)
             for k, v in zip(col_name, d):
                 new_d[k] = v
-        conn2.close()
+            conn1.close()
+            conn2.close()
+            return new_d
 
     conn1.close()
+    conn2.close()
     return new_d
 
 
