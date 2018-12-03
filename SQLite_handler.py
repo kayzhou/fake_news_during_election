@@ -197,31 +197,43 @@ def opinion(_id):
         """
 
         re = -1
-        conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-        c1 = conn1.cursor()
-        c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
-        d = c1.fetchone()
+
+        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_db.sqlite")
+        c = conn.cursor()
+        c.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        d = c.fetchone()
         # print(d)
         if d:
             re = d[0]
-
         else:
-            conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-            c2 = conn2.cursor()
-            c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
-            d = c2.fetchone()
-            # print(d)
+            c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
+            d = c.fetchone()
             if d:
                 re = d[0]
-            conn2.close()
 
-        conn1.close()
+        conn.close()
+        if re != -1:
+            return re
+
+        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_june_sep_db.sqlite")
+        c = conn.cursor()
+        c.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba WHERE tweet_id={}'''.format(_id))
+        d = c.fetchone()
+        # print(d)
+        if d:
+            re = d[0]
+        else:
+            c.execute('''SELECT p_pro_hillary_anti_trump FROM retweet_class_proba WHERE tweet_id={}'''.format(_id))
+            d = c.fetchone()
+            if d:
+                re = d[0]
+
+        conn.close()
+
         return re
 
     v = get_class_proba(_id)
     if v == -1:
-        # print("LOST tweet: ", _id)
-        # exit(-1)
         return -1
     return 1 if v < 0.5 else 0
 
