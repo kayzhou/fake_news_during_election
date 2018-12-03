@@ -6,6 +6,7 @@ Created on 2018-12-01 17:02:07
 """
 from my_weapon import *
 from SQLite_handler import find_tweet
+from collections import defaultdict
 
 
 class URL_TWEET:
@@ -21,6 +22,8 @@ class URL_TWEET:
     """
     def __init__(self):
         self.url_tweets = {}
+        self.tweets = None
+        self.url_timeseries = defaultdict(list)
         # self.set_tweets = set()
 
     def fill_url_tweets(self):
@@ -140,9 +143,37 @@ class URL_TWEET:
         self.convert_to_csv()
 
 
+    def load(self):
+        self.tweets = pd.read_csv("data/url-fake-tweets.csv")
+        for i, row in self.tweets.iterrows():
+            self.url_timeseries[row["tweet_id"]].append(row)
+        sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
+
+        url_tweets = []
+        for v in tqdm(sorted_url):
+            url = v[0]
+            tweet_list = v[1]
+
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
+            for i in range(len(sorted_tweets_list)):
+                if i == 0:
+                    sorted_tweets_list[0]["is_first"] = True
+                else:
+                    sorted_tweets_list[i]["is_first"] = False
+            url_tweets.append({"url": url, "tweets": sorted_tweets_list})
+        self.url_timeseries = url_tweets
+
+
+    def save_url_ts():
+        if self.url_timeseries:
+            json.dump(self.url_timeseries, open("data/url_tweets.txt", "w"), ensure_ascii=False, indent=2)
+
+
 if __name__ == "__main__":
     LeBron = URL_TWEET()
-    LeBron.run()
+    # LeBron.run()
+    LeBron.load()
+    LeBron.save_url_ts()
 
 
 
