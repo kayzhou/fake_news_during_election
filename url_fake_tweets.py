@@ -129,7 +129,8 @@ class URL_TWEET:
     def convert_to_csv(self):
         print("*.csv文件保存中 ...")
         tweets = [info for info in self.url_tweets.values()]
-        pd.DataFrame(tweets).to_csv("data/url-fake-tweets.csv")
+        pd.DataFrame(tweets).to_csv("data/url-fake-tweets.csv", index=False,
+                       index_label=["tweet_id", "user_id", "dt", "is_first", "is_source", "is_IRA", "URL", "hostname"])
 
 
     def run(self):
