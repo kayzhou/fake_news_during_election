@@ -16,6 +16,7 @@ from sklearn.metrics import classification_report
 
 
 class Config:
+
     def __init__(self):
         self.train_file = "data/train_dataset.txt"
         self.train_batch_size = 128
@@ -31,6 +32,7 @@ class Config:
 
 
 class Dataset:
+
     def __init__(self, filepath, batch_size):
         self._file = open(filepath)
         self._batch_size = batch_size
@@ -39,11 +41,14 @@ class Dataset:
         self._batch_size = batch_size
         self._reset()
 
-    def read_wv1():
+        self._wv1 = None
+        self._wv2 = None
+
+    def read_wv1(self):
         print("Loading wv1 ...")
         return Word2Vec.load("model/word2vec.mod")
 
-    def read_wv2():
+    def read_wv2(self):
         print("Loading wv2 ...")
         return word2vecReader.Word2Vec.load_word2vec_format(
             "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
@@ -76,14 +81,11 @@ class Dataset:
     # 接着调用__next__返回数据
     # 如果没有buffer的时候，就补充数据_fill_buffer
     # 如果buffer补充后仍然为空，则停止迭代
-
-    def __iter__(self):
-        self._reset()
-        return self
-
     def _save(self):
-        self._wv1 = read_wv1()
-        self._wv2 = read_wv2()
+        if not self._wv1:
+            self._wv1 = self.read_wv1()
+        if not self._wv2:
+            self._wv2 = self.read_wv2()
         self._reset()
         count = 0
 
@@ -109,6 +111,10 @@ class Dataset:
                 labels = []
                 X = []
                 print(count)
+
+    def __iter__(self):
+        self._reset()
+        return self
 
     def _fill_buffer(self):
         if self._count == 0 and self._file_num <= 189:
@@ -147,8 +153,10 @@ class Dataset:
         self._buffer_iter = None
 
     def save_testdata(self):
-        self._wv1 = read_wv1()
-        self._wv2 = read_wv2()
+        if not self._wv1:
+            self._wv1 = self.read_wv1()
+        if not self._wv2:
+            self._wv2 = self.read_wv2()
 
         labels = []
         sequences = []
@@ -162,7 +170,8 @@ class Dataset:
         np.save("/media/alex/data/train_data/Y_test.npy", np.array(labels))
 
     def get_testdata(self):
-        return {"sequences": torch.Tensor(np.load("/media/alex/data/train_data/X_test.npy")), "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}
+        return {"sequences": torch.Tensor(np.load("/media/alex/data/train_data/X_test.npy")),
+                "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}
 
 
 class CNNClassifier(nn.Module):
