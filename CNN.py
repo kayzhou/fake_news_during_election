@@ -186,6 +186,7 @@ class Dataset2:
         self._buffer = []
         self._buffer_iter = None
         self._buff_count = 0
+        self._file_num = 0
 
         self._reset()
 
@@ -231,32 +232,36 @@ class Dataset2:
         self._reset()
         return self
 
-    def _fill_buffer(self, size):
-        if self._buff_count < self._batch_size:
-            print("buffer空了，补充数据 ...")
+    def _fill_buffer(self):
+            if self._buff_count > 0:
+                return 1
+
+            train_filename = "train_data/train_{:0>2d}".format(0)
             # 遍历文件
-            while True:
-                line = self._file.readline()
-                if (not line) or self._buff_count >= size:
-                    break
-                try:
-                    label, sentence = line.strip().split("\t")
-                except ValueError:
-                    continue
-                label = int(label.strip())
-                sequence1 = self.wv1(sentence)
-                sequence2 = self.wv2(sentence)
+            with open(train_filename) as f:
+                for line in f:
+                    try:
+                        label, sentence = line.strip().split("\t")
+                    except ValueError:
+                        continue
+                    label = int(label.strip())
+                    sequence1 = self.wv1(sentence)
+                    sequence2 = self.wv2(sentence)
 
-                self._buff_count += 1
-                self._buffer.append((label, [sequence1, sequence2]))
+                    self._buff_count += 1
+                    self._buffer.append((label, [sequence1, sequence2]))
 
+            self._file_num += 1
             self._buffer_iter = iter(self._buffer)
             self._buffer = []
 
-    def __next__(self):
-        self._fill_buffer(self._batch_size * 1024) # 每次读1024个batch作为buffer
+            if self._file_num > 18:
+                return 0
+            else:
+                return 1
 
-        if self._buff_count == 0: # After filling, still empty, stop iter!
+    def __next__(self):
+        if self._fill_buffer() == 0:
             raise StopIteration
 
         label_batch = []
@@ -274,6 +279,7 @@ class Dataset2:
         self._buffer = []
         self._buffer_iter = None
         self._buff_count = 0
+        self._file_num = 0
 
     def get_testdata(self):
         labels = []
