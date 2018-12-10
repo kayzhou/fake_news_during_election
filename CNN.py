@@ -178,10 +178,8 @@ class Dataset:
 class Dataset2:
     def __init__(self, filepath, batch_size):
         self._file = open(filepath)
-        if not self._wv1:
-            self._wv1 = self.read_wv1()
-        if not self._wv2:
-            self._wv2 = self.read_wv2()
+        self._wv1 = self.read_wv1()
+        self._wv2 = self.read_wv2()
         self._batch_size = batch_size
 
         self._file.seek(0)
@@ -378,7 +376,7 @@ def train(model, train_set, test_set):
 config = Config()
 
 if __name__ == "__main__":
-    train_set = Dataset(config.train_file, config.train_batch_size)
+    train_set = Dataset2(config.train_file, config.train_batch_size)
     test_set = train_set.get_testdata()
     model = CNNClassifier()
     train(model, train_set, test_set)
