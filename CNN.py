@@ -9,7 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import autograd, optim
 import logging
-logging.basicConfig(filename="log/train-11302018.log", format="%(levelname)s\t%(asctime)s\t%(message)s", level=logging.INFO)
+# logging.basicConfig(filename="log/train-11302018.log", format="%(levelname)s - %(asctime)s - %(message)s", level=logging.INFO)
+logging.basicConfig(format="%(levelname)s - %(asctime)s - %(message)s", level=logging.INFO)
 
 from tensorboardX import SummaryWriter
 from sklearn.metrics import classification_report
@@ -38,11 +39,11 @@ class Dataset:
         self._batch_size = batch_size
         self._count = 0
         self._file_num = 1
-        self._batch_size = batch_size
-        self._reset()
 
         self._wv1 = None
         self._wv2 = None
+
+        self._reset()
 
     def read_wv1(self):
         print("Loading wv1 ...")
@@ -174,6 +175,123 @@ class Dataset:
                 "labels": torch.LongTensor(np.load("/media/alex/data/train_data/Y_test.npy"))}
 
 
+class Dataset2:
+    def __init__(self, filepath, batch_size):
+        self._file = open(filepath)
+        if not self._wv1:
+            self._wv1 = self.read_wv1()
+        if not self._wv2:
+            self._wv2 = self.read_wv2()
+        self._batch_size = batch_size
+
+        self._file.seek(0)
+        self._buffer = []
+        self._buffer_iter = None
+        self._buff_count = 0
+
+        self._reset()
+
+    def wv1(self, line):
+        v = np.zeros(40 * 400).reshape(40, 400)
+        words = line.strip().split(" ")
+        _index = 0
+        for w in words:
+            if _index >= 40:
+                break
+            if w in self._wv1.wv:
+                v[_index] = self._wv1.wv[w]
+                _index += 1
+        return v
+
+    def wv2(self, line):
+            v = np.zeros(40 * 400).reshape(40, 400)
+            words = line.strip().split(" ")
+            _index = 0
+            for w in words:
+                if _index >= 40:
+                    break
+                if w in self._wv2:
+                    v[_index] = self._wv2[w]
+                    _index += 1
+            return v
+
+    def read_wv1(self):
+        print("Loading wv1 ...")
+        return Word2Vec.load("model/word2vec.mod")
+
+    def read_wv2(self):
+        print("Loading wv2 ...")
+        return word2vecReader.Word2Vec.load_word2vec_format(
+            "/media/alex/data/word2vec_twitter_model/word2vec_twitter_model.bin", binary=True)
+
+    # 迭代时候每次先调用__iter__，初始化
+    # 接着调用__next__返回数据
+    # 如果没有buffer的时候，就补充数据_fill_buffer
+    # 如果buffer补充后仍然为空，则停止迭代
+
+    def __iter__(self):
+        self._reset()
+        return self
+
+    def _fill_buffer(self, size):
+        if self._buff_count < self._batch_size:
+            print("buffer空了，补充数据 ...")
+
+            # 遍历文件
+            while True:
+                line = self._file.readline()
+                if (not line) or self._buff_count >= size:
+                    break
+
+                try:
+                    label, sentence = line.strip().split("\t")
+                except ValueError:
+                    continue
+                label = int(label.strip())
+                sequence1 = self.wv1(sentence)
+                sequence2 = self.wv2(sentence)
+
+                self._buff_count += 1
+                self._buffer.append((label, [sequence1, sequence2]))
+
+            self._buffer_iter = iter(self._buffer)
+            self._buff_count = []
+
+    def __next__(self):
+        self._fill_buffer(self._batch_size * 1024) # 每次读1024个batch作为buffer
+
+        if self._buff_count == 0: # After filling, still empty, stop iter!
+            raise StopIteration
+
+        label_batch = []
+        sequence_batch = []
+        for label, sequence in self._buffer_iter:
+            self._buff_count -= 1
+            label_batch.append(label)
+            sequence_batch.append(sequence)
+            if len(label_batch) == self._batch_size:
+                break
+        return {"sequences": np.array(sequence_batch),
+                "labels":    label_batch}
+
+    def _reset(self):
+        self._file.seek(0)
+        self._buffer = []
+        self._buffer_iter = None
+        self._buff_count = 0
+
+    def get_testdata(self):
+        labels = []
+        sequences = []
+        for line in open("data/0-test.txt"):
+            labels.append(0)
+            sequences.append([self.wv1(line), self.wv2(line)])
+        for line in open("data/1-test.txt"):
+            labels.append(1)
+            sequences.append([self.wv1(line), self.wv2(line)])
+        return torch.LongTensor(labels), torch.Tensor(sequences)
+
+
 class CNNClassifier(nn.Module):
     def __init__(self):
         super(CNNClassifier, self).__init__()
@@ -205,7 +323,6 @@ class CNNClassifier(nn.Module):
 
 
 def train(model, train_set, test_set):
-
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
 
