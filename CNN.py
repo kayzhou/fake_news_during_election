@@ -253,7 +253,7 @@ class Dataset2:
                 self._buffer.append((label, [sequence1, sequence2]))
 
             self._buffer_iter = iter(self._buffer)
-            self._buff_count = []
+            self._buffer = []
 
     def __next__(self):
         self._fill_buffer(self._batch_size * 1024) # 每次读1024个batch作为buffer
