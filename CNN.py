@@ -19,7 +19,7 @@ from sklearn.metrics import classification_report
 class Config:
 
     def __init__(self):
-        self.train_file = "data/train_dataset.txt"
+        self.train_file = "train_data/train_dataset.txt"
         self.train_batch_size = 128
 
         self.learning_rate = 0.001
