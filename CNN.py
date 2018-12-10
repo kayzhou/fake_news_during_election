@@ -281,10 +281,10 @@ class Dataset2:
     def get_testdata(self):
         labels = []
         sequences = []
-        for line in open("data/0-test.txt"):
+        for line in open("data/train_data/0-test.txt"):
             labels.append(0)
             sequences.append([self.wv1(line), self.wv2(line)])
-        for line in open("data/1-test.txt"):
+        for line in open("data/train_data/1-test.txt"):
             labels.append(1)
             sequences.append([self.wv1(line), self.wv2(line)])
         return torch.LongTensor(labels), torch.Tensor(sequences)
