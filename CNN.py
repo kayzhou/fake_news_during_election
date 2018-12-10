@@ -334,38 +334,38 @@ def train(model, train_set, test_set):
             sequences = batch["sequences"]
             labels = batch["labels"]
 
-            # Predict
-            try:
-                probs, classes = model(sequences)
-            except:
-                print(sequences.size(), labels.size())
-                print("发生致命错误！")
+        #     # Predict
+        #     try:
+        #         probs, classes = model(sequences)
+        #     except:
+        #         print(sequences.size(), labels.size())
+        #         print("发生致命错误！")
 
-            # Backpropagation
-            optimizer.zero_grad()
-            losses = loss_function(probs, labels)
-            losses.backward()
-            optimizer.step()
+        #     # Backpropagation
+        #     optimizer.zero_grad()
+        #     losses = loss_function(probs, labels)
+        #     losses.backward()
+        #     optimizer.step()
 
-            # Log summary
-            running_losses.append(losses.data.item())
-            if step % config.summary_interval == 0:
-                loss = sum(running_losses) / len(running_losses)
-                writer.add_scalar("train/loss", loss, step)
-                logging.info("step = {}, loss = {}".format(step, loss))
-                running_losses = []
+        #     # Log summary
+        #     running_losses.append(losses.data.item())
+        #     if step % config.summary_interval == 0:
+        #         loss = sum(running_losses) / len(running_losses)
+        #         writer.add_scalar("train/loss", loss, step)
+        #         logging.info("step = {}, loss = {}".format(step, loss))
+        #         running_losses = []
 
-            step += 1
+        #     step += 1
 
-        # Classification report
-        test_X = test_set["sequences"]
-        test_labels = test_set["labels"]
-        probs, y_pred = model(test_X)
-        target_names = ['pro-hillary', 'pro-trump']
-        logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names)))
+        # # Classification report
+        # test_X = test_set["sequences"]
+        # test_labels = test_set["labels"]
+        # probs, y_pred = model(test_X)
+        # target_names = ['pro-hillary', 'pro-trump']
+        # logging.info("{}".format(classification_report(test_labels, y_pred, target_names=target_names)))
 
-        # Save
-        torch.save(model, "model/11292018-model-epoch-{}.pkl".format(epoch))
+        # # Save
+        # torch.save(model, "model/11292018-model-epoch-{}.pkl".format(epoch))
 
         epoch += 1
 
