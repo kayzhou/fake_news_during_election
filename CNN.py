@@ -234,13 +234,11 @@ class Dataset2:
     def _fill_buffer(self, size):
         if self._buff_count < self._batch_size:
             print("buffer空了，补充数据 ...")
-
             # 遍历文件
             while True:
                 line = self._file.readline()
                 if (not line) or self._buff_count >= size:
                     break
-
                 try:
                     label, sentence = line.strip().split("\t")
                 except ValueError:
@@ -269,8 +267,7 @@ class Dataset2:
             sequence_batch.append(sequence)
             if len(label_batch) == self._batch_size:
                 break
-        return {"sequences": np.array(sequence_batch),
-                "labels":    label_batch}
+        return {"sequences": torch.Tensor(sequence_batch), "labels": torch.LongTensor(label_batch)}
 
     def _reset(self):
         self._file.seek(0)
