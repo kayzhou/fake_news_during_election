@@ -22,6 +22,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from sklearn.externals import joblib
 from TwClassifier import TweetClassifier
 
+from tqdm import tqdm
 import pickle
 import time
 import numpy as np
@@ -164,7 +165,7 @@ tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
 tweets = tweets[tweets["tweet_time"]<"2016-09-01 00:00"][tweets["tweet_time"]>="2016-06-01 00:00"]
 
 with open("data/IRA-pro-trump.txt", "a") as f:
-    for i, row in tweets.iterrows():
-        line = row["text"]
+    for i, row in tqdm(tweets.iterrows()):
+        line = row["tweet_text"]
         predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
         f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
