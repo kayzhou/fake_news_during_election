@@ -20,7 +20,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 
 from sklearn.externals import joblib
-# from TwClassifier import TweetClassifier
+from TwClassifier import TweetClassifier
 
 import pickle
 import time
@@ -161,3 +161,4 @@ TweetClass = TweetClassifier(classifier=classifier, label_inv_mapper=label_inv_m
 
 line = "I support Trump, I love Trump!!"
 predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
+print(predict_proba)
