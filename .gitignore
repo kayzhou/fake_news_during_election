@@ -115,3 +115,4 @@ log/
 model/
 *.pkl
 *.json
+train_data/
