@@ -33,7 +33,7 @@ from datetime import datetime
 #%% trump hillary june sep
 
 # sqlite_file = '../databases_ssd/complete_trump_vs_hillary_db.sqlite'
-savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_june_sep_signi/trained_classifier/'
+## ~~ savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_june_sep_signi/trained_classifier/'
 
 # suffix = '26sep_6nov'
 # suffix = '26sep_9nov'
@@ -50,7 +50,7 @@ suffix = '_final_htgs'
 #%% trump hillary sep nov
 
 #sqlite_file = '../databases/complete_trump_vs_hillary_sep-nov_db.sqlite'
-#savedir = 'trump_vs_hillary_sep-nov/trained_classifier/'
+savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_sep-nov/trained_classifier/'
 #
 #suffix = '_final_htgs'
 ##
@@ -162,7 +162,7 @@ label_inv_mapper = cls['label_inv_mapper']
 TweetClass = TweetClassifier(classifier=classifier, label_inv_mapper=label_inv_mapper)
 
 tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
-tweets = tweets[tweets["tweet_time"]<"2016-09-01 00:00"][tweets["tweet_time"]>="2016-06-01 00:00"]
+tweets = tweets[tweets["tweet_time"] >= "2016-09-01 00:00"][tweets["tweet_time"] < "2016-11-09 00:00"]
 
 with open("data/IRA-pro-trump.txt", "a") as f:
     for i, row in tqdm(tweets.iterrows()):
