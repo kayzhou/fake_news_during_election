@@ -149,6 +149,7 @@ suffix = '_final_htgs'
 
 
 #%%
+
 filename = 'sklearn_SGDLogReg_' + suffix + '.pickle'
 
 print('loading ' + savedir + filename)
@@ -159,6 +160,11 @@ label_inv_mapper = cls['label_inv_mapper']
 
 TweetClass = TweetClassifier(classifier=classifier, label_inv_mapper=label_inv_mapper)
 
-line = "I support Trump, I love Trump!!"
-predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
-print(predict_proba)
+tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
+tweets = tweets[tweets["tweet_time"]<"2016-09-01 00:00"][tweets["tweet_time"]>="2016-06-01 00:00"]
+
+with open("data/IRA-pro-trump.txt", "a") as f:
+    for i, row in tweets.iterrows():
+        line = row["text"]
+        predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
+        f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
