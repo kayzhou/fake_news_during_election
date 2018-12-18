@@ -236,7 +236,7 @@ class Dataset2:
             if self._buff_count > 0:
                 return 1
 
-            train_filename = "train_data/train_{:0>2d}".format(0)
+            train_filename = "train_data/train_{:0>2d}".format(self._file_num)
             # 遍历文件
             with open(train_filename) as f:
                 for line in f:
@@ -251,6 +251,7 @@ class Dataset2:
                     self._buff_count += 1
                     self._buffer.append((label, [sequence1, sequence2]))
 
+            print("file:", train_filename)
             self._file_num += 1
             self._buffer_iter = iter(self._buffer)
             self._buffer = []
