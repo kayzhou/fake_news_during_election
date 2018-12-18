@@ -174,6 +174,7 @@ tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
 tws = tweets[tweets["tweet_time"] >= "2016-06-01 00:00"][tweets["tweet_time"] < "2016-09-01 00:00"]
 
 with open("data/IRA-pro-trump.txt", "a") as f:
+    f.write("tweetid,pro_trump\n")
     for i, row in tqdm(tws.iterrows()):
         if is_discuss_trump_hillary(row):
             line = row["tweet_text"]
@@ -193,3 +194,9 @@ TweetClass = TweetClassifier(classifier=classifier, label_inv_mapper=label_inv_m
 
 # tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
 tws = tweets[tweets["tweet_time"] >= "2016-09-01 00:00"][tweets["tweet_time"] < "2016-11-09 00:00"]
+with open("data/IRA-pro-trump.txt", "a") as f:
+    for i, row in tqdm(tws.iterrows()):
+        if is_discuss_trump_hillary(row):
+            line = row["tweet_text"]
+            predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
+            f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
