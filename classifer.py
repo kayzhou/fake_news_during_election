@@ -20,7 +20,7 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 
 from sklearn.externals import joblib
-from TwClassifier import TweetClassifier
+# from TwClassifier import TweetClassifier
 
 import pickle
 import time
