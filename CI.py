@@ -16,6 +16,7 @@ import heapq
 import networkx as nx
 from math import log
 
+
 class TwiAnalytics(object):
     '''
     Object to interface between the archive files from TwAPIer and
@@ -104,7 +105,7 @@ class TwiAnalytics(object):
 
                 winners.append(max_node)
                 winner_deg.append(graph.node[max_node]['start_deg'])
-                winners_ci.append(max_CI ** (1/ball_rad))
+                winners_ci.append(max_CI ** (1 / ball_rad))
                 #winners_ci.append(graph.node[max_node]['start_CI'])
 
                 if G_q_filename is not None:
@@ -298,7 +299,7 @@ class TwiAnalytics(object):
 
                 if G_q_filename is not None:
                     # print q and G(g)
-                    q = 1-graph.number_of_nodes()/num_nodes
+                    q = 1 - graph.number_of_nodes() / num_nodes
                     gc_nodes = max(nx.strongly_connected_components(graph), key=len)
                     nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
                     print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc)/num_nodes), file=G_q_file)
@@ -322,7 +323,6 @@ class TwiAnalytics(object):
                 # Find next influencer
                 max_bundle = None
                 while max_bundle is None and len(pile) > 0:
-
                     # Take the root item
                     try:
                         max_bundle = heapq.heappop(pile)
@@ -420,7 +420,7 @@ class TwiAnalytics(object):
 
         # Build the ball
         visited = {node: 0}
-        rings = [{node}] # {} means set
+        rings = [[node]] # {} means set?
 
         for _ring in range(1, ball_rad + 2):
             nextring = []
@@ -476,8 +476,7 @@ class TwiAnalytics(object):
             return []
 
         ring = 0
-        rings = []
-        rings.append([node])
+        rings = [[node]]
         while ring < ball_rad + 1:
             ring += 1
             nextring = []
@@ -515,3 +514,10 @@ class TwiAnalytics(object):
 
         # Return the new perimeter
         return outer_neighbors
+
+
+if __name__ == "__main__":
+    Lebron = TwiAnalytics()
+    G = nx.Graph()
+    G.add_node(1)
+    print(Lebron.siteCI(G))
