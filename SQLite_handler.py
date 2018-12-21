@@ -295,7 +295,7 @@ def get_user_id(tweet_id):
     """
     conn = sqlite3.connect("/media/alex/data/election_data/tweetid.db")
     c = conn.cursor()
-    c.execute("SELECT user_id from tweetid WHERE tweet_id=?", tweet_id)
+    c.execute("SELECT user_id from user_tweetid WHERE tweet_id=?", tweet_id)
     d = c.fetchone()
     conn.close()
     if d:
