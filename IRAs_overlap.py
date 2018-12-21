@@ -17,18 +17,22 @@ class analyze_IRA_in_network:
         self.user_id_map = {}
 
     def find_user_id_map(self):
-        data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"], dtype=str)
-        for _, row in tqdm(data.iterrows()):
-            user_id = row["userid"]
-            if len(user_id) == 64:
-                if user_id in self.user_id_map:
-                    continue
-                real_user_id = get_user_id(row["tweetid"])
+        data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+                            usecols=["tweetid", "userid"], dtype=str)
+        with open("data/IRA_map_v2.json", "w") as f:
+            for _, row in tqdm(data.iterrows()):
+                tweet_id = row["tweetid"]
+                user_id = row["userid"]
+                # if user_id in self.user_id_map:
+                #     continue
+                real_user_id = get_user_id(tweet_id)
                 if real_user_id:
-                    self.user_id_map[user_id] = real_user_id
+                    # self.user_id_map[user_id] = real_user_id
+                    f.write("{},{},{}\n".format(tweet_id, user_id, real_user_id))
+                
 
         # save
-        json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
+        # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
 
 if __name__ == "__main__":
