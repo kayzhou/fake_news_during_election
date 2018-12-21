@@ -289,6 +289,21 @@ def get_user(user_id):
         return 0
 
 
+def get_user_id(tweet_id):
+    """
+    获取用户
+    """
+    conn = sqlite3.connect("/media/alex/data/election_data/tweetid.db")
+    c = conn.cursor()
+    c.execute("SELECT user_id from tweetid WHERE tweet_id=?", tweet_id)
+    d = c.fetchone()
+    conn.close()
+    if d:
+        return d[0]
+    else:
+        return None
+
+
 def insert_user(tweet_id, user_id, info_json):
     '''
     插入用户
@@ -311,8 +326,8 @@ def insert_many_users(user_list):
     c = conn.cursor()
     try:
         c.executemany("INSERT INTO user VALUES (?, ?, ?)", user_list)
-    except sqlite3.IntegrityError:
-        print('"{}" exists in the list.'.format(user_id))
+    except sqlite3.IntegrityError as e:
+        print(e)
     conn.commit()
     conn.close()
 
