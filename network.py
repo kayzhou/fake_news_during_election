@@ -139,7 +139,7 @@ class analyze_IRA_in_network:
                 u1 = self.user_id_map[u1]
             u2 = row["userid"]
             if u2 in self.user_id_map:
-                u2 = self.user_id_map[u1]
+                u2 = self.user_id_map[u2]
             retweet_link.append((u1, u2))
 
         json.dump(retweet_link, open("data/edges.json", "w"),
