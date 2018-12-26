@@ -145,7 +145,7 @@ class analyze_IRA_in_network:
         #     ensure_ascii=False, indent=2)
 
         # retweet_liks = json.load(open("data/edge.json"))
-        return retweet_liks
+        return retweet_link
 
     def build_network(self):
         self.graph = nx.DiGraph()
