@@ -105,56 +105,64 @@ class analyze_IRA_in_network:
         return uids
 
     def load_edge(self):
-        retweet_link = []
+        # retweet_link = []
 
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-        c = conn.cursor()
-        c.execute(
-            '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
-        for row in c.fetchall():
-            u1 = str(row[0])
-            u2 = str(row[1])
-            retweet_link.append((u1, u2))
-        conn.close()
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+        # c = conn.cursor()
+        # c.execute(
+        #     '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
+        # for row in c.fetchall():
+        #     u1 = str(row[0])
+        #     u2 = str(row[1])
+        #     retweet_link.append((u1, u2))
+        # conn.close()
 
-        # 下一个！
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-        c = conn.cursor()
-        c.execute(
-            '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
-        for row in c.fetchall():
-            u1 = str(row[0])
-            u2 = str(row[1])
-            retweet_link.append((u1, u2))
-        conn.close()
+        # # 下一个！
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        # c = conn.cursor()
+        # c.execute(
+        #     '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
+        # for row in c.fetchall():
+        #     u1 = str(row[0])
+        #     u2 = str(row[1])
+        #     retweet_link.append((u1, u2))
+        # conn.close()
 
-        cnt = 0
-        data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["userid", "retweet_userid"], dtype=str)
-        data_ira = data_ira.dropna()
-        for i, row in data_ira.iterrows():
-            u1 = row["retweet_userid"]
-            if u1 in self.user_id_map:
-                u1 = self.user_id_map[u1]
-            u2 = row["userid"]
-            if u2 in self.user_id_map:
-                u2 = self.user_id_map[u2]
-            retweet_link.append((u1, u2))
+        # cnt = 0
+        # data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["userid", "retweet_userid"], dtype=str)
+        # data_ira = data_ira.dropna()
+        # for i, row in data_ira.iterrows():
+        #     u1 = row["retweet_userid"]
+        #     if u1 in self.user_id_map:
+        #         u1 = self.user_id_map[u1]
+        #     u2 = row["userid"]
+        #     if u2 in self.user_id_map:
+        #         u2 = self.user_id_map[u2]
+        #     retweet_link.append((u1, u2))
 
-        json.dump(retweet_link, open("data/edges.json", "w"),
-            ensure_ascii=False, indent=2)
+        # json.dump(retweet_link, open("data/edge.json", "w"),
+        #     ensure_ascii=False, indent=2)
 
-    # def build_network(self):
+        retweet_liks = json.load(open("data/edge.json"))
+        return retweet_liks
 
-
+    def build_network(self):
+        self.graph = nx.DiGraph()
+        nodes = self.load_node()
+        edges = self.load_edge()
+        self.graph.add_nodes_from(nodes)
+        self.graph.add_edges_from(edges)
+        nx.readwrite.adjlist.write_adjlist(self.graph, 'whole_network.adj')
 
     def run(self):
+
         # self.find_user_id_map()
         # self.cal_map()
         # self.un_anonymization()
         # self.load_node()
-        self.load_edge()
+        self.build_network()
 
 
 if __name__ == "__main__":
