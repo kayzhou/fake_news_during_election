@@ -32,7 +32,10 @@ class analyze_IRA_in_network:
 
     def check(self):
         # IRA_map_v2.json 较大库的映射
-        map1 = [(line.strip().split(",")[1], line.strip(",").split()[2]) for line in open("data/IRA_map_v2.json")]
+        try:
+            map1 = [(line.strip().split(",")[1], line.strip(",").split()[2]) for line in open("data/IRA_map_v2.json")]
+        except:
+            print(line)
 
         # 相同的匿名ID会不会存在不同的ID？
         test_data = {}
