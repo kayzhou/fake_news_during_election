@@ -48,6 +48,7 @@ class analyze_IRA_in_network:
                 continue
             test_data[i] = j
 
+        print(test_data)
         # SQLITE 数据库中的映射
         map2 = [(line.strip().split(",")[1], line.strip().split(",")[2]) for line in open("data/IRA_map_v3.json")]
         test_data = {}
@@ -56,6 +57,7 @@ class analyze_IRA_in_network:
                 print("重复啦！")
                 continue
             test_data[i] = j
+        print(test_data)
 
         # save
         # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
