@@ -15,7 +15,7 @@ class analyze_IRA_in_network:
     def __init__(self):
         self.author = "kay"
         self.user_id_map = json.load(open("data/IRA_map_ele.json"))
-        self.network = nx.graph()
+        # self.network = nx.graph()
 
     def find_user_id_map(self):
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
