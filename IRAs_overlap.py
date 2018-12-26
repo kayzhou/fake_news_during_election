@@ -90,7 +90,8 @@ class analyze_IRA_in_network:
     def run(self):
         # self.find_user_id_map()
         # self.cal_map()
-        self.un_anonymization()
+        # self.un_anonymization()
+        load_node()
 
     def load_node():
         uids = find_all_uids()
