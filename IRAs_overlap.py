@@ -25,16 +25,24 @@ class analyze_IRA_in_network:
                 user_id = row["userid"]
                 # if user_id in self.user_id_map:
                 #     continue
-                real_user_id = find_tweet(tweet_id)
+                real_user_id = find_tweet(tweet_id)["user_id"]
                 if real_user_id:
                     # self.user_id_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, real_user_id))
-                
+
+    def check(self):
+        # IRA_map_v2.json 较大库的映射
+        map1 = []
+        # SQLITE 数据库中的映射
+        map2 = []
+
 
         # save
         # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
+    def run(self):
+        self.find_user_id_map()
 
 if __name__ == "__main__":
     Lebron = analyze_IRA_in_network()
-    Lebron.find_user_id_map()
+    Lebron.run()
