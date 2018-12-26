@@ -8,13 +8,14 @@ Created on 2018-11-16 09:01:28
 """
 
 from my_weapon import *
-from SQLite_handler import get_user_id, find_tweet
+from SQLite_handler import get_user_id, find_tweet, find_all_uids
 
 
 class analyze_IRA_in_network:
     def __init__(self):
         self.author = "kay"
         self.user_id_map = json.load(open("data/IRA_map_ele.json"))
+        self.network = nx.graph()
 
     def find_user_id_map(self):
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
@@ -73,7 +74,6 @@ class analyze_IRA_in_network:
         json.dump(test_data2, open("data/IRA_map_ele.json", "w"), indent=2)
         json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
-
     def un_anonymization(self):
         # 取消匿名化
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
@@ -87,15 +87,23 @@ class analyze_IRA_in_network:
                 un_ano_count += 1
         print(un_ano_count, un_ano_count / len(data))
 
-
     def run(self):
         # self.find_user_id_map()
         # self.cal_map()
         self.un_anonymization()
 
-
-
-
+    def load_node():
+        uids = find_all_uids()
+        for uid in self.user_id_map.values():
+            uids.append(uid)
+        uids = set(uids)
+        data = pd.read_csv("data/ira_users_csv_hashed.csv",
+            usecols=["userid"], dtype=str)
+        for _, row in tqdm(data.iterrows()):
+            user_id = row["userid"]
+            if user_id not in self.user_id_map:
+                uids.add(user_id)
+        json.dump(list(uids), open("data/node.json", "w"), indent=2)
 
 if __name__ == "__main__":
     Lebron = analyze_IRA_in_network()

@@ -80,6 +80,29 @@ def find_retweeted(_id):
     return new_d
 
 
+def find_all_uids():
+    '''
+    找到所有的uids
+    '''
+    uids = []
+
+    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c1 = conn1.cursor()
+    c1.execute('''SELECT user_id FROM user''')
+    for d in c1.fetchall():
+        uids.append(str(d[0]))
+    conn1.close()
+
+    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c2 = conn2.cursor()
+    c2.execute('''SELECT user_id FROM user''')
+    for d in c2.fetchall():
+        uids.append(str(d[0]))
+    conn2.close()
+
+    return uids
+
+
 def find_user(_id):
     new_d = {}
 
