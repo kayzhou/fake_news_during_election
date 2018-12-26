@@ -14,7 +14,7 @@ from SQLite_handler import get_user_id, find_tweet
 class analyze_IRA_in_network:
     def __init__(self):
         self.author = "kay"
-        self.user_id_map = json.load(open("data/IRA_map.json"))
+        self.user_id_map = json.load(open("data/IRA_map_ele.json"))
 
     def find_user_id_map(self):
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
@@ -89,7 +89,7 @@ class analyze_IRA_in_network:
 
     def run(self):
         # self.find_user_id_map()
-        self.cal_map()
+        # self.cal_map()
         self.un_anonymization()
 
 
