@@ -82,7 +82,8 @@ class analyze_IRA_in_network:
         un_ano_count = 0
         for _, row in tqdm(data.iterrows()):
             user_id = row["userid"]
-            if user_id in self.user_id_map or len(user_id) != 64:
+            # if user_id in self.user_id_map or len(user_id) != 64:
+            if len(user_id) != 64
                 un_ano_count += 1
         print(un_ano_count, un_ano_count / len(data))
 
