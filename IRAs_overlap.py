@@ -74,7 +74,7 @@ class analyze_IRA_in_network:
 
     def run(self):
         # self.find_user_id_map()
-        self.get_map()
+        self.cal_map()
 
 if __name__ == "__main__":
     Lebron = analyze_IRA_in_network()
