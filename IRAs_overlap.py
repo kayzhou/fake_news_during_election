@@ -30,7 +30,7 @@ class analyze_IRA_in_network:
                     # self.user_id_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, d["user_id"]))
 
-    def check(self):
+    def get_map(self):
         # IRA_map_v2.json 较大库的映射
         map1 = []
         for line in open("data/IRA_map_v2.json"):
@@ -41,23 +41,27 @@ class analyze_IRA_in_network:
                 print(words)
 
         # 相同的匿名ID会不会存在不同的ID？
-        test_data = {}
+        test_data1 = {}
         for i, j in map1:
-            if i in test_data and j != test_data[i]:
+            if i in test_data1 and j != test_data1[i]:
                 print("重复啦！")
                 continue
-            test_data[i] = j
+            test_data1[i] = j
 
-        print(test_data)
         # SQLITE 数据库中的映射
         map2 = [(line.strip().split(",")[1], line.strip().split(",")[2]) for line in open("data/IRA_map_v3.json")]
-        test_data = {}
+        test_data2 = {}
         for i, j in map2:
-            if i in test_data and j != test_data[i]:
+            if i in test_data2 and j != test_data2[i]:
                 print("重复啦！")
                 continue
-            test_data[i] = j
-        print(test_data)
+            test_data2[i] = j
+
+        for k in test_data2.keys():
+            if k not in test_data1:
+                print("OH MY GOD")
+
+
 
         # save
         # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
