@@ -32,16 +32,31 @@ class analyze_IRA_in_network:
 
     def check(self):
         # IRA_map_v2.json 较大库的映射
-        map1 = []
-        # SQLITE 数据库中的映射
-        map2 = []
+        map1 = [(line.strip().split()[1], line.strip().split()[2]) for line in open("data/IRA_map_v2.json")]
 
+        # 相同的匿名ID会不会存在不同的ID？
+        test_data = {}
+        for i, j in map1:
+            if i in test_data and j != test_data[i]:
+                print("重复啦！")
+                continue
+            test_data[i] = j
+
+        # SQLITE 数据库中的映射
+        map2 = [(line.strip().split()[1], line.strip().split()[2]) for line in open("data/IRA_map_v3.json")]
+        test_data = {}
+        for i, j in map2:
+            if i in test_data and j != test_data[i]:
+                print("重复啦！")
+                continue
+            test_data[i] = j
 
         # save
         # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
     def run(self):
-        self.find_user_id_map()
+        # self.find_user_id_map()
+        self.check()
 
 if __name__ == "__main__":
     Lebron = analyze_IRA_in_network()
