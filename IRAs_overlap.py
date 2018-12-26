@@ -62,10 +62,8 @@ class analyze_IRA_in_network:
 
         IRA_map = {}
         for k, v in test_data1.items():
-            if k not in IRA_map:
                 IRA_map[k] = v
         for k, v in test_data2.items():
-            if k not in IRA_map:
                 IRA_map[k] = v
         print(len(IRA_map))
 
