@@ -8,7 +8,7 @@ Created on 2018-11-16 09:01:28
 """
 
 from my_weapon import *
-from SQLite_handler import get_user_id
+from SQLite_handler import get_user_id, find_tweet
 
 
 class analyze_IRA_in_network:
@@ -19,13 +19,13 @@ class analyze_IRA_in_network:
     def find_user_id_map(self):
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                             usecols=["tweetid", "userid"], dtype=str)
-        with open("data/IRA_map_v2.json", "w") as f:
+        with open("data/IRA_map_v3.json", "w") as f:
             for _, row in tqdm(data.iterrows()):
                 tweet_id = row["tweetid"]
                 user_id = row["userid"]
                 # if user_id in self.user_id_map:
                 #     continue
-                real_user_id = get_user_id(tweet_id)
+                real_user_id = find_tweet(tweet_id)
                 if real_user_id:
                     # self.user_id_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, real_user_id))
