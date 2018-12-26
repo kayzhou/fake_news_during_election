@@ -37,6 +37,14 @@ class analyze_IRA_in_network:
         except:
             print(line)
 
+        map1 = []
+        for line in open("data/IRA_map_v2.json"):
+            words = line.strip().split(",")
+            try:
+                map1.append((words[1], words[2]))
+            except:
+                print(words)
+
         # 相同的匿名ID会不会存在不同的ID？
         test_data = {}
         for i, j in map1:
