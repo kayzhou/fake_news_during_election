@@ -25,7 +25,8 @@ class analyze_IRA_in_network:
                 user_id = row["userid"]
                 # if user_id in self.user_id_map:
                 #     continue
-                real_user_id = find_tweet(tweet_id)["user_id"]
+                real_user_id = find_tweet(tweet_id)
+                print(real_user_id)
                 if real_user_id:
                     # self.user_id_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, real_user_id))
