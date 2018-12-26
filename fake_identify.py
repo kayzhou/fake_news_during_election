@@ -1,6 +1,7 @@
 import ujson as json
 
-host_label = json.load(open('data/host_label.json'))
+host_label = json.load(open("data/source.txt"))
+host_label = json.load(open("data/mbfc_host_label.json"))
 # d = json.load(open('data/sources.json'))
 # for k, v in d.items():
 #     if v['type'] in ['fake', 'conspiracy', 'hate', 'Conspiracy', 'fake news']:
