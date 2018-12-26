@@ -70,6 +70,7 @@ class analyze_IRA_in_network:
         self.user_id_map = IRA_map
 
         # save
+        json.dump(test_data2, open("data/IRA_map_ele.json", "w"), indent=2)
         json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
 
