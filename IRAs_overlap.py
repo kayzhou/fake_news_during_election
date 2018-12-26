@@ -30,7 +30,7 @@ class analyze_IRA_in_network:
                     # self.user_id_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, d["user_id"]))
 
-    def get_map(self):
+    def cal_map(self):
         # IRA_map_v2.json 较大库的映射
         map1 = []
         for line in open("data/IRA_map_v2.json"):
@@ -67,10 +67,10 @@ class analyze_IRA_in_network:
                 IRA_map[k] = v
         print(len(IRA_map))
 
-
+        self.user_id_map = IRA_map
 
         # save
-        # json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
+        json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
 
     def run(self):
         # self.find_user_id_map()
