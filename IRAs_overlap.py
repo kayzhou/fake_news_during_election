@@ -32,11 +32,6 @@ class analyze_IRA_in_network:
 
     def check(self):
         # IRA_map_v2.json 较大库的映射
-        try:
-            map1 = [(line.strip().split(",")[1], line.strip(",").split()[2]) for line in open("data/IRA_map_v2.json")]
-        except:
-            print(line)
-
         map1 = []
         for line in open("data/IRA_map_v2.json"):
             words = line.strip().split(",")
