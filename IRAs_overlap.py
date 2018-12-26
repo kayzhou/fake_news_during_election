@@ -48,6 +48,8 @@ class analyze_IRA_in_network:
                 continue
             test_data1[i] = j
 
+        print(len(test_data1))
+
         # SQLITE 数据库中的映射
         map2 = [(line.strip().split(",")[1], line.strip().split(",")[2]) for line in open("data/IRA_map_v3.json")]
         test_data2 = {}
@@ -56,10 +58,16 @@ class analyze_IRA_in_network:
                 print("重复啦！")
                 continue
             test_data2[i] = j
+        print(len(test_data2))
 
-        for k in test_data2.keys():
-            if k not in test_data1:
-                print("OH MY GOD")
+        IRA_map = {}
+        for k, v in test_data1.items():
+            if k not in IRA_map:
+                IRA_map[k] = v
+        for k, v in test_data2.items():
+            if k not in IRA_map:
+                IRA_map[k] = v
+        print(len(IRA_map))
 
 
 
