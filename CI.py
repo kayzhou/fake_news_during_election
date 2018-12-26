@@ -1,12 +1,12 @@
-'''
-Created on Nov 4, 2015
+#-*- coding: utf-8 -*-
 
-@author: geofurb
-'''
+"""
+Created on 2018-12-20 15:40:26
+@author: https://kayzhou.github.io/
+"""
 
 # NetworkX performs network analytics (computes scc)
 # BitAPIer.py is only used to find the archive directory (no TCP connections)
-
 
 import time
 from multiprocessing import Pool
@@ -94,7 +94,7 @@ class TwiAnalytics(object):
                 max_CI = max_bundle[0] * -1
                 max_node = max_bundle[1]
 
-                # Remove influencer, Why??
+                # Remove influencer
                 main_proc_time += time.time() - newtime
                 newtime = time.time()
 
@@ -307,7 +307,7 @@ class TwiAnalytics(object):
                 graph.remove_node(max_node)
 
                 if flashy:
-                    print('#',end="",flush=True)
+                    print('#', end="", flush=True)
                     if len(winners) % 100 == 0:
                             print('')
 
