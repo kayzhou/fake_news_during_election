@@ -103,7 +103,7 @@ class analyze_IRA_in_network:
         uids = json.load(open("data/node.json"))
         return uids
 
-    def load_edges():
+    def load_edge(self):
         retweet_link = []
 
         conn = sqlite3.connect(
@@ -153,7 +153,7 @@ class analyze_IRA_in_network:
         # self.cal_map()
         # self.un_anonymization()
         # self.load_node()
-        self.load_edges()
+        self.load_edge()
 
 
 if __name__ == "__main__":
