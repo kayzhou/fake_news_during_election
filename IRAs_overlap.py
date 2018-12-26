@@ -89,7 +89,7 @@ class analyze_IRA_in_network:
 
     def run(self):
         # self.find_user_id_map()
-        # self.cal_map()
+        self.cal_map()
         self.un_anonymization()
 
 
