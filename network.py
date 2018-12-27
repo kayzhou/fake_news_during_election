@@ -18,6 +18,8 @@ class analyze_IRA_in_network:
         self.author = "kay"
         self.IRA_map = json.load(open("data/IRA_map_ele.json"))
         self.uid_index = {}
+        self.chosed_nodes = set()
+
         self.G = nx.DiGraph()
 
     def find_IRA_map(self):
@@ -117,7 +119,11 @@ class analyze_IRA_in_network:
             self.uid_index[uid] = i
         print("nodes:", len(self.uid_index))
 
-        return list(range(len(self.uid_index)))
+        degree = json.load(open("data/degree.json"))
+        nodes = [k for k, v in degree.items() if v["all_d"] > 1]
+        self.chosed_nodes = set(nodes)
+
+        return nodes
 
     def load_edge(self):
         # e_count = 0
@@ -191,13 +197,13 @@ class analyze_IRA_in_network:
         #     for edge in retweet_link:
         #         f.write(edge + "\n")
 
-
         retweet_link = []
         for line in open("data/edge.txt"):
             w = line.strip().split("-")
             u1 = self.uid_index[w[0]]
             u2 = self.uid_index[w[1]]
-            retweet_link.append((u1, u2))
+            if u1 in self.chosed_nodes and u2 in self.chosed_nodes:
+                retweet_link.append((u1, u2))
 
         print("edge:", len(retweet_link))
         print("finished!")
@@ -224,18 +230,18 @@ class analyze_IRA_in_network:
 
         json.dump(degree, open("data/degree.json", "w"), indent=2)
         degree = json.load(open("data/degree.json"))
-        nodes = [k for k, v in degree.items() if v["all_d"] <= 1]
+        nodes = [k for k, v in degree.items() if v["all_d"] > 1]
         print(len(nodes))
 
     def build_network(self):
         nodes = self.load_node()
-        self.cal_degree()
-        # edges = self.load_edge()
+        # self.cal_degree()
+        edges = self.load_edge()
         print("add nodes from ...")
-        # self.G.add_nodes_from(nodes)
+        self.G.add_nodes_from(nodes)
         print("add edge from ...")
-        # self.G.add_edges_from(edges)
-        # nx.readwrite.adjlist.write_adjlist(self.G, 'data/whole_network.adj')
+        self.G.add_edges_from(edges)
+        nx.write_gpickle(G, "data/whole_network.gpickle")
 
     def run(self):
 
