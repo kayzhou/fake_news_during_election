@@ -5,8 +5,9 @@ Created on 2018-11-12 16:09:49
 @author: https://kayzhou.github.io/
 """
 
-import sqlite3
 import json
+import sqlite3
+
 # import queue
 import pandas as pd
 from tqdm import tqdm

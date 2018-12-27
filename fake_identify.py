@@ -1,34 +1,35 @@
 import json
 
-NEW_HOST_1 = {}
-for k, v in json.load(open("data/sources.json")).items():
-    hostname = k.lower()
-    _type = v["type"]
-    if _type in ["fake", "conspiracy", "hate"]:
-        NEW_HOST_1[hostname] = "FAKE"
-    elif _type == "bias":
-        NEW_HOST_1[hostname] = "BIAS"
+class Who_is_fake(object):
+    def __init__(self):
+        self.NEW_HOST_1 = {}
+        for k, v in json.load(open("data/sources.json")).items():
+            hostname = k.lower()
+            _type = v["type"]
+            if _type in ["fake", "conspiracy", "hate"]:
+                self.NEW_HOST_1[hostname] = "FAKE"
+            elif _type == "bias":
+                self.NEW_HOST_1[hostname] = "BIAS"
 
-NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
+        self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
 
 
-def kind_of_news(ht):
-    ht = ht.lower()
-    labels = []
-    if ht in NEW_HOST_1:
-        labels.append(NEW_HOST_1[ht])
-    else:
-        labels.append("NOT FAKE")
+    def identify(self, ht):
+        ht = ht.lower()
+        labels = []
+        if ht in self.NEW_HOST_1:
+            labels.append(self.NEW_HOST_1[ht])
+        else:
+            labels.append("GOOD")
 
-    if ht in NEW_HOST_2:
-        labels.extend(NEW_HOST_2[ht])
-    else:
-        labels.extend([-1, -1])
+        if ht in self.NEW_HOST_2:
+            labels.extend(self.NEW_HOST_2[ht])
+        else:
+            labels.extend([-1, -1])
 
-    return labels
+        return labels
 
 
 if __name__ == "__main__":
-    print(len(NEW_HOST_1))
-    print(len(NEW_HOST_2))
-    print(kind_of_news("cnn.com"))
+    who = Who_is_fake()
+    print(who.identify("bbc.com"))
