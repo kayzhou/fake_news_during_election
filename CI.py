@@ -6,21 +6,20 @@ Created on 2018-12-20 15:40:26
 """
 
 # NetworkX performs network analytics (computes scc)
-# BitAPIer.py is only used to find the archive directory (no TCP connections)
 
-import time
-from multiprocessing import Pool
-from functools import partial
 import heapq
+import json
+import time
+from functools import partial
+from math import log
+from multiprocessing import Pool
 
 import networkx as nx
-from math import log
 
 
-class TwiAnalytics(object):
+class CollectiveInfluencer(object):
     '''
-    Object to interface between the archive files from TwAPIer and
-    graph analytics software.
+    for CI
     '''
 
     def __init__(self, num_ci_threads=1):
@@ -517,7 +516,9 @@ class TwiAnalytics(object):
 
 
 if __name__ == "__main__":
-    Lebron = TwiAnalytics()
-    G = nx.Graph()
-    G.add_node(1)
-    print(Lebron.siteCI(G))
+    Lebron = CollectiveInfluencer()
+    G = nx.read_gpickle("data/whole_network.gpickle")
+    winners, winner_deg, winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
+    json.dump(winners, open("data/winners.json", "w"), indent=2)
+    json.dump(winner_deg, open("data/winner_deg.json", "w"), indent=2)
+    json.dump(winners_ci, open("data/winners_ci.json", "w"), indent=2)
