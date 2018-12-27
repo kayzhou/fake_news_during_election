@@ -103,7 +103,7 @@ class analyze_IRA_in_network:
 
         # load from edge.txt
         for line in open("data/edge.txt"):
-            w = line.strip().split(",")
+            w = line.strip().split("-")
             uids.add(int(w[0]))
             uids.add(int(w[1]))
 
@@ -210,6 +210,11 @@ class analyze_IRA_in_network:
             edge.append((u1, u2))
 
         return edge
+
+    def cal_degree(self):
+        pass
+
+
 
     def build_network(self):
 
