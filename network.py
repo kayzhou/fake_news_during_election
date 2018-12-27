@@ -169,7 +169,7 @@ class analyze_IRA_in_network:
 
             u2 = row["userid"]
             if u2 in self.IRA_map:
-                u2 = self.uid_index[self.IRA_map[u2]]
+                u2 = self.IRA_map[u2]
             # try:
             #     u2 = self.uid_index[u2]
             # except:
