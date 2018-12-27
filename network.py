@@ -16,6 +16,7 @@ class analyze_IRA_in_network:
     def __init__(self):
         self.author = "kay"
         self.user_id_map = json.load(open("data/IRA_map_ele.json"))
+        self.uid_index = {}
         # self.network = nx.graph()
 
     def find_user_id_map(self):
@@ -102,10 +103,15 @@ class analyze_IRA_in_network:
         # json.dump(list(uids), open("data/node.json", "w"), indent=2)
 
         uids = json.load(open("data/node.json"))
-        return uids
+        for i, uid in enumerate(uids):
+            self.uid_index[uid] = i
+        print("nodes:", len(self.uid_index))
+        return list(range(len(self.uid_index)))
 
     def load_edge(self):
-        retweet_link = []
+        e_count = 0
+        print("loading edge ...")
+        retweet_link = set()
 
         conn = sqlite3.connect(
             "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
@@ -113,10 +119,15 @@ class analyze_IRA_in_network:
         c.execute(
             '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
         for row in c.fetchall():
-            u1 = str(row[0])
-            u2 = str(row[1])
-            retweet_link.append((u1, u2))
+            e_count += 1
+            try:
+                u1 = self.uid_index[str(row[0])]
+                u2 = self.uid_index[str(row[1])]
+                retweet_link.add(str(u1) + "-" + str(u2))
+            except:
+                pass
         conn.close()
+        print(e_count)
 
         # 下一个！
         conn = sqlite3.connect(
@@ -125,35 +136,73 @@ class analyze_IRA_in_network:
         c.execute(
             '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
         for row in c.fetchall():
-            u1 = str(row[0])
-            u2 = str(row[1])
-            retweet_link.append((u1, u2))
+            e_count += 1
+            try:
+                u1 = self.uid_index[str(row[0])]
+                u2 = self.uid_index[str(row[1])]
+                retweet_link.add(str(u1) + "-" + str(u2))
+            except:
+                pass
         conn.close()
+        print(e_count)
 
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["userid", "retweet_userid"], dtype=str)
         data_ira = data_ira.dropna()
         for i, row in data_ira.iterrows():
+            e_count += 1
             u1 = row["retweet_userid"]
             if u1 in self.user_id_map:
                 u1 = self.user_id_map[u1]
+            try:
+                u1 = self.uid_index[u1]
+            except:
+                continue
+
             u2 = row["userid"]
             if u2 in self.user_id_map:
-                u2 = self.user_id_map[u2]
-            retweet_link.append((u1, u2))
+                u2 = self.uid_index[self.user_id_map[u2]]
+            try:
+                u2 = self.uid_index[u2]
+            except:
+                continue
+
+            retweet_link.add(str(u1) + "-" + str(u2))
+
+        print(e_count)
+        with(open("data/edge.txt", "w")) as f:
+            for edge in retweet_link:
+                f.write(edge + "\n")
+
+        """
+        retweet_link = []
+        for line in open("data/edge.txt"):
+            words = line.strip().split(",")
+            retweet_link.append( [int(words[0]), int(words[1])] )
+        """
 
         # json.dump(retweet_link, open("data/edge.json", "w"),
         #     ensure_ascii=False, indent=2)
 
         # retweet_liks = json.load(open("data/edge.json"))
-        return retweet_link
+        print("edge:", len(retweet_link))
+        print("finished!")
+
+        edge = []
+        for e in retweet_link:
+            u1, u2 = e.split("-")
+            edge.append((u1, u2))
+
+        return edge
 
     def build_network(self):
         self.graph = nx.DiGraph()
         nodes = self.load_node()
         edges = self.load_edge()
+        print("add nodes from ...")
         self.graph.add_nodes_from(nodes)
+        print("add edge from ...")
         self.graph.add_edges_from(edges)
-        nx.readwrite.adjlist.write_adjlist(self.graph, 'whole_network.adj')
+        # nx.readwrite.adjlist.write_adjlist(self.graph, 'data/whole_network.adj')
 
     def run(self):
 
