@@ -220,7 +220,7 @@ class analyze_IRA_in_network:
             degree[u1]["out_d"] += 1
             degree[u1]["all_d"] += 1
             degree[u2]["in_d"] += 1
-            degree[u2]["out_d"] += 1
+            degree[u2]["all_d"] += 1
 
         json.dump(degree, open("data/degree.json", "w"), indent=2)
 
