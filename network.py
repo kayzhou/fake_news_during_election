@@ -205,25 +205,25 @@ class analyze_IRA_in_network:
         return retweet_link
 
     def cal_degree(self):
-        # degree = {}
-        # for v in self.uid_index.values():
-        #     degree[v] = {
-        #         "in_d": 0,
-        #         "out_d": 0,
-        #         "all_d": 0
-        #     }
+        degree = {}
+        for v in self.uid_index.values():
+            degree[v] = {
+                "in_d": 0,
+                "out_d": 0,
+                "all_d": 0
+            }
 
-        # for line in open("data/edge.txt"):
-        #     w = line.strip().split("-")
-        #     u1 = self.uid_index[w[0]]
-        #     u2 = self.uid_index[w[1]]
-        #     degree[u1]["out_d"] += 1
-        #     degree[u1]["all_d"] += 1
-        #     degree[u2]["in_d"] += 1
-        #     degree[u2]["all_d"] += 1
+        for line in open("data/edge.txt"):
+            w = line.strip().split("-")
+            u1 = self.uid_index[w[0]]
+            u2 = self.uid_index[w[1]]
+            degree[u1]["out_d"] += 1
+            degree[u1]["all_d"] += 1
+            degree[u2]["in_d"] += 1
+            degree[u2]["all_d"] += 1
 
-        # json.dump(degree, open("data/degree.json", "w"), indent=2)
-        degree = json.load(open("data/degree.json", "w"))
+        json.dump(degree, open("data/degree.json", "w"), indent=2)
+        degree = json.load(open("data/degree.json"))
         nodes = [k for k, v in degree.items() if v["all_d"] <= 1]
         print(len(nodes))
 
