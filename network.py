@@ -101,6 +101,12 @@ class analyze_IRA_in_network:
             if user_id not in self.IRA_map:
                 uids.add(user_id)
 
+        # load from edge.txt
+        for line in open("data/edge.txt"):
+            w = line.strip().split(",")
+            uids.add(int(w[0]))
+            uids.add(int(w[1]))
+
         # save
         json.dump(list(uids), open("data/node.json", "w"), indent=2)
 
@@ -193,8 +199,8 @@ class analyze_IRA_in_network:
 
         # json.dump(retweet_link, open("data/edge.json", "w"),
         #     ensure_ascii=False, indent=2)
-
         # retweet_liks = json.load(open("data/edge.json"))
+
         print("edge:", len(retweet_link))
         print("finished!")
 
@@ -207,8 +213,8 @@ class analyze_IRA_in_network:
 
     def build_network(self):
 
-        # nodes = self.load_node()
-        edges = self.load_edge()
+        nodes = self.load_node()
+        # edges = self.load_edge()
         print("add nodes from ...")
         # self.G.add_nodes_from(nodes)
         print("add edge from ...")
