@@ -26,11 +26,11 @@ class analyze_IRA_in_network:
             for _, row in tqdm(data.iterrows()):
                 tweet_id = row["tweetid"]
                 user_id = row["userid"]
-                # if user_id in self.user_id_map:
+                # if user_id in self.IRA_map:
                 #     continue
                 d = find_tweet(tweet_id)
                 if d:
-                    # self.user_id_map[user_id] = real_user_id
+                    # self.IRA_map[user_id] = real_user_id
                     f.write("{},{},{}\n".format(tweet_id, user_id, d["user_id"]))
 
     def cal_map(self):
@@ -84,7 +84,7 @@ class analyze_IRA_in_network:
         un_ano_count = 0
         for _, row in tqdm(data.iterrows()):
             user_id = row["userid"]
-            # if user_id in self.user_id_map or len(user_id) != 64:
+            # if user_id in self.IRA_map or len(user_id) != 64:
             if len(user_id) != 64:
                 un_ano_count += 1
         print(un_ano_count, un_ano_count / len(data))
@@ -160,16 +160,16 @@ class analyze_IRA_in_network:
         for i, row in data_ira.iterrows():
             e_count += 1
             u1 = row["retweet_userid"]
-            if u1 in self.user_id_map:
-                u1 = self.user_id_map[u1]
+            if u1 in self.IRA_map:
+                u1 = self.IRA_map[u1]
             # try:
             #     u1 = self.uid_index[u1]
             # except:
             #     continue
 
             u2 = row["userid"]
-            if u2 in self.user_id_map:
-                u2 = self.uid_index[self.user_id_map[u2]]
+            if u2 in self.IRA_map:
+                u2 = self.uid_index[self.IRA_map[u2]]
             # try:
             #     u2 = self.uid_index[u2]
             # except:
