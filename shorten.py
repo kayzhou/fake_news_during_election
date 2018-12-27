@@ -15,8 +15,9 @@ short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.
 
 
 def get_urls():
-    tweets = pd.read_csv('data/ira-tweets.csv')
+    tweets = pd.read_csv('data/ira-tweets-ele.csv')
     print(len(tweets))
+
     for i, row in tweets.iterrows():
         # print(i, row, type(row), row['urls'], type(row['urls']))
         if not isinstance(row['urls'], str):
@@ -35,11 +36,10 @@ def get_urls():
                 traceback.print_exc(file=sys.stdout)
                 # print(i, e)
 
-
 def task(_ids):
     unshortener = UnshortenIt()
 
-    with open("IRA-final-url-v3.json", "w") as f:
+    with open("IRA-final-url.json", "w") as f:
         for d in tqdm(_ids):
             # print("input", d)
             # if d['short']:
@@ -53,14 +53,6 @@ def task(_ids):
                 except Exception as e:
                     d['error'] = True
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
-
-
-def again():
-    dict_id_host = []
-    for line in open("IRA-final-url-v2.json"):
-        d = json.loads(line.strip())
-        dict_id_host.append(d)
-    task(dict_id_host)
 
 
 def keep_url():
@@ -102,95 +94,16 @@ def keep_url():
         t.start()
     """
 
-def temp():
-    """
-    mutiprocess > solve
-    """
-
-    """
-    ids = set([])
-    for i, line in enumerate(open('id_host_short-20181021.txt')):
-        # ids.add(json.loads(line.strip())['id'])
-        line = line.strip()
-        cnt += line.count("{")
-        if line.count("{") == 1:
-            out_file.write(line + '\n')
-        else:
-            print(line.count("{"), line)
-            ws = line.split("}")
-            for w in ws:
-                if w != '':
-                    out_file.write(w + '}\n')
-    print("cnt:", cnt)
-    exit(0)
-
-    ids = set([])
-    with open('id_host_short.txt') as f:
-        for line in f:
-            if line != ' ':
-                # print(i, line)
-                ids.add(json.loads(line.strip())['id'])
-
+def again():
     dict_id_host = []
-    for line in open('id_host-20181021.txt'):
-        _id, url, hostname = line.strip().split('\t')
-        if _id in ids:
-            continue
-        if len(url) <= 30 and len(hostname) <= 10:
-            d = {
-                'id': _id,
-                'url': url,
-                'hostname': hostname,
-                'short': True
-            }
-        else:
-            d = {
-                'id': _id,
-                'url': url,
-                'hostname': hostname,
-                'short': False
-            }
-        dict_id_host.append(d)
-    print(len(dict_id_host))
-    """
-
-    """
-    dict_id_host = []
-    for line in open("id_host_short.txt"):
-        dict_id_host.append(json.loads(line.strip()))
-
-    hostname_type = json.load(open("data/host_label.json"))
-
-    i = 0
-    cnt = 0
-    with open('id_host_short_new.txt', 'w') as f:
-        for d in dict_id_host:
-            i += 1
-            if i % 50000 == 0:
-                print(i)
-            if d["hostname"] in hostname_type:
-                d["type"] = int(hostname_type[d["hostname"]])
-                if d["type"] == -2:
-                    cnt += 1
-            else:
-                d["type"] = 100
-
-            f.write(json.dumps(d, ensure_ascii=False) + "\n")
-
-    print("fake news:", cnt)
-    """
-
-    cnt = [0] * 7
-    for line in open("id_host_short_new.txt"):
+    for line in open("IRA-final-url.json"):
         d = json.loads(line.strip())
-        if d["type"] != 100:
-            cnt[d["type"] + 2] += 1
-
-    print(cnt)
+        dict_id_host.append(d)
+    task(dict_id_host)
 
 
 if __name__ == "__main__":
-    # get_urls()
+    get_urls()
     # keep_url()
     # again()
     # temp()
