@@ -9,6 +9,7 @@ Created on 2018-11-16 09:01:28
 
 from my_weapon import *
 import sqlite3
+from collections import defaultdict
 from SQLite_handler import get_user_id, find_tweet, find_all_uids
 
 
@@ -90,25 +91,25 @@ class analyze_IRA_in_network:
         print(un_ano_count, un_ano_count / len(data))
 
     def load_node(self):
-        uids = find_all_uids()
-        for uid in self.IRA_map.values():
-            uids.append(uid)
-        uids = set(uids)
-        data = pd.read_csv("data/ira_users_csv_hashed.csv",
-            usecols=["userid"], dtype=str)
-        for _, row in tqdm(data.iterrows()):
-            user_id = row["userid"]
-            if user_id not in self.IRA_map:
-                uids.add(user_id)
+        # uids = find_all_uids()
+        # for uid in self.IRA_map.values():
+        #     uids.append(uid)
+        # uids = set(uids)
+        # data = pd.read_csv("data/ira_users_csv_hashed.csv",
+        #     usecols=["userid"], dtype=str)
+        # for _, row in tqdm(data.iterrows()):
+        #     user_id = row["userid"]
+        #     if user_id not in self.IRA_map:
+        #         uids.add(user_id)
 
-        # load from edge.txt
-        for line in open("data/edge.txt"):
-            w = line.strip().split("-")
-            uids.add(w[0])
-            uids.add(w[1])
+        # # load from edge.txt
+        # for line in open("data/edge.txt"):
+        #     w = line.strip().split("-")
+        #     uids.add(w[0])
+        #     uids.add(w[1])
 
         # save
-        json.dump(list(uids), open("data/node.json", "w"), indent=2)
+        # json.dump(list(uids), open("data/node.json", "w"), indent=2)
 
         # load
         uids = json.load(open("data/node.json"))
@@ -119,106 +120,114 @@ class analyze_IRA_in_network:
         return list(range(len(self.uid_index)))
 
     def load_edge(self):
-        e_count = 0
-        print("loading edge ...")
-        retweet_link = set()
+        # e_count = 0
+        # print("loading edge ...")
+        # retweet_link = set()
 
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-        c = conn.cursor()
-        c.execute(
-            '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
-        for row in c.fetchall():
-            e_count += 1
-            try:
-                u1 = str(row[0])
-                u2 = str(row[1])
-                # u1 = self.uid_index[str(row[0])]
-                # u2 = self.uid_index[str(row[1])]
-                retweet_link.add(str(u1) + "-" + str(u2))
-            except:
-                pass
-        conn.close()
-        print(e_count)
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+        # c = conn.cursor()
+        # c.execute(
+        #     '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
+        # for row in c.fetchall():
+        #     e_count += 1
+        #     try:
+        #         u1 = str(row[0])
+        #         u2 = str(row[1])
+        #         # u1 = self.uid_index[str(row[0])]
+        #         # u2 = self.uid_index[str(row[1])]
+        #         retweet_link.add(str(u1) + "-" + str(u2))
+        #     except:
+        #         pass
+        # conn.close()
+        # print(e_count)
 
-        # 下一个！
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-        c = conn.cursor()
-        c.execute(
-            '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
-        for row in c.fetchall():
-            e_count += 1
-            try:
-                u1 = str(row[0])
-                u2 = str(row[1])
-                # u1 = self.uid_index[str(row[0])]
-                # u2 = self.uid_index[str(row[1])]
-                retweet_link.add(str(u1) + "-" + str(u2))
-            except:
-                pass
-        conn.close()
-        print(e_count)
+        # # 下一个！
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        # c = conn.cursor()
+        # c.execute(
+        #     '''SELECT retweeted_uid, author_uid FROM tweet_to_retweeted_uid''')
+        # for row in c.fetchall():
+        #     e_count += 1
+        #     try:
+        #         u1 = str(row[0])
+        #         u2 = str(row[1])
+        #         # u1 = self.uid_index[str(row[0])]
+        #         # u2 = self.uid_index[str(row[1])]
+        #         retweet_link.add(str(u1) + "-" + str(u2))
+        #     except:
+        #         pass
+        # conn.close()
+        # print(e_count)
 
-        data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
-                usecols=["userid", "retweet_userid"], dtype=str)
-        data_ira = data_ira.dropna()
-        for i, row in data_ira.iterrows():
-            e_count += 1
-            u1 = row["retweet_userid"]
-            if u1 in self.IRA_map:
-                u1 = self.IRA_map[u1]
-            # try:
-            #     u1 = self.uid_index[u1]
-            # except:
-            #     continue
+        # data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+        #         usecols=["userid", "retweet_userid"], dtype=str)
+        # data_ira = data_ira.dropna()
+        # for i, row in data_ira.iterrows():
+        #     e_count += 1
+        #     u1 = row["retweet_userid"]
+        #     if u1 in self.IRA_map:
+        #         u1 = self.IRA_map[u1]
+        #     # try:
+        #     #     u1 = self.uid_index[u1]
+        #     # except:
+        #     #     continue
 
-            u2 = row["userid"]
-            if u2 in self.IRA_map:
-                u2 = self.IRA_map[u2]
-            # try:
-            #     u2 = self.uid_index[u2]
-            # except:
-            #     continue
+        #     u2 = row["userid"]
+        #     if u2 in self.IRA_map:
+        #         u2 = self.IRA_map[u2]
+        #     # try:
+        #     #     u2 = self.uid_index[u2]
+        #     # except:
+        #     #     continue
 
-            retweet_link.add(str(u1) + "-" + str(u2))
+        #     retweet_link.add(str(u1) + "-" + str(u2))
 
-        print(e_count)
+        # print(e_count)
 
         # save all edges
-        with(open("data/edge.txt", "w")) as f:
-            for edge in retweet_link:
-                f.write(edge + "\n")
+        # with(open("data/edge.txt", "w")) as f:
+        #     for edge in retweet_link:
+        #         f.write(edge + "\n")
 
-        """
+
         retweet_link = []
         for line in open("data/edge.txt"):
-            words = line.strip().split(",")
-            retweet_link.append( [int(words[0]), int(words[1])] )
-        """
-
-        # json.dump(retweet_link, open("data/edge.json", "w"),
-        #     ensure_ascii=False, indent=2)
-        # retweet_liks = json.load(open("data/edge.json"))
+            w = line.strip().split("-")
+            u1 = self.uid_index[w[0]]
+            u2 = self.uid_index[w[1]]
+            retweet_link.append((u1, u2))
 
         print("edge:", len(retweet_link))
         print("finished!")
 
-        edge = []
-        for e in retweet_link:
-            u1, u2 = e.split("-")
-            edge.append((u1, u2))
-
-        return edge
+        return retweet_link
 
     def cal_degree(self):
-        pass
+        degree = {}
+        for v in self.uid_index.values():
+            degree[v] = {
+                "in_d": 0,
+                "out_d": 0,
+                "all_d": 0
+            }
 
+        for line in open("data/edge.txt"):
+            w = line.strip().split("-")
+            u1 = self.uid_index[w[0]]
+            u2 = self.uid_index[w[1]]
+            degree[u1]["out_d"] += 1
+            degree[u1]["all_d"] += 1
+            degree[u2]["in_d"] += 1
+            degree[u2]["out_d"] += 1
+
+        json.dump(degree, open("data/degree.json", "w"), indent=2)
 
 
     def build_network(self):
-
         nodes = self.load_node()
+        self.cal_degree()
         # edges = self.load_edge()
         print("add nodes from ...")
         # self.G.add_nodes_from(nodes)
