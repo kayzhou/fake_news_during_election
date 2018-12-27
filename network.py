@@ -224,7 +224,7 @@ class analyze_IRA_in_network:
 
         # json.dump(degree, open("data/degree.json", "w"), indent=2)
         degree = json.load(open("data/degree.json", "w"))
-        nodes = [k for k, v in degree.items() v["all_d"] <= 1]
+        nodes = [k for k, v in degree.items() if v["all_d"] <= 1]
         print(len(nodes))
 
     def build_network(self):
