@@ -38,16 +38,13 @@ def get_urls():
 
 def task(_ids):
     unshortener = UnshortenIt()
-
-    with open("IRA-final-url.json", "w") as f:
+    with open("data/ira-final-url.json", "w") as f:
         for d in tqdm(_ids):
-            # print("input", d)
-            # if d['short']:
-            if "error" in d and d["error"]:
+            if d['short'] or ("error" in d and d["error"]):
                 try:
                     d["error"] = False
                     url = unshortener.unshorten(d["url"])
-                    d["real_url"] = url
+                    d["final_url"] = url
                     hostname = urlparse(url).hostname
                     d['hostname'] = hostname
                 except Exception as e:
@@ -57,30 +54,21 @@ def task(_ids):
 
 def keep_url():
     dict_id_host = []
-    cnt = 0
-    for line in open('data/id_url_hostname.csv'):
+    for line in open('data/ira-id-url-hostname.csv'):
         _id, tweetid, url, hostname = line.strip().split('\t')
+        d = {
+            'id': _id,
+            'tweetid': tweetid,
+            'url': url,
+            'hostname': hostname,
+            'final_url': url,
+            'short': False
+        }
         if len(hostname) <= 10:
-            cnt += 1
-            d = {
-                'id': _id,
-                'tweetid': tweetid,
-                'url': url,
-                'hostname': hostname,
-                'real_url': url,
-                'short': True
-            }
-        else:
-            d = {
-                'id': _id,
-                'url': url,
-                'tweetid': tweetid,
-                'hostname': hostname,
-                'real_url': url,
-                'short': False
-            }
+            d['short'] = True
         dict_id_host.append(d)
     task(dict_id_host)
+
 
     """
     task_cnt = 5
@@ -96,15 +84,16 @@ def keep_url():
 
 def again():
     dict_id_host = []
-    for line in open("IRA-final-url.json"):
+    for line in open("data/ira-final-url.json"):
         d = json.loads(line.strip())
         dict_id_host.append(d)
     task(dict_id_host)
 
 
 if __name__ == "__main__":
-    get_urls()
-    # keep_url()
+    # get_urls()
+    keep_url()
+
     # again()
     # temp()
 
