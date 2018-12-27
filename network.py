@@ -104,8 +104,8 @@ class analyze_IRA_in_network:
         # load from edge.txt
         for line in open("data/edge.txt"):
             w = line.strip().split("-")
-            uids.add(int(w[0]))
-            uids.add(int(w[1]))
+            uids.add(w[0])
+            uids.add(w[1])
 
         # save
         json.dump(list(uids), open("data/node.json", "w"), indent=2)
