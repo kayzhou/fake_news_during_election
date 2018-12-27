@@ -38,21 +38,29 @@ def get_urls():
 
 def task(_ids):
     unshortener = UnshortenIt()
-    with open("data/ira-final-url.json", "w") as f:
-        for d in tqdm(_ids):
-            if d['short'] or ("error" in d and d["error"]):
-                try:
-                    d["error"] = False
-                    url = unshortener.unshorten(d["url"])
-                    d["final_url"] = url
-                    hostname = urlparse(url).hostname
-                    d['hostname'] = hostname
-                except Exception as e:
-                    d['error'] = True
+    new_ids = []
+    for d in _ids:
+        if d['short'] or ("error" in d and d["error"]):
+            try:
+                d["error"] = False
+                url = unshortener.unshorten(d["url"])
+                d["final_url"] = url
+                hostname = urlparse(url).hostname
+                d['hostname'] = hostname
+            except Exception as e:
+                d['error'] = True
+        new_ids.append(d)
+    return new_ids
+
+
+def write2json(new_ids):
+    print("写入文件中 ... ...")
+    with open("data/ira-final-url.json", "a") as f:
+        for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
 
-def keep_url():
+def unshorten_url():
     dict_id_host = []
     for line in open('data/ira-id-url-hostname.csv'):
         _id, tweetid, url, hostname = line.strip().split('\t')
@@ -67,20 +75,22 @@ def keep_url():
         if len(hostname) <= 10:
             d['short'] = True
         dict_id_host.append(d)
-    task(dict_id_host)
 
+    # task(dict_id_host)
 
-    """
-    task_cnt = 5
+    task_cnt = 4
     step = int(len(dict_id_host) / task_cnt)
+    pool = multiprocessing.Pool()
     for i in range(task_cnt):
         if i == task_cnt - 1:
             _ids = dict_id_host[i * step:]
         else:
             _ids = dict_id_host[i * step: (i + 1) * step]
-        t = multiprocessing.Process(target=task, args=(_ids,))
-        t.start()
-    """
+    pool.apply_async(task, (_ids,), callback=write2json)
+
+    pool.close()
+    pool.join()
+
 
 def again():
     dict_id_host = []
@@ -92,7 +102,7 @@ def again():
 
 if __name__ == "__main__":
     # get_urls()
-    keep_url()
+    unshorten_url()
 
     # again()
     # temp()
