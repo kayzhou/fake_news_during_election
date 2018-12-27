@@ -29,4 +29,6 @@ def kind_of_news(ht):
 
 
 if __name__ == "__main__":
+    print(len(NEW_HOST_1))
+    print(len(NEW_HOST_2))
     print(kind_of_news("cnn.com"))
