@@ -122,6 +122,7 @@ class analyze_IRA_in_network:
         degree = json.load(open("data/degree.json"))
         nodes = [k for k, v in degree.items() if v["all_d"] > 1]
         self.chosed_nodes = set(nodes)
+        print("chosed nodes:", len(self.chosed_nodes))
 
         return nodes
 
