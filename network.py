@@ -15,11 +15,11 @@ from SQLite_handler import get_user_id, find_tweet, find_all_uids
 class analyze_IRA_in_network:
     def __init__(self):
         self.author = "kay"
-        self.user_id_map = json.load(open("data/IRA_map_ele.json"))
+        self.IRA_map = json.load(open("data/IRA_map_ele.json"))
         self.uid_index = {}
-        # self.network = nx.graph()
+        self.G = nx.DiGraph()
 
-    def find_user_id_map(self):
+    def find_IRA_map(self):
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                             usecols=["tweetid", "userid"], dtype=str)
         with open("data/IRA_map_v3.json", "w") as f:
@@ -70,13 +70,13 @@ class analyze_IRA_in_network:
                 IRA_map[k] = v
         print(len(IRA_map))
 
-        self.user_id_map = IRA_map
+        # self.IRA_map = IRA_map
 
         # save
         json.dump(test_data2, open("data/IRA_map_ele.json", "w"), indent=2)
-        json.dump(self.user_id_map, open("data/IRA_map.json", "w"), indent=2)
+        # json.dump(self.IRA_map, open("data/IRA_map.json", "w"), indent=2)
 
-    def un_anonymization(self):
+    def un_anony(self):
         # 取消匿名化
         data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                             usecols=["tweetid", "userid"], dtype=str)
@@ -90,22 +90,26 @@ class analyze_IRA_in_network:
         print(un_ano_count, un_ano_count / len(data))
 
     def load_node(self):
-        # uids = find_all_uids()
-        # for uid in self.user_id_map.values():
-        #     uids.append(uid)
-        # uids = set(uids)
-        # data = pd.read_csv("data/ira_users_csv_hashed.csv",
-        #     usecols=["userid"], dtype=str)
-        # for _, row in tqdm(data.iterrows()):
-        #     user_id = row["userid"]
-        #     if user_id not in self.user_id_map:
-        #         uids.add(user_id)
-        # json.dump(list(uids), open("data/node.json", "w"), indent=2)
+        uids = find_all_uids()
+        for uid in self.IRA_map.values():
+            uids.append(uid)
+        uids = set(uids)
+        data = pd.read_csv("data/ira_users_csv_hashed.csv",
+            usecols=["userid"], dtype=str)
+        for _, row in tqdm(data.iterrows()):
+            user_id = row["userid"]
+            if user_id not in self.IRA_map:
+                uids.add(user_id)
 
+        # save
+        json.dump(list(uids), open("data/node.json", "w"), indent=2)
+
+        # load
         uids = json.load(open("data/node.json"))
         for i, uid in enumerate(uids):
             self.uid_index[uid] = i
         print("nodes:", len(self.uid_index))
+
         return list(range(len(self.uid_index)))
 
     def load_edge(self):
@@ -121,8 +125,10 @@ class analyze_IRA_in_network:
         for row in c.fetchall():
             e_count += 1
             try:
-                u1 = self.uid_index[str(row[0])]
-                u2 = self.uid_index[str(row[1])]
+                u1 = str(row[0])
+                u2 = str(row[1])
+                # u1 = self.uid_index[str(row[0])]
+                # u2 = self.uid_index[str(row[1])]
                 retweet_link.add(str(u1) + "-" + str(u2))
             except:
                 pass
@@ -138,37 +144,42 @@ class analyze_IRA_in_network:
         for row in c.fetchall():
             e_count += 1
             try:
-                u1 = self.uid_index[str(row[0])]
-                u2 = self.uid_index[str(row[1])]
+                u1 = str(row[0])
+                u2 = str(row[1])
+                # u1 = self.uid_index[str(row[0])]
+                # u2 = self.uid_index[str(row[1])]
                 retweet_link.add(str(u1) + "-" + str(u2))
             except:
                 pass
         conn.close()
         print(e_count)
 
-        data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["userid", "retweet_userid"], dtype=str)
+        data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+                usecols=["userid", "retweet_userid"], dtype=str)
         data_ira = data_ira.dropna()
         for i, row in data_ira.iterrows():
             e_count += 1
             u1 = row["retweet_userid"]
             if u1 in self.user_id_map:
                 u1 = self.user_id_map[u1]
-            try:
-                u1 = self.uid_index[u1]
-            except:
-                continue
+            # try:
+            #     u1 = self.uid_index[u1]
+            # except:
+            #     continue
 
             u2 = row["userid"]
             if u2 in self.user_id_map:
                 u2 = self.uid_index[self.user_id_map[u2]]
-            try:
-                u2 = self.uid_index[u2]
-            except:
-                continue
+            # try:
+            #     u2 = self.uid_index[u2]
+            # except:
+            #     continue
 
             retweet_link.add(str(u1) + "-" + str(u2))
 
         print(e_count)
+
+        # save all edges
         with(open("data/edge.txt", "w")) as f:
             for edge in retweet_link:
                 f.write(edge + "\n")
@@ -195,21 +206,21 @@ class analyze_IRA_in_network:
         return edge
 
     def build_network(self):
-        self.graph = nx.DiGraph()
-        nodes = self.load_node()
+
+        # nodes = self.load_node()
         edges = self.load_edge()
         print("add nodes from ...")
-        self.graph.add_nodes_from(nodes)
+        # self.G.add_nodes_from(nodes)
         print("add edge from ...")
-        self.graph.add_edges_from(edges)
-        # nx.readwrite.adjlist.write_adjlist(self.graph, 'data/whole_network.adj')
+        # self.G.add_edges_from(edges)
+        # nx.readwrite.adjlist.write_adjlist(self.G, 'data/whole_network.adj')
 
     def run(self):
 
-        # self.find_user_id_map()
+        # self.find_IRA_map()
         # self.cal_map()
-        # self.un_anonymization()
-        # self.load_node()
+        # self.un_anony()
+
         self.build_network()
 
 
