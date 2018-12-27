@@ -120,7 +120,7 @@ class analyze_IRA_in_network:
         print("nodes:", len(self.uid_index))
 
         degree = json.load(open("data/degree.json"))
-        nodes = [k for k, v in degree.items() if v["all_d"] > 1]
+        nodes = [int(k) for k, v in degree.items() if v["all_d"] > 1]
         self.chosed_nodes = set(nodes)
         print("chosed nodes:", len(self.chosed_nodes))
 
@@ -242,7 +242,7 @@ class analyze_IRA_in_network:
         self.G.add_nodes_from(nodes)
         print("add edge from ...")
         self.G.add_edges_from(edges)
-        nx.write_gpickle(G, "data/whole_network.gpickle")
+        nx.write_gpickle(self.G, "data/whole_network.gpickle")
 
     def run(self):
 
