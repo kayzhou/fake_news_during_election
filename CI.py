@@ -518,7 +518,7 @@ class CollectiveInfluencer(object):
 if __name__ == "__main__":
     Lebron = CollectiveInfluencer()
     G = nx.read_gpickle("data/whole_network.gpickle")
-    winners, winner_deg, winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
-    json.dump(winners, open("data/winners.json", "w"), indent=2)
-    json.dump(winner_deg, open("data/winner_deg.json", "w"), indent=2)
-    json.dump(winners_ci, open("data/winners_ci.json", "w"), indent=2)
+    _winners, _winner_deg, _winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
+    json.dump(_winners, open("data/winners.json", "w"), indent=2)
+    json.dump(_winner_deg, open("data/winner_deg.json", "w"), indent=2)
+    json.dump(_winners_ci, open("data/winners_ci.json", "w"), indent=2)
