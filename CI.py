@@ -58,16 +58,16 @@ class CollectiveInfluencer(object):
 
         num_nodes = len(graph.nodes())
 
-
         newtime = time.time()
         main_proc_time += newtime - start
         newtime = time.time()
 
+        # Calculate CI
         print("clean ...")
-        node_CIs = pool.map(f, graph.nodes())
-
-        self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike
-
+        node_CIs = {}
+        for node in tqdm(graph.nodes()):
+            this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
+            node_CIs[node] = this_CI
         print("finished!")
 
         CI_time += time.time() - newtime
