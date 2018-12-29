@@ -15,6 +15,7 @@ from math import log
 from multiprocessing import Pool
 
 import networkx as nx
+from tqdm import tqdm
 
 
 class CollectiveInfluencer(object):
@@ -48,8 +49,8 @@ class CollectiveInfluencer(object):
             G_q_file = open(G_q_filename, 'w')
 
         # Start thread pool
-        pool = Pool(self.CORES)
-        f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
+        # pool = Pool(self.CORES)
+        # f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
         # Calculate CI for entire graph
         if verbose:
@@ -64,6 +65,9 @@ class CollectiveInfluencer(object):
 
         print("clean ...")
         node_CIs = pool.map(f, graph.nodes())
+
+        self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike
+
         print("finished!")
 
         CI_time += time.time() - newtime
@@ -241,8 +245,8 @@ class CollectiveInfluencer(object):
             G_q_file = open(G_q_filename, 'w')
 
         # Start thread pool
-        pool = Pool(self.CORES)
-        f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
+        # pool = Pool(self.CORES)
+        # f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
         # Calculate CI for entire graph
         if verbose: print('\nMultitasking with ' + str(self.CORES) + ' threads.\n')
@@ -255,7 +259,12 @@ class CollectiveInfluencer(object):
         newtime = time.time()
 
         # Calculate CI
-        node_CIs = pool.map(f, graph.nodes())
+        node_CIs = {}
+        for node in tqdm(graph.nodes()):
+            this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
+            node_CIs[node] = this_CI
+
+        # pool.map(f, graph.nodes())
 
         CI_time += time.time() - newtime
         newtime = time.time()
@@ -411,6 +420,7 @@ class CollectiveInfluencer(object):
     # Calculate the CI value for the specified node
     def cleanCalcCI(self, graph, node, ball_rad, directed, treelike):
         print("Calulate CI value for", node)
+
         # If this node isn't in the graph, it VERY isn't influential
         if node not in graph:
             return -1
