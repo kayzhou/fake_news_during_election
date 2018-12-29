@@ -307,8 +307,8 @@ class CollectiveInfluencer(object):
 if __name__ == "__main__":
     Lebron = CollectiveInfluencer(num_ci_threads=8)
     # Lebron = CollectiveInfluencer()
-    G = nx.read_gpickle("data/whole_network.gpickle")
-    # G = nx.fast_gnp_random_graph(10000, 0.1, directed=True)
+    # G = nx.read_gpickle("data/whole_network.gpickle")
+    G = nx.fast_gnp_random_graph(1000, 0.1, directed=True)
     print("loaded graph!")
     _win, _win_deg, _win_ci = Lebron.siteCI(G, ball_rad=2)
     json.dump(_win, open("data/winners.json", "w"), indent=2)
