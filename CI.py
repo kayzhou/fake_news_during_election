@@ -52,7 +52,8 @@ class CollectiveInfluencer(object):
         f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
         # Calculate CI for entire graph
-        if verbose: print('\nMultitasking with ' + str(self.CORES) + ' threads.\n')
+        if verbose:
+            print('\nMultitasking with ' + str(self.CORES) + ' threads.\n')
 
         num_nodes = len(graph.nodes())
 
@@ -409,7 +410,7 @@ class CollectiveInfluencer(object):
 
     # Calculate the CI value for the specified node
     def cleanCalcCI(self, graph, node, ball_rad, directed, treelike):
-
+        print("Calulate CI value for", node)
         # If this node isn't in the graph, it VERY isn't influential
         if node not in graph:
             return -1
