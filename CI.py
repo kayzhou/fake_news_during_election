@@ -95,7 +95,7 @@ class CollectiveInfluencer(object):
 
         # Remove influencers until none remain
         while max_bundle is not None and len(winners) < 100:
-            print("count(winners) >", len(winners))
+            print("count(winners) =", len(winners))
             max_CI = max_bundle[0] * -1
             max_node = max_bundle[1]
 
@@ -419,7 +419,7 @@ class CollectiveInfluencer(object):
 
     # Calculate the CI value for the specified node
     def cleanCalcCI(self, graph, node, ball_rad, directed, treelike):
-        print("Calulate CI value for", node)
+        # print("Calulate CI value for", node)
 
         # If this node isn't in the graph, it VERY isn't influential
         if node not in graph:
