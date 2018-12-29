@@ -49,12 +49,12 @@ class CollectiveInfluencer(object):
             G_q_file = open(G_q_filename, 'w')
 
         # Start thread pool
-        # pool = Pool(self.CORES)
-        # f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
+        pool = Pool(self.CORES)
+        f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
         # Calculate CI for entire graph
         if verbose:
-            print('\nMultitasking with ' + str(self.CORES) + ' threads.\n')
+            print('Multitasking with ' + str(self.CORES) + ' threads.\n')
 
         num_nodes = len(graph.nodes())
 
@@ -64,10 +64,14 @@ class CollectiveInfluencer(object):
 
         # Calculate CI
         print("clean ...")
-        node_CIs = {}
-        for node in tqdm(graph.nodes()):
-            this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-            node_CIs[node] = this_CI
+        node_CIs = pool.map(f, graph.nodes())
+
+        # node_CIs = {}
+        # for node in tqdm(graph.nodes()):
+        #     this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
+        #     node_CIs[node] = this_CI
+        pool.close()
+        pool.join()
         print("finished!")
 
         CI_time += time.time() - newtime
@@ -166,42 +170,6 @@ class CollectiveInfluencer(object):
                     heapq.heappush(pile, (-1 * new_CI, max_node))
                     max_bundle = None
                     continue
-                '''
-                # Threading this isn't worth the overhead
-                # Saving this code for when it might be
-                if max_node in updated:
-
-                    # Recalc CORES nodes at a time for efficiency
-                    recalc_nodes = []; no_recalc = []
-                    recalc_nodes.append(max_node)
-                    updated.remove(max_node)
-
-                    while len(recalc_nodes) < self.CORES and len(pile) > 0:
-                        next_bundle = heapq.heappop(pile)
-                        next_top = next_bundle[1]
-                        if next_top in updated:
-                            updated.remove(next_top)
-                            recalc_nodes.append(next_top)
-                        else:
-                            no_recalc.append(next_bundle)
-
-                    sort_time += time.time() - newtime
-                    newtime = time.time()
-
-                    # Calculate fresh CIs
-                    new_CIs = pool.map(f, recalc_nodes)
-
-                    CI_time += time.time() - newtime
-                    newtime = time.time()
-
-                    # Reinsert into heap with newly computed CI values
-                    for n, node in enumerate(recalc_nodes):
-                        heapq.heappush(pile, (-1 * new_CIs[n], node))
-                    for node in no_recalc:
-                        heapq.heappush(pile, node)
-                    max_bundle = None
-                    continue
-                    '''
 
                 sort_time += time.time() - newtime
                 newtime = time.time()
@@ -219,7 +187,6 @@ class CollectiveInfluencer(object):
             print('\nInfluencers Total: ' + str(len(winners)))
             print('Number of Nodes: ' + str(num_nodes))
             print('\n')
-        pool.close(); pool.join()
 
         if G_q_filename is not None:
             G_q_file.close()
