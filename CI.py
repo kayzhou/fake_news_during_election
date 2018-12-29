@@ -63,7 +63,7 @@ class CollectiveInfluencer(object):
         newtime = time.time()
 
         # Calculate CI
-        print("clean ...")
+        print("Calculating CI ...")
         node_CIs = pool.map(f, graph.nodes())
 
         # node_CIs = {}
@@ -121,7 +121,7 @@ class CollectiveInfluencer(object):
                 # print q and G(g)
                 q = 1 - graph.number_of_nodes() / num_nodes
                 gc_nodes = max(nx.strongly_connected_components(graph), key=len)
-                nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
+                nodes_in_gc = [node for node in graph.nodes() if node in gc_nodes]
 
                 print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc) / num_nodes), file=G_q_file)
 
@@ -187,197 +187,6 @@ class CollectiveInfluencer(object):
             print('\nInfluencers Total: ' + str(len(winners)))
             print('Number of Nodes: ' + str(num_nodes))
             print('\n')
-
-        if G_q_filename is not None:
-            G_q_file.close()
-
-        return winners, winner_deg, winners_ci
-
-    # Threaded CI routine
-    def deferredThreadedCI(self, graph, ball_rad=2, directed=True, treelike=True,
-                           verbose=True, flashy=True, G_q_filename=None):
-
-        start = time.time()
-        main_proc_time = 0
-        CI_time = 0
-        sort_time = 0
-        build_in_time = 0
-
-        winners = []
-        winner_deg = []
-        winners_ci = []
-
-
-        if G_q_filename is not None:
-            G_q_file = open(G_q_filename, 'w')
-
-        # Start thread pool
-        # pool = Pool(self.CORES)
-        # f = partial(self.cleanCalcCI, graph, ball_rad=ball_rad, directed=directed, treelike=treelike)
-
-        # Calculate CI for entire graph
-        if verbose: print('\nMultitasking with ' + str(self.CORES) + ' threads.\n')
-
-        num_nodes = len(graph.nodes())
-
-
-        newtime = time.time()
-        main_proc_time += newtime - start
-        newtime = time.time()
-
-        # Calculate CI
-        node_CIs = {}
-        for node in tqdm(graph.nodes()):
-            this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-            node_CIs[node] = this_CI
-
-        # pool.map(f, graph.nodes())
-
-        CI_time += time.time() - newtime
-        newtime = time.time()
-
-        pile = []
-        for n, node in enumerate(graph.nodes()):
-            graph.node[node]['CI'] = node_CIs[n]
-            graph.node[node]['start_deg'] = graph.degree(node)
-            pile.append((-1 * node_CIs[n], node))
-
-        # Our hybrid heap/hashmap wizardry
-        updated = set()
-        heapq.heapify(pile)
-
-        try:
-            max_bundle = heapq.heappop(pile)
-        except IndexError:
-            max_bundle = None
-
-
-        main_proc_time += time.time() - newtime
-        newtime = time.time()
-
-        # Remove influencers until none remain
-        while max_bundle is not None:
-            max_CI = max_bundle[0] * -1
-            max_node = max_bundle[1]
-
-            # Remove influencer
-            main_proc_time += time.time() - newtime
-            newtime = time.time()
-
-            max_ball = self.buildInBall(graph, max_node, ball_rad)
-
-            build_in_time += time.time() - newtime
-            newtime = time.time()
-
-            winners.append(max_node)
-            winner_deg.append(graph.node[max_node]['start_deg'])
-            winners_ci.append(max_CI)
-
-            if G_q_filename is not None:
-                # print q and G(g)
-                q = 1 - graph.number_of_nodes() / num_nodes
-                gc_nodes = max(nx.strongly_connected_components(graph), key=len)
-                nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
-                print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc)/num_nodes), file=G_q_file)
-
-            graph.remove_node(max_node)
-
-            if flashy:
-                print('#', end="", flush=True)
-                if len(winners) % 100 == 0:
-                        print('')
-
-            # Mark nodes inside the ball for deferred CI update
-            # (Other CI values will not have changed)
-            for ring in max_ball:
-                for node in ring:
-                    updated.add(node)
-
-            main_proc_time += time.time() - newtime
-            newtime = time.time()
-
-            # Find next influencer
-            max_bundle = None
-            while max_bundle is None and len(pile) > 0:
-                # Take the root item
-                try:
-                    max_bundle = heapq.heappop(pile)
-                except IndexError:
-                    max_bundle = None
-                    break
-                max_CI = max_bundle[0] * -1
-                max_node = max_bundle[1]
-
-
-                # Check if it's up-to-date
-                if max_node in updated:
-
-                    sort_time += time.time() - newtime
-                    newtime = time.time()
-
-                    new_CI = self.cleanCalcCI(graph, max_node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-
-                    CI_time += time.time() - newtime
-                    newtime = time.time()
-
-                    updated.remove(max_node)
-                    heapq.heappush(pile, (-1 * new_CI, max_node))
-                    max_bundle = None
-                    continue
-                '''
-                # Threading this isn't worth the overhead
-                # Saving this code for when it might be
-                if max_node in updated:
-
-                    # Recalc CORES nodes at a time for efficiency
-                    recalc_nodes = []; no_recalc = []
-                    recalc_nodes.append(max_node)
-                    updated.remove(max_node)
-
-                    while len(recalc_nodes) < self.CORES and len(pile) > 0:
-                        next_bundle = heapq.heappop(pile)
-                        next_top = next_bundle[1]
-                        if next_top in updated:
-                            updated.remove(next_top)
-                            recalc_nodes.append(next_top)
-                        else:
-                            no_recalc.append(next_bundle)
-
-                    sort_time += time.time() - newtime
-                    newtime = time.time()
-
-                    # Calculate fresh CIs
-                    new_CIs = pool.map(f, recalc_nodes)
-
-                    CI_time += time.time() - newtime
-                    newtime = time.time()
-
-                    # Reinsert into heap with newly computed CI values
-                    for n, node in enumerate(recalc_nodes):
-                        heapq.heappush(pile, (-1 * new_CIs[n], node))
-                    for node in no_recalc:
-                        heapq.heappush(pile, node)
-                    max_bundle = None
-                    continue
-                    '''
-
-                sort_time += time.time() - newtime
-                newtime = time.time()
-
-                # Remove it
-                if max_CI < 1:
-                    break
-
-        # Return your sorted list of influencers
-        if verbose:
-            print('\nMain proc: ' + str(main_proc_time))
-            print('CI time: ' + str(CI_time))
-            print('Sort time: ' + str(sort_time))
-            print('Build In: ' + str(build_in_time))
-            print('\nInfluencers Total: ' + str(len(winners)))
-            print('Number of Nodes: ' + str(num_nodes))
-            print('\n')
-        pool.close(); pool.join()
 
         if G_q_filename is not None:
             G_q_file.close()
@@ -494,11 +303,12 @@ class CollectiveInfluencer(object):
 
 
 if __name__ == "__main__":
-    Lebron = CollectiveInfluencer(num_ci_threads=4)
+    Lebron = CollectiveInfluencer(num_ci_threads=8)
     # Lebron = CollectiveInfluencer()
     G = nx.read_gpickle("data/whole_network.gpickle")
+    # G = nx.fast_gnp_random_graph(10000, 0.1, directed=True)
     print("loaded graph!")
-    _winners, _winner_deg, _winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
-    json.dump(_winners, open("data/winners.json", "w"), indent=2)
-    json.dump(_winner_deg, open("data/winner_deg.json", "w"), indent=2)
-    json.dump(_winners_ci, open("data/winners_ci.json", "w"), indent=2)
+    _win, _win_deg, _win_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
+    json.dump(_win, open("data/winners.json", "w"), indent=2)
+    json.dump(_win_deg, open("data/winner_deg.json", "w"), indent=2)
+    json.dump(_win_ci, open("data/winners_ci.json", "w"), indent=2)
