@@ -64,14 +64,16 @@ class CollectiveInfluencer(object):
 
         # Calculate CI
         print("Calculating CI ...")
-        node_CIs = pool.map(f, graph.nodes())
+        # node_CIs = pool.map(f, graph.nodes())
+        # pool.close()
+        # pool.join()
 
-        # node_CIs = {}
-        # for node in tqdm(graph.nodes()):
-        #     this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-        #     node_CIs[node] = this_CI
-        pool.close()
-        pool.join()
+        node_CIs = {}
+        for node in tqdm(graph.nodes()):
+            this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad,
+                                    directed=directed, treelike=treelike)
+            node_CIs[node] = this_CI
+
         print("finished!")
 
         CI_time += time.time() - newtime
@@ -308,7 +310,7 @@ if __name__ == "__main__":
     G = nx.read_gpickle("data/whole_network.gpickle")
     # G = nx.fast_gnp_random_graph(10000, 0.1, directed=True)
     print("loaded graph!")
-    _win, _win_deg, _win_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
+    _win, _win_deg, _win_ci = Lebron.siteCI(G, ball_rad=2)
     json.dump(_win, open("data/winners.json", "w"), indent=2)
     json.dump(_win_deg, open("data/winner_deg.json", "w"), indent=2)
     json.dump(_win_ci, open("data/winners_ci.json", "w"), indent=2)
