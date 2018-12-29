@@ -61,7 +61,9 @@ class CollectiveInfluencer(object):
         main_proc_time += newtime - start
         newtime = time.time()
 
+        print("clean ...")
         node_CIs = pool.map(f, graph.nodes())
+        print("finished ...")
 
         CI_time += time.time() - newtime
         newtime = time.time()
@@ -72,7 +74,6 @@ class CollectiveInfluencer(object):
             graph.node[node]['start_deg'] = graph.degree(node)
             graph.node[node]['start_CI'] = node_CIs[n]
             pile.append((-1 * node_CIs[n], node))
-            n += 1
 
         # Our hybrid heap/hashmap wizardry
         updated = set()
@@ -263,7 +264,6 @@ class CollectiveInfluencer(object):
             graph.node[node]['CI'] = node_CIs[n]
             graph.node[node]['start_deg'] = graph.degree(node)
             pile.append((-1 * node_CIs[n], node))
-            n += 1
 
         # Our hybrid heap/hashmap wizardry
         updated = set()
@@ -516,7 +516,7 @@ class CollectiveInfluencer(object):
 
 
 if __name__ == "__main__":
-    Lebron = CollectiveInfluencer()
+    Lebron = CollectiveInfluencer(num_ci_threads=4)
     G = nx.read_gpickle("data/whole_network.gpickle")
     _winners, _winner_deg, _winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
     json.dump(_winners, open("data/winners.json", "w"), indent=2)
