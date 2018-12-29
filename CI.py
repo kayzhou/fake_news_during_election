@@ -63,7 +63,7 @@ class CollectiveInfluencer(object):
 
         print("clean ...")
         node_CIs = pool.map(f, graph.nodes())
-        print("finished ...")
+        print("finished!")
 
         CI_time += time.time() - newtime
         newtime = time.time()
@@ -90,7 +90,7 @@ class CollectiveInfluencer(object):
 
         # Remove influencers until none remain
         while max_bundle is not None and len(winners) < 100:
-
+            print("count(winners) >", len(winners))
             max_CI = max_bundle[0] * -1
             max_node = max_bundle[1]
 
@@ -516,8 +516,10 @@ class CollectiveInfluencer(object):
 
 
 if __name__ == "__main__":
-    Lebron = CollectiveInfluencer(num_ci_threads=4)
+    # Lebron = CollectiveInfluencer(num_ci_threads=4)
+    Lebron = CollectiveInfluencer()
     G = nx.read_gpickle("data/whole_network.gpickle")
+    print("loaded graph!")
     _winners, _winner_deg, _winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
     json.dump(_winners, open("data/winners.json", "w"), indent=2)
     json.dump(_winner_deg, open("data/winner_deg.json", "w"), indent=2)
