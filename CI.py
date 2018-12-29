@@ -494,8 +494,8 @@ class CollectiveInfluencer(object):
 
 
 if __name__ == "__main__":
-    # Lebron = CollectiveInfluencer(num_ci_threads=4)
-    Lebron = CollectiveInfluencer()
+    Lebron = CollectiveInfluencer(num_ci_threads=4)
+    # Lebron = CollectiveInfluencer()
     G = nx.read_gpickle("data/whole_network.gpickle")
     print("loaded graph!")
     _winners, _winner_deg, _winners_ci = Lebron.siteCI(G, ball_rad=3, G_q_filename="data/G_q.txt")
