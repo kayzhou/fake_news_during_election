@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from urllib.parse import urlparse
 import requests
@@ -11,7 +12,7 @@ from tqdm import tqdm
 import sqlite3
 
 
-short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
+# short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
 
 
 def get_urls():
@@ -37,6 +38,7 @@ def get_urls():
                 # print(i, e)
 
 def task(_ids):
+    print("{} task starts ... ".format(os.getpid()))
     unshortener = UnshortenIt()
     new_ids = []
     for d in _ids:
@@ -50,12 +52,13 @@ def task(_ids):
             except Exception as e:
                 d['error'] = True
         new_ids.append(d)
+    write2json(new_ids)
     return new_ids
 
 
 def write2json(new_ids):
     print("写入文件中 ... ...")
-    with open("data/ira-final-url.json", "a") as f:
+    with open("ira-final-url.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
@@ -78,7 +81,7 @@ def unshorten_url():
 
     # task(dict_id_host)
 
-    task_cnt = 4
+    task_cnt = 8
     step = int(len(dict_id_host) / task_cnt)
     pool = multiprocessing.Pool()
     for i in range(task_cnt):
@@ -86,7 +89,8 @@ def unshorten_url():
             _ids = dict_id_host[i * step:]
         else:
             _ids = dict_id_host[i * step: (i + 1) * step]
-    pool.apply_async(task, (_ids,), callback=write2json)
+
+        pool.apply_async(task, (_ids,))
 
     pool.close()
     pool.join()

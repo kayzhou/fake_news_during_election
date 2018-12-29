@@ -90,112 +90,112 @@ class CollectiveInfluencer(object):
         # Remove influencers until none remain
         while max_bundle is not None and len(winners) < 100:
 
+            max_CI = max_bundle[0] * -1
+            max_node = max_bundle[1]
+
+            # Remove influencer
+            main_proc_time += time.time() - newtime
+            newtime = time.time()
+
+            max_ball = self.buildInBall(graph, max_node, ball_rad)
+
+            build_in_time += time.time() - newtime
+            newtime = time.time()
+
+            winners.append(max_node)
+            winner_deg.append(graph.node[max_node]['start_deg'])
+            winners_ci.append(max_CI ** (1 / ball_rad))
+            #winners_ci.append(graph.node[max_node]['start_CI'])
+
+            if G_q_filename is not None:
+                # print q and G(g)
+                q = 1 - graph.number_of_nodes() / num_nodes
+                gc_nodes = max(nx.strongly_connected_components(graph), key=len)
+                nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
+
+                print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc) / num_nodes), file=G_q_file)
+
+            graph.remove_node(max_node) # why remove?
+
+            if flashy:
+                print('#', end="", flush=True)
+                if len(winners) % 100 == 0:
+                        print('')
+
+            # Mark nodes inside the ball for deferred CI update
+            # (Other CI values will not have changed)
+            for ring in max_ball:
+                for node in ring:
+                    updated.add(node)
+
+            main_proc_time += time.time() - newtime
+            newtime = time.time()
+
+            # Find next influencer
+            max_bundle = None
+            while max_bundle is None and len(pile) > 0:
+
+                # Take the root item
+                try:
+                    max_bundle = heapq.heappop(pile)
+                except IndexError:
+                    max_bundle = None
+                    break
                 max_CI = max_bundle[0] * -1
                 max_node = max_bundle[1]
 
-                # Remove influencer
-                main_proc_time += time.time() - newtime
-                newtime = time.time()
 
-                max_ball = self.buildInBall(graph, max_node, ball_rad)
+                # Check if it's up-to-date
+                if max_node in updated:
 
-                build_in_time += time.time() - newtime
-                newtime = time.time()
+                    sort_time += time.time() - newtime
+                    newtime = time.time()
 
-                winners.append(max_node)
-                winner_deg.append(graph.node[max_node]['start_deg'])
-                winners_ci.append(max_CI ** (1 / ball_rad))
-                #winners_ci.append(graph.node[max_node]['start_CI'])
+                    new_CI = self.cleanCalcCI(graph, max_node, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
-                if G_q_filename is not None:
-                    # print q and G(g)
-                    q = 1 - graph.number_of_nodes() / num_nodes
-                    gc_nodes = max(nx.strongly_connected_components(graph), key=len)
-                    nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
+                    CI_time += time.time() - newtime
+                    newtime = time.time()
 
-                    print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc) / num_nodes), file=G_q_file)
+                    updated.remove(max_node)
+                    heapq.heappush(pile, (-1 * new_CI, max_node))
+                    max_bundle = None
+                    continue
+                '''
+                # Threading this isn't worth the overhead
+                # Saving this code for when it might be
+                if max_node in updated:
 
-                graph.remove_node(max_node) # why remove?
+                    # Recalc CORES nodes at a time for efficiency
+                    recalc_nodes = []; no_recalc = []
+                    recalc_nodes.append(max_node)
+                    updated.remove(max_node)
 
-                if flashy:
-                    print('#', end="", flush=True)
-                    if len(winners) % 100 == 0:
-                            print('')
+                    while len(recalc_nodes) < self.CORES and len(pile) > 0:
+                        next_bundle = heapq.heappop(pile)
+                        next_top = next_bundle[1]
+                        if next_top in updated:
+                            updated.remove(next_top)
+                            recalc_nodes.append(next_top)
+                        else:
+                            no_recalc.append(next_bundle)
 
-                # Mark nodes inside the ball for deferred CI update
-                # (Other CI values will not have changed)
-                for ring in max_ball:
-                    for node in ring:
-                        updated.add(node)
+                    sort_time += time.time() - newtime
+                    newtime = time.time()
 
-                main_proc_time += time.time() - newtime
-                newtime = time.time()
+                    # Calculate fresh CIs
+                    new_CIs = pool.map(f, recalc_nodes)
 
-                # Find next influencer
-                max_bundle = None
-                while max_bundle is None and len(pile) > 0:
+                    CI_time += time.time() - newtime
+                    newtime = time.time()
 
-                    # Take the root item
-                    try:
-                        max_bundle = heapq.heappop(pile)
-                    except IndexError:
-                        max_bundle = None
-                        break
-                    max_CI = max_bundle[0] * -1
-                    max_node = max_bundle[1]
-
-
-                    # Check if it's up-to-date
-                    if max_node in updated:
-
-                        sort_time += time.time() - newtime
-                        newtime = time.time()
-
-                        new_CI = self.cleanCalcCI(graph, max_node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-
-                        CI_time += time.time() - newtime
-                        newtime = time.time()
-
-                        updated.remove(max_node)
-                        heapq.heappush(pile, (-1 * new_CI, max_node))
-                        max_bundle = None
-                        continue
+                    # Reinsert into heap with newly computed CI values
+                    for n, node in enumerate(recalc_nodes):
+                        heapq.heappush(pile, (-1 * new_CIs[n], node))
+                    for node in no_recalc:
+                        heapq.heappush(pile, node)
+                    max_bundle = None
+                    continue
                     '''
-                    # Threading this isn't worth the overhead
-                    # Saving this code for when it might be
-                    if max_node in updated:
-
-                        # Recalc CORES nodes at a time for efficiency
-                        recalc_nodes = []; no_recalc = []
-                        recalc_nodes.append(max_node)
-                        updated.remove(max_node)
-
-                        while len(recalc_nodes) < self.CORES and len(pile) > 0:
-                            next_bundle = heapq.heappop(pile)
-                            next_top = next_bundle[1]
-                            if next_top in updated:
-                                updated.remove(next_top)
-                                recalc_nodes.append(next_top)
-                            else:
-                                no_recalc.append(next_bundle)
-
-                        sort_time += time.time() - newtime
-                        newtime = time.time()
-
-                        # Calculate fresh CIs
-                        new_CIs = pool.map(f, recalc_nodes)
-
-                        CI_time += time.time() - newtime
-                        newtime = time.time()
-
-                        # Reinsert into heap with newly computed CI values
-                        for n, node in enumerate(recalc_nodes):
-                            heapq.heappush(pile, (-1 * new_CIs[n], node))
-                        for node in no_recalc:
-                            heapq.heappush(pile, node)
-                        max_bundle = None
-                        continue
-                        '''
 
                 sort_time += time.time() - newtime
                 newtime = time.time()
@@ -280,109 +280,109 @@ class CollectiveInfluencer(object):
 
         # Remove influencers until none remain
         while max_bundle is not None:
+            max_CI = max_bundle[0] * -1
+            max_node = max_bundle[1]
+
+            # Remove influencer
+            main_proc_time += time.time() - newtime
+            newtime = time.time()
+
+            max_ball = self.buildInBall(graph, max_node, ball_rad)
+
+            build_in_time += time.time() - newtime
+            newtime = time.time()
+
+            winners.append(max_node)
+            winner_deg.append(graph.node[max_node]['start_deg'])
+            winners_ci.append(max_CI)
+
+            if G_q_filename is not None:
+                # print q and G(g)
+                q = 1 - graph.number_of_nodes() / num_nodes
+                gc_nodes = max(nx.strongly_connected_components(graph), key=len)
+                nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
+                print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc)/num_nodes), file=G_q_file)
+
+            graph.remove_node(max_node)
+
+            if flashy:
+                print('#', end="", flush=True)
+                if len(winners) % 100 == 0:
+                        print('')
+
+            # Mark nodes inside the ball for deferred CI update
+            # (Other CI values will not have changed)
+            for ring in max_ball:
+                for node in ring:
+                    updated.add(node)
+
+            main_proc_time += time.time() - newtime
+            newtime = time.time()
+
+            # Find next influencer
+            max_bundle = None
+            while max_bundle is None and len(pile) > 0:
+                # Take the root item
+                try:
+                    max_bundle = heapq.heappop(pile)
+                except IndexError:
+                    max_bundle = None
+                    break
                 max_CI = max_bundle[0] * -1
                 max_node = max_bundle[1]
 
-                # Remove influencer
-                main_proc_time += time.time() - newtime
-                newtime = time.time()
 
-                max_ball = self.buildInBall(graph, max_node, ball_rad)
+                # Check if it's up-to-date
+                if max_node in updated:
 
-                build_in_time += time.time() - newtime
-                newtime = time.time()
+                    sort_time += time.time() - newtime
+                    newtime = time.time()
 
-                winners.append(max_node)
-                winner_deg.append(graph.node[max_node]['start_deg'])
-                winners_ci.append(max_CI)
+                    new_CI = self.cleanCalcCI(graph, max_node, ball_rad=ball_rad, directed=directed, treelike=treelike)
 
-                if G_q_filename is not None:
-                    # print q and G(g)
-                    q = 1 - graph.number_of_nodes() / num_nodes
-                    gc_nodes = max(nx.strongly_connected_components(graph), key=len)
-                    nodes_in_gc = [node for node in graph.nodes_iter() if node in gc_nodes]
-                    print("{:.6f}".format(q) + ', ' + "{:.6f}".format(len(nodes_in_gc)/num_nodes), file=G_q_file)
+                    CI_time += time.time() - newtime
+                    newtime = time.time()
 
-                graph.remove_node(max_node)
+                    updated.remove(max_node)
+                    heapq.heappush(pile, (-1 * new_CI, max_node))
+                    max_bundle = None
+                    continue
+                '''
+                # Threading this isn't worth the overhead
+                # Saving this code for when it might be
+                if max_node in updated:
 
-                if flashy:
-                    print('#', end="", flush=True)
-                    if len(winners) % 100 == 0:
-                            print('')
+                    # Recalc CORES nodes at a time for efficiency
+                    recalc_nodes = []; no_recalc = []
+                    recalc_nodes.append(max_node)
+                    updated.remove(max_node)
 
-                # Mark nodes inside the ball for deferred CI update
-                # (Other CI values will not have changed)
-                for ring in max_ball:
-                    for node in ring:
-                        updated.add(node)
+                    while len(recalc_nodes) < self.CORES and len(pile) > 0:
+                        next_bundle = heapq.heappop(pile)
+                        next_top = next_bundle[1]
+                        if next_top in updated:
+                            updated.remove(next_top)
+                            recalc_nodes.append(next_top)
+                        else:
+                            no_recalc.append(next_bundle)
 
-                main_proc_time += time.time() - newtime
-                newtime = time.time()
+                    sort_time += time.time() - newtime
+                    newtime = time.time()
 
-                # Find next influencer
-                max_bundle = None
-                while max_bundle is None and len(pile) > 0:
-                    # Take the root item
-                    try:
-                        max_bundle = heapq.heappop(pile)
-                    except IndexError:
-                        max_bundle = None
-                        break
-                    max_CI = max_bundle[0] * -1
-                    max_node = max_bundle[1]
+                    # Calculate fresh CIs
+                    new_CIs = pool.map(f, recalc_nodes)
 
+                    CI_time += time.time() - newtime
+                    newtime = time.time()
 
-                    # Check if it's up-to-date
-                    if max_node in updated:
-
-                        sort_time += time.time() - newtime
-                        newtime = time.time()
-
-                        new_CI = self.cleanCalcCI(graph, max_node, ball_rad=ball_rad, directed=directed, treelike=treelike)
-
-                        CI_time += time.time() - newtime
-                        newtime = time.time()
-
-                        updated.remove(max_node)
-                        heapq.heappush(pile, (-1 * new_CI, max_node))
-                        max_bundle = None
-                        continue
+                    # Reinsert into heap with newly computed CI values
+                    for n, node in enumerate(recalc_nodes):
+                        heapq.heappush(pile, (-1 * new_CIs[n], node))
+                    for node in no_recalc:
+                        heapq.heappush(pile, node)
+                    max_bundle = None
+                    continue
                     '''
-                    # Threading this isn't worth the overhead
-                    # Saving this code for when it might be
-                    if max_node in updated:
-
-                        # Recalc CORES nodes at a time for efficiency
-                        recalc_nodes = []; no_recalc = []
-                        recalc_nodes.append(max_node)
-                        updated.remove(max_node)
-
-                        while len(recalc_nodes) < self.CORES and len(pile) > 0:
-                            next_bundle = heapq.heappop(pile)
-                            next_top = next_bundle[1]
-                            if next_top in updated:
-                                updated.remove(next_top)
-                                recalc_nodes.append(next_top)
-                            else:
-                                no_recalc.append(next_bundle)
-
-                        sort_time += time.time() - newtime
-                        newtime = time.time()
-
-                        # Calculate fresh CIs
-                        new_CIs = pool.map(f, recalc_nodes)
-
-                        CI_time += time.time() - newtime
-                        newtime = time.time()
-
-                        # Reinsert into heap with newly computed CI values
-                        for n, node in enumerate(recalc_nodes):
-                            heapq.heappush(pile, (-1 * new_CIs[n], node))
-                        for node in no_recalc:
-                            heapq.heappush(pile, node)
-                        max_bundle = None
-                        continue
-                        '''
 
                 sort_time += time.time() - newtime
                 newtime = time.time()
