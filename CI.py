@@ -69,7 +69,9 @@ class CollectiveInfluencer(object):
         # pool.join()
 
         node_CIs = {}
-        for node in tqdm(graph.nodes()):
+        for node in graph.nodes():
+            if len(node_CIs) % 1000 == 0:
+                print(len(node_CIs))
             this_CI = self.cleanCalcCI(graph, node, ball_rad=ball_rad,
                                     directed=directed, treelike=treelike)
             node_CIs[node] = this_CI
