@@ -33,7 +33,6 @@ class CollectiveInfluencer(object):
     # Threaded CI routine
     def siteCI(self, graph, ball_rad=2, directed=True, treelike=True,
                            verbose=True, flashy=True, G_q_filename=None):
-
         start = time.time()
         main_proc_time = 0
         CI_time = 0
@@ -43,7 +42,6 @@ class CollectiveInfluencer(object):
         winners = []
         winner_deg = []
         winners_ci = []
-
 
         if G_q_filename is not None:
             G_q_file = open(G_q_filename, 'w')
@@ -82,11 +80,11 @@ class CollectiveInfluencer(object):
         newtime = time.time()
 
         pile = []
-        for n, node in enumerate(graph.nodes()):
-            graph.node[node]['CI'] = node_CIs[n]
+        for node in graph.nodes():
+            graph.node[node]['CI'] = node_CIs[node]
             graph.node[node]['start_deg'] = graph.degree(node)
-            graph.node[node]['start_CI'] = node_CIs[n]
-            pile.append((-1 * node_CIs[n], node))
+            graph.node[node]['start_CI'] = node_CIs[node]
+            pile.append((-1 * node_CIs[node], node))
 
         # Our hybrid heap/hashmap wizardry
         updated = set()
@@ -96,7 +94,6 @@ class CollectiveInfluencer(object):
             max_bundle = heapq.heappop(pile)
         except IndexError:
             max_bundle = None
-
 
         main_proc_time += time.time() - newtime
         newtime = time.time()
