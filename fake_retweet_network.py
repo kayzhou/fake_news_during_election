@@ -36,10 +36,7 @@ def find_fake_tweets():
     col_names = [t[0] for t in c.description]
 
     with open("data/fake_tweets.json", "w") as f:
-        for d in c.fetchall():
-            if cnt % 500000 == 0:
-                print(cnt)
-            cnt += 1
+        for d in tqdm(c.fetchall()):
             if d[8]:
                 hostname = d[8]
                 # print(hostname)
