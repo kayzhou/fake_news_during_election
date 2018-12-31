@@ -80,7 +80,6 @@ def load_all_nodes():
 def find_links(tweets_ids):
 
     retweet_link = {}
-
     conn = sqlite3.connect(
         "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
@@ -94,10 +93,10 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        last_id = c.fetchone()
-        if last_id:
-            retweet_link[str(_id)] = str(last_id[0])
+        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        # last_id = c.fetchone()
+        # if last_id:
+        #     retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
@@ -115,10 +114,10 @@ def find_links(tweets_ids):
             retweet_link[next_id] = str(_id)
 
         # 找到我转发了谁？
-        c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
-        last_id = c.fetchone()
-        if last_id:
-            retweet_link[str(_id)] = str(last_id[0])
+        # c.execute('''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+        # last_id = c.fetchone()
+        # if last_id:
+        #     retweet_link[str(_id)] = str(last_id[0])
 
     conn.close()
 
@@ -129,7 +128,8 @@ def find_links(tweets_ids):
         tid = row["tweetid"]
         re_tid = row["retweet_tweetid"]
 
-        if re_tid in tweets_ids or tid in tweets_ids:
+        # if re_tid in tweets_ids or tid in tweets_ids:
+        if re_tid in tweets_ids:
             retweet_link[tid] = re_tid
             cnt += 1
 
@@ -139,7 +139,7 @@ def find_links(tweets_ids):
                                  "w"), ensure_ascii=False, indent=2)
 
 
-def load_fake_news_source():
+def load_fake_news_sources():
     data = json.load(open("data/retweet_network_fake.json"))
     sources = [v for v in data.values()]
     return sources
