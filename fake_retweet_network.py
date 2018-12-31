@@ -36,6 +36,7 @@ def find_fake_tweets():
     col_names = [t[0] for t in c.description]
 
     with open("data/fake_tweets.json", "w") as f:
+        print("start ...")
         for d in tqdm(c.fetchall()):
             if d[8]:
                 hostname = d[8]
