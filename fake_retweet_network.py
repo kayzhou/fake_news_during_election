@@ -136,8 +136,17 @@ def find_links(tweets_ids):
 
 
 def find_fake_news_sources():
-    data = json.load(open("data/retweet_network_fake.json"))
-    sources = [v for v in data.values()]
+    data = json.load(open("data/fake_retweet_network.json"))
+    not_sources = str([str(v) for v in data.keys()])
+
+    t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
+    print(len(t_ids))
+    ira_t_ids = set([str(json.loads(line.strip())["tweetid"]) for line in open("data/IRA_fake_tweets.json")])
+    print(len(ira_t_ids))
+    t_ids = t_ids | ira_t_ids
+
+    sources = list(t_ids - not_sources)
+
     with open("data/fake_news_source.txt", "w") as f:
         for sou in sources:
             f.write("{}\n".format(sou))
@@ -145,15 +154,6 @@ def find_fake_news_sources():
 
 
 def load_fake_news():
-    fake_news = set()
-    data = json.load(open("data/retweet_network_fake.json"))
-    for k, v in data.items():
-        fake_news.add(k)
-        fake_news.add(v)
-    return list(fake_news)
-
-
-def load_fake_news_not_original():
     fake_news = set()
     data = json.load(open("data/retweet_network_fake.json"))
     for k, v in data.items():
