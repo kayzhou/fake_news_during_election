@@ -55,7 +55,7 @@ class Fake_source(object):
                     # "is_first": None,
                     # "is_source": None,
                     "is_IRA": 1,
-                    "URL": d["real_url"].lower(),
+                    "URL": d["final_url"].lower(),
                     "hostname": d["hostname"].lower()
                 }
                 self.url_tweets[str(d["tweetid"])] = tweet
