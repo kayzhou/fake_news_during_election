@@ -98,20 +98,19 @@ class FAKE_TWEET(object):
     def fill_IRA_info(self):
         print("补充IRA数据处理中 ...")
         cnt = 0
-        IRA_info = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
         for i, row in tqdm(IRA_info.iterrows()):
-            uid = row["userid"]
-            if uid in self.IRA_map:
-                uid = str(self.IRA_map[uid])
+            tweetid = row["tweetid"]
 
-            if row["tweetid"] in self.tweets:
-                self.tweets[row["tweetid"]].update(
-                    {
-                        "user_id": uid,
-                        "is_IRA": 1,
-                        "dt": row["tweet_time"] + ":00"
-                    }
-                )
+            if tweetid in self.tweets:
+                uid = row["userid"]
+                if uid in self.IRA_map:
+                    uid = str(self.IRA_map[uid])
+
+                self.tweets[tweetid]["is_IRA"] = 1
+                self.tweets[tweetid]["user_id"] = uid
+                if not self.tweets[tweetid]["dt"]:
+                    self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
         print("Count of IRA tweets:", cnt)
 
