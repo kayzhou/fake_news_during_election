@@ -140,12 +140,13 @@ def find_fake_news_sources():
     not_sources = set([str(v) for v in data.keys()])
 
     t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
-    print(len(t_ids))
     ira_t_ids = set([str(json.loads(line.strip())["tweetid"]) for line in open("data/IRA_fake_tweets.json")])
-    print(len(ira_t_ids))
+
     t_ids = t_ids | ira_t_ids
+    print("count of fake news:", len(ira_t_ids))
 
     sources = list(t_ids - not_sources)
+    print("count of sources of fake news:", len(sources))
 
     with open("data/fake_news_source.txt", "w") as f:
         for sou in sources:
