@@ -44,6 +44,7 @@ def find_fake_tweets():
                 if judge.is_fake(hostname):
                     json_d = {k: v for k, v in zip(col_names, d)}
                     f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
+    conn.close()
 
     # IRA
     with open("data/IRA_fake_tweets.json", "w") as f:
