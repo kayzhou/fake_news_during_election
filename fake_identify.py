@@ -21,12 +21,10 @@ class Who_is_fake(object):
             labels.append(self.NEW_HOST_1[ht])
         else:
             labels.append("GOOD")
-
         if ht in self.NEW_HOST_2:
             labels.extend(self.NEW_HOST_2[ht])
         else:
             labels.extend([-1, -1])
-
         return labels
 
     def is_fake(self, ht):
