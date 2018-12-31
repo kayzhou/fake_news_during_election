@@ -37,7 +37,7 @@ class Fake_source(object):
                     "dt": d["datetime_EST"],
                     # "is_first": None,
                     # "is_source": None,
-                    "is_IRA": None,
+                    "is_IRA": 0,
                     "URL": d["final_url"].lower(),
                     "hostname": d["final_hostname"].lower()
                 }
@@ -123,16 +123,17 @@ class Fake_source(object):
 
 
     def run(self):
-        self.fill_url_tweets()
-        self.fill_IRA_info()
+        # self.fill_url_tweets()
+        # self.fill_IRA_info()
 
         # 保存
         self.save_csv()
-
+        self.
 
 if __name__ == "__main__":
     LeBron = Fake_source()
-    LeBron.run()
+    # LeBron.run()
+    LeBron.
 
 
 
