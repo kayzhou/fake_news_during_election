@@ -121,7 +121,7 @@ class URL_TWEET:
             uid = row["userid"]
             if uid in IRA_match:
                 uid = str(IRA_match[uid])
-    
+
             if row["tweetid"] in self.url_tweets:
                 self.url_tweets[row["tweetid"]].update(
                     {
@@ -184,7 +184,6 @@ class URL_TWEET:
 
         # 保存
         self.save_csv()
-
 
 
 if __name__ == "__main__":
