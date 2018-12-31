@@ -187,7 +187,7 @@ class FAKE_TWEET(object):
 
 
 if __name__ == "__main__":
-    LeBron = URL_TWEET()
+    LeBron = FAKE_TWEET()
     LeBron.run()
 
 
