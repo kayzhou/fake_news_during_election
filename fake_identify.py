@@ -30,7 +30,7 @@ class Who_is_fake(object):
         return labels
 
     def is_fake(self, ht):
-        if self.identify(ht) == "FAKE":
+        if self.identify(ht)[0] == "FAKE":
             return True
         else:
             return False
