@@ -87,7 +87,7 @@ class FAKE_TWEET(object):
 
             # 原来就存在
             else:
-                self.tweets[tweetid]["is_source"] = 1
+                self.tweets[tweetid]["is_source"] = 0
 
         # 什么是source？没有转发别人的！
         for tweetid in self.tweets.keys():
@@ -161,14 +161,14 @@ class FAKE_TWEET(object):
         nodes = list(self.tweets_csv["user_id"])
         edges = []
         for n2, n1 in retweet_network.items():
-            u1 = self.tweets_csv[tweet_csv["tweet_id"] == n1]["user_id"]
-            u2 = self.tweets_csv[tweet_csv["tweet_id"] == n2]["user_id"]
+            u1 = self.tweets_csv[self.tweets_csv["tweet_id"] == n1]["user_id"]
+            u2 = self.tweets_csv[self.tweets_csv["tweet_id"] == n2]["user_id"]
             edges.append((u1, u2))
 
         print("add nodes from ...")
-        self.G.add_nodes_from(nodes)
+        G.add_nodes_from(nodes)
         print("add edge from ...")
-        self.G.add_edges_from(edges)
+        G.add_edges_from(edges)
         nx.write_gpickle(G, "data/fake_network.gpickle")
 
     def run(self):
@@ -182,7 +182,7 @@ class FAKE_TWEET(object):
         # 保存
         self.save_url_ts()
         self.save_csv()
-        self.save_network()
+        # self.save_network()
 
 
 if __name__ == "__main__":
