@@ -255,7 +255,7 @@ def get_tweets(tweets_ids):
 if __name__ == "__main__":
 
     # 找出所有fake_news
-    # find_fake_tweets()
+    find_fake_tweets()
 
     # 获取转发关系
     t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
