@@ -101,8 +101,8 @@ class FAKE_TWEET(object):
         IRA_info = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
         for i, row in tqdm(IRA_info.iterrows()):
             uid = row["userid"]
-            if uid in IRA_map:
-                uid = str(IRA_map[uid])
+            if uid in self.IRA_map:
+                uid = str(self.IRA_map[uid])
 
             if row["tweetid"] in self.tweets:
                 self.tweets[row["tweetid"]].update(
@@ -183,7 +183,7 @@ class FAKE_TWEET(object):
         # 保存
         self.save_url_ts()
         self.save_csv()
-        self.save()
+        self.save_network()
 
 
 if __name__ == "__main__":
