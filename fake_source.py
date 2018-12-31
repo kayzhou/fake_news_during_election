@@ -21,7 +21,7 @@ class Fake_source(object):
         self.fake_source_tweetids = set([line.strip() for line in open("data/fake_news_source.txt")])
         self.url_tweets = {}
         # self.tweets = None
-        self.tweets_csv = None
+        self.tweets_csv = []
         self.IRA_map = json.load(open("data/IRA_map_ele.json"))
         self.url_timeseries = defaultdict(list)
         # self.set_tweets = set()
