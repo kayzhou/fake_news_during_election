@@ -255,22 +255,18 @@ def get_tweets(tweets_ids):
 
 if __name__ == "__main__":
 
-    # 找出所有的fake_hostname
-    # get_fake_host_label()
-
     # 找出所有fake_news
-    # find_fake_tweets()
-    # find_IRA_fake_tweets()
+    find_fake_tweets()
 
     # 获取转发关系
-    t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
-    print(len(t_ids))
-    ira_t_ids = set([str(json.loads(line.strip())["tweetid"]) for line in open("data/IRA_fake_tweets.json")])
-    print(len(ira_t_ids))
-    t_ids = t_ids | ira_t_ids
-    print(len(t_ids))
+    # t_ids = set([str(json.loads(line.strip())["tweet_id"]) for line in open("data/fake_tweets.json")])
+    # print(len(t_ids))
+    # ira_t_ids = set([str(json.loads(line.strip())["tweetid"]) for line in open("data/IRA_fake_tweets.json")])
+    # print(len(ira_t_ids))
+    # t_ids = t_ids | ira_t_ids
+    # print(len(t_ids))
 
-    find_links(t_ids)
+    # find_links(t_ids)
 
     # tids = load_fake_news_source()
     # get_tweets(tids)
