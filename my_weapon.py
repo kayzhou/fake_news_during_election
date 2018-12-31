@@ -5,10 +5,11 @@ Created on 2018-11-19 14:45:24
 @author: https://kayzhou.github.io/
 """
 
+import json
+
+import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import json
-from tqdm import tqdm
 import seaborn as sns
-import networkx as nx
+from tqdm import tqdm
