@@ -33,7 +33,18 @@ class Who_is_fake(object):
         else:
             return False
 
+class Are_you_IRA(object):
+    def __init__(self):
+        self.IRA_user_set = set(json.load(open("data/IRA-users-set.json")))
+
+    def fuck(self, ht):
+        return ht in self.IRA_user_set
+
 
 if __name__ == "__main__":
     who = Who_is_fake()
     print(who.identify("bbc.com"))
+
+
+
+
