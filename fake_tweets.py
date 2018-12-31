@@ -152,17 +152,17 @@ class FAKE_TWEET(object):
         pd.DataFrame(self.tweets_csv).to_csv("data/fake-tweets.csv", index=None)
 
     def save_network(self):
-        if self.tweets_csv is None:
-            self.tweets_csv = pd.read_csv("data/fake-tweets.csv")
-
         retweet_network = json.load(open("data/fake_retweet_network.json"))
-
         G = nx.DiGraph()
-        nodes = list(self.tweets_csv["user_id"])
+        nodes = tweets_csv["user_id"].tolist()
         edges = []
+        dict_tweetid_userid = {}
+        for _, row in tweets_csv.iterrows():
+            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
+
         for n2, n1 in retweet_network.items():
-            u1 = self.tweets_csv[self.tweets_csv["tweet_id"] == n1]["user_id"]
-            u2 = self.tweets_csv[self.tweets_csv["tweet_id"] == n2]["user_id"]
+            u1 = dict_tweetid_userid[n1]
+            u2 = dict_tweetid_userid[n2]
             edges.append((u1, u2))
 
         print("add nodes from ...")

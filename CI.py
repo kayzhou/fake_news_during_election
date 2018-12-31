@@ -29,6 +29,9 @@ class CollectiveInfluencer(object):
         '''
         self.CORES = num_ci_threads
         self.CP = False
+        self.winners = None
+        self.winner_deg = None
+        self.winners_ci = None
 
     # Threaded CI routine
     def siteCI(self, graph, ball_rad=2, directed=True, treelike=True,
@@ -192,6 +195,10 @@ class CollectiveInfluencer(object):
         if G_q_filename is not None:
             G_q_file.close()
 
+        self.winners = winners
+        self.winner_deg = winner_deg
+        self.winners_ci = winners_ci
+
         return winners, winner_deg, winners_ci
 
     # Calculate the CI value for the specified node
@@ -302,14 +309,18 @@ class CollectiveInfluencer(object):
         # Return the new perimeter
         return outer_neighbors
 
+    def save_winners(self):
+        json.dump(self.winners, open("data/fake_winners.json", "w"), indent=2)
+        json.dump(self.winner_deg, open("data/fake_winner_deg.json", "w"), indent=2)
+        json.dump(self.winners_ci, open("data/fake_winners_ci.json", "w"), indent=2)
+
 
 if __name__ == "__main__":
     # Lebron = CollectiveInfluencer(num_ci_threads=8)
     Lebron = CollectiveInfluencer()
-    G = nx.read_gpickle("data/whole_network.gpickle")
+    # G = nx.read_gpickle("data/whole_network.gpickle")
+    G = nx.read_gpickle("data/fake_network.gpickle")
     # G = nx.fast_gnp_random_graph(1000, 0.1, directed=True)
     print("loaded graph!")
-    _win, _win_deg, _win_ci = Lebron.siteCI(G, ball_rad=2)
-    json.dump(_win, open("data/winners.json", "w"), indent=2)
-    json.dump(_win_deg, open("data/winner_deg.json", "w"), indent=2)
-    json.dump(_win_ci, open("data/winners_ci.json", "w"), indent=2)
+    Lebron.siteCI(G, ball_rad=2)
+    Lebron.save_winners()
