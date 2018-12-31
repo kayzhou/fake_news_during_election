@@ -42,8 +42,7 @@ def find_fake_tweets():
                 # print(hostname)
                 if judge.is_fake(hostname):
                     json_d = {k: v for k, v in zip(col_names, d)}
-                    json_d = json.dumps(json_d, ensure_ascii=False)
-                    f.write(json_d + '\n')
+                    f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
 
     # IRA
     with open("data/IRA_fake_tweets.json", "w") as f:
@@ -52,8 +51,7 @@ def find_fake_tweets():
             hostname = d["hostname"]
             # print(hostname)
             if judge.is_fake(hostname):
-                json_d = json.dumps(d, ensure_ascii=False)
-                f.write(json_d + '\n')
+                f.write(json.dumps(d, ensure_ascii=False) + '\n')
 
 
 def load_all_nodes():
