@@ -34,10 +34,9 @@ def find_fake_tweets():
     c = conn.cursor()
     c.execute('''SELECT * FROM urls;''')
     col_names = [t[0] for t in c.description]
-    data = c.fetchall()
-    cnt = 0
+
     with open("data/fake_tweets.json", "w") as f:
-        for d in data:
+        for d in c.fetchall():
             if cnt % 500000 == 0:
                 print(cnt)
             cnt += 1
