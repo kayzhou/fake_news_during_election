@@ -183,27 +183,31 @@ def find_original_tweetid(_id):
     return new_d
 
 
-def find_source(_id):
+def find_source(tweet_ids):
     """
-    仅仅是找到对应的source_content_id
+    仅仅是找到对应的source_content_id，然后再映射name！
     """
-    tweet = find_tweet(_id)
-    source_content_id_map = {}
-    if tweet:
+    rsts = []
+    for _id in tqdm(tweet_ids):
+        tweet = find_tweet(_id)
+        source_content_id_map = {}
+        if tweet:
 
-        from_db = tweet["from_db"][0]
-        # print(type(tweet["source_content_id"]))
-        tmp = from_db + "-" + str(tweet["source_content_id"])
+            from_db = tweet["from_db"][0]
+            # print(type(tweet["source_content_id"]))
+            tmp = from_db + "-" + str(tweet["source_content_id"])
 
-        if tmp in source_content_id_map:
-            source_content = source_content_id_map[tmp]
+            if tmp in source_content_id_map:
+                source_content = source_content_id_map[tmp]
+            else:
+                source_content = find_source_name(from_db, tweet["source_content_id"])
+                source_content_id_map[tmp] = source_content
+
+            rsts.append({"tweet_id": _id, "source_content": source_content})
         else:
-            source_content = find_source_name(from_db, tweet["source_content_id"])
-            source_content_id_map[tmp] = source_content
+            return rsts.append({"tweet_id": _id, "source_content": -1})
+    return rsts
 
-        return source_content
-    else:
-        return None
 
 def find_source_name(from_db, _id):
     if from_db == "1":
