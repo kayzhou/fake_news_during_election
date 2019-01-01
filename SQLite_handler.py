@@ -204,7 +204,7 @@ def find_source_name(from_db, _id):
         return "error"
 
     c = conn.cursor()
-    c.execute("SELECT source_content from source_content where id=?", _id)
+    c.execute("SELECT source_content from source_content where id=?", (_id,))
     d = c.fetchone()[0]
     conn.close()
 
