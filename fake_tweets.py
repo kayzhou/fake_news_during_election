@@ -145,7 +145,7 @@ class FAKE_TWEET(object):
     # -- save -- #
     def save_url_ts(self):
         if self.url_timeseries:
-            json.dump(self.url_timeseries, open("data/url-tweets.txt", "w"), ensure_ascii=False, indent=2)
+            json.dump(self.url_timeseries, open("data/fake-url-tweets.json", "w"), ensure_ascii=False, indent=2)
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
@@ -154,10 +154,10 @@ class FAKE_TWEET(object):
     def save_network(self):
         retweet_network = json.load(open("data/fake_retweet_network.json"))
         G = nx.DiGraph()
-        nodes = tweets_csv["user_id"].tolist()
+        nodes = self.tweets_csv["user_id"].tolist()
         edges = []
         dict_tweetid_userid = {}
-        for _, row in tweets_csv.iterrows():
+        for _, row in self.tweets_csv.iterrows():
             dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
 
         for n2, n1 in retweet_network.items():
