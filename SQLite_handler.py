@@ -188,10 +188,20 @@ def find_source(_id):
     仅仅是找到对应的source_content_id
     """
     tweet = find_tweet(_id)
+    source_content_id_map = {}
     if tweet:
+
         from_db = tweet["from_db"][0]
         # print(type(tweet["source_content_id"]))
-        return find_source_name(from_db, tweet["source_content_id"])
+        tmp = from_db + "-" + str(tweet["source_content_id"])
+
+        if tmp in source_content_id_map:
+            source_content = source_content_id_map[tmp]
+        else:
+            source_content = find_source_name(from_db, tweet["source_content_id"])
+            source_content_id_map[tmp] = source_content
+
+        return source_content
     else:
         return None
 
