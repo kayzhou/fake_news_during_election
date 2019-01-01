@@ -190,6 +190,7 @@ def find_source(tweet_ids):
     rsts = []
     source_content_id_map = {}
     for _id in tweet_ids:
+        print(_id)
         tweet = find_tweet(_id)
         if tweet:
             from_db = tweet["from_db"][0]
