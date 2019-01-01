@@ -205,7 +205,7 @@ def find_source(tweet_ids):
 
             rsts.append({"tweet_id": _id, "source_content": source_content})
         else:
-            return rsts.append({"tweet_id": _id, "source_content": -1})
+            rsts.append({"tweet_id": _id, "source_content": -1})
     return rsts
 
 
