@@ -188,11 +188,10 @@ def find_source(tweet_ids):
     仅仅是找到对应的source_content_id，然后再映射name！
     """
     rsts = []
-    for _id in tqdm(tweet_ids):
+    source_content_id_map = {}
+    for _id in tweet_ids:
         tweet = find_tweet(_id)
-        source_content_id_map = {}
         if tweet:
-
             from_db = tweet["from_db"][0]
             # print(type(tweet["source_content_id"]))
             tmp = from_db + "-" + str(tweet["source_content_id"])
