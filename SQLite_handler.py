@@ -190,7 +190,7 @@ def find_source(_id):
     tweet = find_tweet(_id)
     if tweet:
         from_db = tweet["from_db"][0]
-        print(type(tweet["source_content_id"]))
+        # print(type(tweet["source_content_id"]))
         return find_source_name(from_db, tweet["source_content_id"])
     else:
         return None
@@ -204,7 +204,7 @@ def find_source_name(from_db, _id):
         return "error"
 
     c = conn.cursor()
-    c.execute("SELECT source_content from source_content where id=?", (_id))
+    c.execute("SELECT source_content from source_content where id=?", _id)
     d = c.fetchone()[0]
     conn.close()
 
