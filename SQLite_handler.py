@@ -190,7 +190,7 @@ def find_source(_id):
     tweet = find_tweet(_id)
     if tweet:
         from_db = tweet["from_db"][0]
-        return find_source_name(tweet["source_content_id"])
+        return find_source_name(from_db, tweet["source_content_id"])
     else:
         return None
 
