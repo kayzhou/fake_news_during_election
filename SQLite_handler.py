@@ -12,6 +12,9 @@ import json
 
 
 def find_tweet(_id):
+    """
+    不仅找tweet，还要找retweet
+    """
     new_d = {}
 
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
@@ -22,6 +25,7 @@ def find_tweet(_id):
         col_name = [t[0] for t in c1.description]
         for k, v in zip(col_name, d):
             new_d[k] = v
+        new_d["from_db"] = "1-tweet"
         conn1.close()
         return new_d
 
@@ -34,13 +38,14 @@ def find_tweet(_id):
             col_name = [t[0] for t in c2.description]
             for k, v in zip(col_name, d):
                 new_d[k] = v
+            new_d["from_db"] = "2-tweet"
             conn1.close()
             conn2.close()
             return new_d
 
+
     conn1.close()
     conn2.close()
-
     if not new_d:
         new_d = find_retweeted(_id)
 
@@ -58,6 +63,7 @@ def find_retweeted(_id):
         col_name = [t[0] for t in c1.description]
         for k, v in zip(col_name, d):
             new_d[k] = v
+        new_d["from_db"] = "1-retweeted"
 
         conn1.close()
         return new_d
@@ -71,6 +77,7 @@ def find_retweeted(_id):
             col_name = [t[0] for t in c2.description]
             for k, v in zip(col_name, d):
                 new_d[k] = v
+            new_d["from_db"] = "2-retweeted"
             conn1.close()
             conn2.close()
             return new_d
@@ -177,37 +184,30 @@ def find_original_tweetid(_id):
 
 
 def find_source(_id):
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-    c1 = conn1.cursor()
-    c2 = conn2.cursor()
-
-    new_d = {}
-    c1.execute('''SELECT * FROM source_content WHERE id={}'''.format(_id))
-    d = c1.fetchone()
-    if d:
-        col_name = [t[0] for t in c1.description]
-            # print(d)
-        for k, v in zip(col_name, d):
-            new_d[k] = v
-
+    """
+    仅仅是找到对应的source_content_id
+    """
+    tweet = find_tweet(_id)
+    if tweet:
+        from_db = tweet["from_db"][0]
+        return find_source_name(tweet["source_content_id"])
     else:
-        c2.execute('''SELECT * FROM source_content WHERE id={}'''.format(_id))
-        d = c2.fetchone()
-        if d:
-            col_name = [t[0] for t in c2.description]
-            # print(d)
-            for k, v in zip(col_name, d):
-                new_d[k] = v
+        return None
 
-    conn1.close()
-    conn2.close()
+def find_source_name(from_db, _id):
+    if from_db == "1":
+        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    elif from_db == "2":
+        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    else:
+        return "error"
 
-#     if not new_d:
-#         print("找不到该source：", _id)
+    c = conn.cursor()
+    c.execute("SELECT source_content from source_content where id=?", (_id))
+    d = c.fetchone()[0]
+    conn.close()
 
-    return new_d
-
+    return d
 
 def opinion(_id):
     """
@@ -288,6 +288,7 @@ def get_hashtag_tweet_user():
     conn2.close()
 
 
+# ------------------- make a large db!! ----------------------
 def create_db():
     conn = sqlite3.connect("tweets.db")
     c = conn.cursor()
