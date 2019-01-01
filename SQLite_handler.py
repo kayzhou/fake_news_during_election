@@ -203,8 +203,8 @@ def find_source(_id):
     conn1.close()
     conn2.close()
 
-    if not new_d:
-        print("找不到该source：", _id)
+#     if not new_d:
+#         print("找不到该source：", _id)
 
     return new_d
 
