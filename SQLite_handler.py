@@ -122,7 +122,6 @@ def find_user(_id):
         for k, v in zip(col_name, d):
             new_d[k] = v
 
-
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
         c2 = conn2.cursor()
@@ -148,7 +147,7 @@ def find_user_info(_id):
     if d:
         return json.loads(d[0])
     else:
-        {}
+        return None
 
 
 def find_original_tweetid(_id):
