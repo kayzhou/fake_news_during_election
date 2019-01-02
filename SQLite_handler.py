@@ -131,7 +131,6 @@ def find_users(uids):
             d = c2.fetchone()
             if d:
                 col_name = [t[0] for t in c2.description]
-                # print(d)
                 for k, v in zip(col_name, d):
                     new_d[k] = v
 
@@ -141,10 +140,10 @@ def find_users(uids):
 
     conn2.close()
     conn1.close()
-    return new_d
+    return new_ds
 
 
-def find_users_info(uids):
+def find_users_from_large(uids):
     """
     较大的库
     """
