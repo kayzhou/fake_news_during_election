@@ -110,44 +110,60 @@ def find_all_uids():
     return uids
 
 
-def find_user(_id):
-    new_d = {}
+def find_users(uids):
+    new_ds = []
 
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM user WHERE user_id={}'''.format(_id))
-    d = c1.fetchone()
-    if d:
-        col_name = [t[0] for t in c1.description]
-        for k, v in zip(col_name, d):
-            new_d[k] = v
+    c2 = conn2.cursor()
 
-    else:
-        conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-        c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM user WHERE user_id={}'''.format(_id))
-        d = c2.fetchone()
+    for _id in uids:
+        new_d = {}
+        c1.execute('''SELECT * FROM user WHERE user_id={}'''.format(_id))
+        d = c1.fetchone()
         if d:
-            col_name = [t[0] for t in c2.description]
-            # print(d)
+            col_name = [t[0] for t in c1.description]
             for k, v in zip(col_name, d):
                 new_d[k] = v
-        conn2.close()
+        else:
+            c2.execute('''SELECT * FROM user WHERE user_id={}'''.format(_id))
+            d = c2.fetchone()
+            if d:
+                col_name = [t[0] for t in c2.description]
+                # print(d)
+                for k, v in zip(col_name, d):
+                    new_d[k] = v
 
+        if not new_d:
+            new_d = {"user_id": _id, "error": "not found"}
+        new_ds.append(new_d)
+
+    conn2.close()
     conn1.close()
     return new_d
 
 
-def find_user_info(_id):
+def find_users_info(uids):
+    """
+    较大的库
+    """
+    users_info = []
+
     conn1 = sqlite3.connect("/media/alex/data/election_data/users.db")
     c1 = conn1.cursor()
-    c1.execute('''SELECT info FROM user WHERE user_id={}'''.format(_id))
-    d = c1.fetchone()
+
+    for _id in uids:
+        c1.execute('''SELECT info FROM user WHERE user_id={}'''.format(_id))
+        d = c1.fetchone()
+        if d:
+            d = json.loads(d[0])
+        else:
+            d = {"user_id": _id, "error": "not found"}
+        users_info.append(d)
     conn1.close()
-    if d:
-        return json.loads(d[0])
-    else:
-        return None
+
+    return users_info
 
 
 def find_original_tweetid(_id):
