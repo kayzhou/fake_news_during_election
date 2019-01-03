@@ -11,6 +11,7 @@ from my_weapon import *
 import sqlite3
 from collections import defaultdict
 from SQLite_handler import get_user_id, find_tweet, find_all_uids
+import graph_tool as gt
 
 
 class analyze_IRA_in_network:
@@ -23,8 +24,7 @@ class analyze_IRA_in_network:
         self.G = nx.DiGraph()
 
     def find_IRA_map(self):
-        data = pd.read_csv("data/ira_tweets_csv_hashed.csv",
-                            usecols=["tweetid", "userid"], dtype=str)
+        data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"], dtype=str)
         with open("data/IRA_map_v3.json", "w") as f:
             for _, row in tqdm(data.iterrows()):
                 tweet_id = row["tweetid"]
@@ -243,6 +243,20 @@ class analyze_IRA_in_network:
         print("add edge from ...")
         self.G.add_edges_from(edges)
         nx.write_gpickle(self.G, "data/whole_network.gpickle")
+
+    def build_network_gt(self):
+        nodes = self.load_node()
+        # self.cal_degree()
+        edges = self.load_edge()
+        g = Graph(directed=True)
+
+        print("add nodes from ...")
+        g.add_vertex(len(nodes))
+        print("add edge from ...")
+        for e in edges:
+            g.add_edge(e[1], e[0])
+
+        g.save("data/whole_network.gt")
 
     def run(self):
 
