@@ -9,10 +9,10 @@ import json
 
 try:
     import matplotlib.pyplot as plt
+    import seaborn as sns
 except:
     print("import plt error.")
 import networkx as nx
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from tqdm import tqdm
