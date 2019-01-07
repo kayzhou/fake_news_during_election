@@ -49,7 +49,7 @@ class ALL_TWEET(object):
                     json_d["fake"] = fake_label
                     json_d["polarity"] = polarity_label
                     f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
-                    self.tweet_ids.append(json_d["tweet_id"])
+                    # self.tweet_ids.append(json_d["tweet_id"])
         conn.close()
 
         # IRA
@@ -64,7 +64,7 @@ class ALL_TWEET(object):
                 d["fake"] = fake_label
                 d["polarity"] = polarity_label
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
-                self.tweet_ids.append(d["tweetid"])
+                # self.tweet_ids.append(d["tweetid"])
 
 
     def find_links(self):
@@ -270,6 +270,7 @@ class ALL_TWEET(object):
         nx.write_gpickle(G, "data/fake_network.gpickle")
 
     def run(self):
+        # 找数据
         self.find_all_tweets()
         self.find_links()
 
