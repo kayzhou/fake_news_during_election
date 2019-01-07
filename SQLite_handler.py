@@ -9,6 +9,7 @@ import sqlite3
 from tqdm import tqdm
 import pendulum
 import json
+from collections import defaultdict
 
 
 def find_tweet(_id):
@@ -137,6 +138,34 @@ def find_tweets(tweet_ids):
     conn1.close()
     return new_ds
 
+
+def find_tweets_by_users(uids):
+    """
+    通过用户id找到与之相关的全部tweets
+    """
+    dict_uids_tweetids = defaultdict(list)
+    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c1 = conn1.cursor()
+    c2 = conn2.cursor()
+
+    for _id in uids:
+        c1.execute('''SELECT tweet_id FROM retweeted_status WHERE user_id={}'''.format(_id))
+        for d in c1.fetchall():
+            dict_uids_tweetids[_id].append(str(d[0]) + "-retweet")
+        c1.execute('''SELECT tweet_id FROM tweet_id WHERE user_id={}'''.format(_id))
+        for d in c1.fetchall():
+            dict_uids_tweetids[_id].append(str(d[0]))
+
+        c2.execute('''SELECT tweet_id FROM retweeted_status WHERE user_id={}'''.format(_id))
+        for d in c1.fetchall():
+            dict_uids_tweetids[_id].append(str(d[0]) + "-retweet")
+        c2.execute('''SELECT tweet_id FROM tweet_id WHERE user_id={}'''.format(_id))
+        for d in c2.fetchall():
+            dict_uids_tweetids[_id].append(str(d[0]))
+    conn2.close()
+    conn1.close()
+    return dict_uids_tweetids
 
 
 def find_all_uids():
