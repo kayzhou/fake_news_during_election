@@ -43,6 +43,8 @@ class ALL_TWEET(object):
                     labels = judge.identify(hostname)
                     fake_label = labels[0]
                     polarity_label = labels[1]
+                    if fake_label == "GOOD" and polarity_label == -1:
+                        continue
                     json_d = {k: v for k, v in zip(col_names, d)}
                     json_d["fake"] = fake_label
                     json_d["polarity"] = polarity_label
