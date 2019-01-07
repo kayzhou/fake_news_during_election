@@ -43,7 +43,7 @@ class Are_you_IRA(object):
 
 if __name__ == "__main__":
     who = Who_is_fake()
-    print(who.identify("bbc.com"))
+    print(who.identify("baidu.com"))
 
 
 
