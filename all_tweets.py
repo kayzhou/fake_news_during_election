@@ -34,7 +34,7 @@ class ALL_TWEET(object):
         c.execute('''SELECT * FROM urls;''')
         col_names = [t[0] for t in c.description]
 
-        with open("data/all_tweets.json", "w") as f:
+        with open("disk/all_tweets.json", "w") as f:
             print("start ...")
             for d in tqdm(c.fetchall()):
                 if d[8]:
@@ -53,7 +53,7 @@ class ALL_TWEET(object):
         conn.close()
 
         # IRA
-        with open("data/all_IRA_tweets.json", "w") as f:
+        with open("disk/all_IRA_tweets.json", "w") as f:
             for line in open("data/ira-final-urls.json"):
                 d = json.loads(line.strip())
                 hostname = d["hostname"]
@@ -111,7 +111,7 @@ class ALL_TWEET(object):
 
         print("IRA -> ", cnt)
 
-        json.dump(retweet_link, open("data/all_retweet_network.json",
+        json.dump(retweet_link, open("disk/all_retweet_network.json",
                                     "w"), ensure_ascii=False, indent=2)
 
     def fill_url_tweets(self):
