@@ -64,11 +64,20 @@ class ALL_TWEET(object):
                 d["fake"] = fake_label
                 d["polarity"] = polarity_label
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
-                self.tweet_ids.append(json_d["tweet_id"])
+                self.tweet_ids.append(d["tweetid"])
 
 
     def find_links(self):
-        tweets_ids = self.tweet_ids
+        if not self.tweet_ids:
+            for line in open("disk/all_tweets.json"):
+                self.tweet_id.append(json.loads(line.strip())["tweet_id"])
+            print(len(self.tweet_ids))
+            for line in open("disk/all_IRA_tweets.json"):
+                self.tweet_id.append(json.loads(line.strip())["tweetid"])
+            print(len(self.tweet_ids))
+
+        tweets_ids = set(self.tweet_ids)
+        print(len(tweets_ids))
         retweet_link = {}
         conn = sqlite3.connect(
             "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
