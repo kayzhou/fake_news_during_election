@@ -70,10 +70,10 @@ class ALL_TWEET(object):
     def find_links(self):
         if not self.tweet_ids:
             for line in open("disk/all_tweets.json"):
-                self.tweet_id.append(json.loads(line.strip())["tweet_id"])
+                self.tweet_ids.append(json.loads(line.strip())["tweet_id"])
             print(len(self.tweet_ids))
             for line in open("disk/all_IRA_tweets.json"):
-                self.tweet_id.append(json.loads(line.strip())["tweetid"])
+                self.tweet_ids.append(json.loads(line.strip())["tweetid"])
             print(len(self.tweet_ids))
 
         tweets_ids = set(self.tweet_ids)
@@ -271,7 +271,7 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        self.find_all_tweets()
+        # self.find_all_tweets()
         self.find_links()
 
         # self.fill_url_tweets()
