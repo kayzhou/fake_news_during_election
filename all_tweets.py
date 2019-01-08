@@ -126,7 +126,7 @@ class ALL_TWEET(object):
     def fill_url_tweets(self):
         print("原始数据处理中 ...")
 
-        for line in tqdm(open("data/fake_tweets.json")):
+        for line in tqdm(open("disk/all_tweets.json")):
             d = json.loads(line.strip())
             tweet = {
                 "tweet_id": str(d["tweet_id"]),
@@ -137,10 +137,11 @@ class ALL_TWEET(object):
                 "is_IRA": 0,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower()
+
             }
             self.tweets[str(d["tweet_id"])] = tweet
 
-        for line in tqdm(open("data/IRA_fake_tweets.json")):
+        for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
             if str(d["tweetid"]) in self.tweets:
                 self.tweets[d["tweetid"]]["is_IRA"] = 1
@@ -153,14 +154,16 @@ class ALL_TWEET(object):
                     "is_source": None,
                     "is_IRA": 1,
                     "URL": d["final_url"].lower(),
-                    "hostname": d["hostname"].lower()
+                    "hostname": d["hostname"].lower(),
+                    "fake": d["fake"],
+                    "polarity": d["polarity"]
                 }
                 self.tweets[str(d["tweetid"])] = tweet
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
 
-        fake_retweets_links = json.load(open("data/fake_retweet_network.json"))
+        fake_retweets_links = json.load(open("disk/all_retweet_network.json"))
         for tweet_id, retweetd_id in tqdm(fake_retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
 
@@ -174,7 +177,9 @@ class ALL_TWEET(object):
                     "is_source": 0,
                     "is_IRA": 0,
                     "URL": self.tweets[origin_tweetdid]["URL"],
-                    "hostname": self.tweets[origin_tweetdid]["hostname"]
+                    "hostname": self.tweets[origin_tweetdid]["hostname"],
+                    "fake": d["fake"],
+                    "polarity": d["polarity"]
                 }
                 d = find_tweet(tweetid)
                 if d:
@@ -242,15 +247,15 @@ class ALL_TWEET(object):
     # -- save -- #
     def save_url_ts(self):
         if self.url_timeseries:
-            json.dump(self.url_timeseries, open("data/fake-url-tweets.json", "w"), ensure_ascii=False, indent=2)
+            json.dump(self.url_timeseries, open("data/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
-        pd.DataFrame(self.tweets_csv).to_csv("data/fake-tweets.csv", index=None)
+        pd.DataFrame(self.tweets_csv).to_csv("data/all-tweets.csv", index=None)
 
     def save_network(self):
-        tweets_csv = pd.read_csv("data/fake-tweets.csv")
-        retweet_network = json.load(open("data/fake_retweet_network.json"))
+        tweets_csv = pd.read_csv("data/all-tweets.csv")
+        retweet_network = json.load(open("disk/all_retweet_network.json"))
         G = nx.DiGraph()
         nodes = tweets_csv["user_id"].tolist()
         edges = []
@@ -272,18 +277,18 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         # self.find_all_tweets()
-        self.find_links()
+        # self.find_links()
 
-        # self.fill_url_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_url_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
-        # self.convert_url_timeseries()
+        self.convert_url_timeseries()
 
         # 保存
-        # self.save_url_ts()
-        # self.save_csv()
+        self.save_url_ts()
+        self.save_csv()
         # self.save_network()
 
 
