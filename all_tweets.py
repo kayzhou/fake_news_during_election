@@ -291,35 +291,20 @@ class ALL_TWEET(object):
         self.retweet_network = r_net
 
 
-    def save_network_gt(self, _tweets, _users, out_name):
+    def save_network_gt(self, _tweets, dict_tweetid_userid, node_map, out_name):
         g = gt.Graph()
 
-        nodes = _users.index.tolist()
-        node_map = {n:i for i, n in enumerate(nodes)}
-
-        dict_tweetid_userid = {}
-        for _, row in _tweets.iterrows():
-            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
-
         print("add nodes from ...")
-        vlist = g.add_vertex(len(nodes))
+        vlist = g.add_vertex(len(node_map))
 
-        edges = []
         print("add edge from ...")
         for n2, n1 in tqdm(self.retweet_network.items()):
-            if n1 in dict_tweetid_userid:
+            if n1 in _tweets:
                 u1 = node_map[dict_tweetid_userid[n1]]
-                try:
-                    u2 = node_map[dict_tweetid_userid[n2]]
-                except:
-                    print("can not find n2!")
-                    continue
-
+                u2 = node_map[dict_tweetid_userid[n2]]
                 g.add_edge(g.vertex(u1), g.vertex(u2))
 
-        json.dump(node_map, open(out_name + "_node_map.json", "w"))
-
-        print("saving the graph ...", out_name + ".gt")
+        print("saving the graph ...", out_name)
         g.save(out_name + ".gt")
         print("finished!")
 
@@ -337,9 +322,17 @@ class ALL_TWEET(object):
 
     def relation_betw_source_and_CI(self):
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
-        print("loaded all tweets!")
         all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+        print("loaded all tweets!")
+
         self.load_retweet_network()
+
+        dict_tweetid_userid = {}
+        for _, row in all_tweets.iterrows():
+            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
+        nodes = all_tweets["user_id"].unique().tolist()
+        node_map = {n:i for i, n in enumerate(nodes)}
+        json.dump(node_map, open("disk/node_map.json", "w"))
 
         fake_labels = ["FAKE", "BIAS"]
 
@@ -348,7 +341,7 @@ class ALL_TWEET(object):
             tweets = all_tweets[all_tweets["fake"]==f_label]
             users = self.get_users(tweets)
             users.to_csv("data/users_{}.csv".format(f_label))
-            self.save_network_gt(tweets, users, "disk/network_{}.gt".format(f_label))
+            self.save_network_gt(set(tweets.tweet_id), dict_tweetid_userid, node_map, "disk/network_{}.gt".format(f_label))
 
         polarity_labels = ["LEFT", "LEFTCENTER", "CENTER", "RIGHTCENTER", "RIGHT"]
 
@@ -357,7 +350,7 @@ class ALL_TWEET(object):
             tweets = all_tweets[all_tweets["polarity"]==p_label]
             users = self.get_users(tweets)
             users.to_csv("data/users_{}.csv".format(p_label))
-            self.save_network_gt(tweets, users, "disk/network_{}".format(p_label))
+            self.save_network_gt(set(tweets.tweet_id), dict_tweetid_userid, node_map, "disk/network_{}.gt".format(p_label))
 
     def run(self):
         # 找数据
