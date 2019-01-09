@@ -74,6 +74,7 @@ class ALL_TWEET(object):
                 d["polarity"] = polarity_label
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
                 # self.tweet_ids.append(d["tweetid"])
+
         print("count of IRAs:", cnt)
 
     def find_links(self):
@@ -325,10 +326,12 @@ class ALL_TWEET(object):
         all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
         print("loaded all tweets!")
 
+        print("loading retweet network ...")
         self.load_retweet_network()
 
+        print("making dict_tweetid_userid ...")
         dict_tweetid_userid = {}
-        for _, row in all_tweets.iterrows():
+        for _, row in tqdm(all_tweets.iterrows()):
             dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
         nodes = all_tweets["user_id"].unique().tolist()
         node_map = {n:i for i, n in enumerate(nodes)}
@@ -354,8 +357,8 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        # self.find_all_tweets()
-        # self.find_links()
+        self.find_all_tweets()
+        self.find_links()
 
         self.fill_url_tweets()
         self.fill_retweets()
@@ -368,12 +371,12 @@ class ALL_TWEET(object):
         self.save_url_ts()
         self.save_csv()
         # self.save_network()
-        self.save_network_gt()
+        # self.save_network_gt()
 
 
 if __name__ == "__main__":
     LeBron = ALL_TWEET()
-    # LeBron.run()
+    LeBron.run()
 
     # make graphs and make user dataset
     LeBron.relation_betw_source_and_CI()
