@@ -4,12 +4,16 @@
 Created on 2018-12-01 17:02:07
 @author: https://kayzhou.github.io/
 """
+import sqlite3
+from collections import defaultdict
+from datetime import datetime
+
+import graph_tool.all as gt
+
+from fake_identify import Who_is_fake
 from my_weapon import *
 from SQLite_handler import find_tweet
-from collections import defaultdict
-from fake_identify import Who_is_fake
-import sqlite3
-import graph_tool.all as gt
+
 
 class ALL_TWEET(object):
     """
@@ -373,6 +377,3 @@ if __name__ == "__main__":
 
     # make graphs and make user dataset
     LeBron.relation_betw_source_and_CI()
-
-
-
