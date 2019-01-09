@@ -309,11 +309,18 @@ class ALL_TWEET(object):
         for n2, n1 in tqdm(self.retweet_network.items()):
             if n1 in dict_tweetid_userid:
                 u1 = node_map[dict_tweetid_userid[n1]]
-                u2 = node_map[dict_tweetid_userid[n2]]
+                _u2 = dict_tweetid_userid[n2]
+                if _u2 not in node_map:
+                    print("add node ...", len(node_map))
+                    node_map[_u2] = len(node_map) - 1
+                    print("added!", len(node_map))
+                u2 = node_map[_u2]
                 g.add_edge(g.vertex(u1), g.vertex(u2))
 
-        print("saving the graph ...", out_name)
-        g.save(out_name)
+        json.dump(node_map, open(out_name + "_node_map.json", "w"))
+
+        print("saving the graph ...", out_name + ".gt")
+        g.save(out_name + ".gt")
         print("finished!")
 
     def get_users(self, tweets):
@@ -350,7 +357,7 @@ class ALL_TWEET(object):
             tweets = all_tweets[all_tweets["polarity"]==p_label]
             users = self.get_users(tweets)
             users.to_csv("data/users_{}.csv".format(p_label))
-            self.save_network_gt(tweets, users, "disk/network_{}.gt".format(p_label))
+            self.save_network_gt(tweets, users, "disk/network_{}".format(p_label))
 
     def run(self):
         # 找数据
