@@ -281,14 +281,20 @@ class ALL_TWEET(object):
         G.add_edges_from(edges)
         nx.write_gpickle(G, "data/fake_network.gpickle")
 
-    def save_network_gt(self):
+
+    def load_retweet_network(self):
+        r_net = json.load(open("disk/all_retweet_network.json"))
+        self.retweet_network = r_net
+
+
+    def save_network_gt(self, _tweets, _users, out_name):
         g = gt.Graph()
-        retweet_network = json.load(open("disk/all_retweet_network.json"))
-        nodes = self.tweets_csv["user_id"].tolist()
+
+        nodes = _users.index.tolist()
         node_map = {n:i for i, n in enumerate(nodes)}
 
         dict_tweetid_userid = {}
-        for _, row in self.tweets_csv.iterrows():
+        for _, row in _tweets.iterrows():
             dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
 
         print("add nodes from ...")
@@ -296,12 +302,51 @@ class ALL_TWEET(object):
 
         edges = []
         print("add edge from ...")
-        for n2, n1 in retweet_network.items():
-            u1 = node_map[dict_tweetid_userid[n1]]
-            u2 = node_map[dict_tweetid_userid[n2]]
-            g.add_edge(g.vertex(u1), g.vertex(u2))
+        for n2, n1 in tqdm(self.retweet_network.items()):
+            if n1 in dict_tweetid_userid:
+                u1 = node_map[dict_tweetid_userid[n1]]
+                u2 = node_map[dict_tweetid_userid[n2]]
+                g.add_edge(g.vertex(u1), g.vertex(u2))
 
-        g.save("disk/alls_network.gt")
+        print("saving the graph ...", out_name)
+        g.save(out_name)
+        print("finished!")
+
+    def get_users(self, tweets):
+        user_count = pd.value_counts(tweets["user_id"]).rename("cnt")
+        user_sources_count = tweets["is_source"].groupby(tweets["user_id"]).sum().sort_values(ascending=False).rename("source_cnt")
+        user_first_count = tweets["is_first"].groupby(tweets["user_id"]).sum().sort_values(ascending=False).rename("first_cnt")
+        users = pd.concat([user_count, user_first_count, user_sources_count], axis=1, sort=False)
+        users["source_rate"] = users["source_cnt"] / users["cnt"]
+        users["first_rate"] = users["first_cnt"] / users["cnt"]
+        users["first_source_rate"] = users["first_cnt"] / users["source_cnt"]
+        users.fillna(0, inplace=True)
+        # print(users.head())
+        return users
+
+    def relation_betw_source_and_CI(self):
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
+        print("loaded all tweets!")
+        all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+        self.load_retweet_network()
+
+        fake_labels = ["FAKE", "BIAS"]
+
+        for f_label in fake_labels:
+            print(f_label, "...")
+            tweets = all_tweets[all_tweets["fake"]==f_label]
+            users = self.get_users(tweets)
+            users.to_csv("data/users_{}.csv".format(f_label))
+            self.save_network_gt(tweets, users, "disk/network_{}.gt".format(f_label))
+
+        polarity_labels = ["LEFT", "LEFTCENTER", "CENTER", "RIGHTCENTER", "RIGHT"]
+
+        for p_label in polarity_labels:
+            print(p_label, "...")
+            tweets = all_tweets[all_tweets["polarity"]==p_label]
+            users = self.get_users(tweets)
+            users.to_csv("data/users_{}.csv".format(p_label))
+            self.save_network_gt(tweets, users, "disk/network_{}.gt".format(p_label))
 
     def run(self):
         # 找数据
@@ -324,7 +369,10 @@ class ALL_TWEET(object):
 
 if __name__ == "__main__":
     LeBron = ALL_TWEET()
-    LeBron.run()
+    # LeBron.run()
+
+    # make graphs and make user dataset
+    LeBron.relation_betw_source_and_CI()
 
 
 
