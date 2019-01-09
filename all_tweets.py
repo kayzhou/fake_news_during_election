@@ -136,8 +136,9 @@ class ALL_TWEET(object):
                 "is_source": None,
                 "is_IRA": 0,
                 "URL": d["final_url"].lower(),
-                "hostname": d["final_hostname"].lower()
-
+                "hostname": d["final_hostname"].lower(),
+                "fake": d["fake"],
+                "polarity": d["polarity"]
             }
             self.tweets[str(d["tweet_id"])] = tweet
 
@@ -178,8 +179,8 @@ class ALL_TWEET(object):
                     "is_IRA": 0,
                     "URL": self.tweets[origin_tweetdid]["URL"],
                     "hostname": self.tweets[origin_tweetdid]["hostname"],
-                    "fake": d["fake"],
-                    "polarity": d["polarity"]
+                    "fake": self.tweets[origin_tweetdid]["fake"],
+                    "polarity": self.tweets[origin_tweetdid]["polarity"]
                 }
                 d = find_tweet(tweetid)
                 if d:
@@ -247,11 +248,11 @@ class ALL_TWEET(object):
     # -- save -- #
     def save_url_ts(self):
         if self.url_timeseries:
-            json.dump(self.url_timeseries, open("data/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
+            json.dump(self.url_timeseries, open("disk/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
-        pd.DataFrame(self.tweets_csv).to_csv("data/all-tweets.csv", index=None)
+        pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
     def save_network(self):
         tweets_csv = pd.read_csv("data/all-tweets.csv")
