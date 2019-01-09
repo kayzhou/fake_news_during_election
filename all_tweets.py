@@ -376,7 +376,7 @@ class ALL_TWEET(object):
 
 if __name__ == "__main__":
     LeBron = ALL_TWEET()
-    LeBron.run()
+    # LeBron.run()
 
     # make graphs and make user dataset
     LeBron.relation_betw_source_and_CI()
