@@ -309,12 +309,12 @@ class ALL_TWEET(object):
         for n2, n1 in tqdm(self.retweet_network.items()):
             if n1 in dict_tweetid_userid:
                 u1 = node_map[dict_tweetid_userid[n1]]
-                _u2 = dict_tweetid_userid[n2]
-                if _u2 not in node_map:
-                    print("add node ...", len(node_map))
-                    node_map[_u2] = len(node_map) - 1
-                    print("added!", len(node_map))
-                u2 = node_map[_u2]
+                try:
+                    u2 = node_map[dict_tweetid_userid[n2]]
+                except:
+                    print("can not find n2!")
+                    continue
+
                 g.add_edge(g.vertex(u1), g.vertex(u2))
 
         json.dump(node_map, open(out_name + "_node_map.json", "w"))
