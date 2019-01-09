@@ -9,6 +9,7 @@ from SQLite_handler import find_tweet
 from collections import defaultdict
 from fake_identify import Who_is_fake
 import sqlite3
+import graph_tool.all as gt
 
 class ALL_TWEET(object):
     """
@@ -16,7 +17,6 @@ class ALL_TWEET(object):
     """
     def __init__(self):
         self.tweet_ids = []
-
         self.tweets = {}
         self.tweets_csv = []
         self.url_timeseries = defaultdict(list)
@@ -43,6 +43,7 @@ class ALL_TWEET(object):
                     labels = judge.identify(hostname)
                     fake_label = labels[0]
                     polarity_label = labels[1]
+                    # 既没有极性也不是fake或bias
                     if fake_label == "GOOD" and polarity_label == -1:
                         continue
                     json_d = {k: v for k, v in zip(col_names, d)}
@@ -52,6 +53,7 @@ class ALL_TWEET(object):
                     # self.tweet_ids.append(json_d["tweet_id"])
         conn.close()
 
+        cnt = 0
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
             for line in open("data/ira-final-urls.json"):
@@ -61,11 +63,14 @@ class ALL_TWEET(object):
                 labels = judge.identify(hostname)
                 fake_label = labels[0]
                 polarity_label = labels[1]
+                if fake_label == "GOOD" and polarity_label == -1:
+                    continue
+                cnt += 1
                 d["fake"] = fake_label
                 d["polarity"] = polarity_label
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
                 # self.tweet_ids.append(d["tweetid"])
-
+        print("count of IRAs:", cnt)
 
     def find_links(self):
         if not self.tweet_ids:
@@ -77,8 +82,9 @@ class ALL_TWEET(object):
             print(len(self.tweet_ids))
 
         tweets_ids = set(self.tweet_ids)
-        print(len(tweets_ids))
+        print("目前所有tweets的量", len(tweets_ids))
         retweet_link = {}
+
         conn = sqlite3.connect(
             "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
         c = conn.cursor()
@@ -117,7 +123,6 @@ class ALL_TWEET(object):
             if re_tid in tweets_ids:
                 retweet_link[tid] = re_tid
                 cnt += 1
-
         print("IRA -> ", cnt)
 
         json.dump(retweet_link, open("disk/all_retweet_network.json",
@@ -258,6 +263,7 @@ class ALL_TWEET(object):
         tweets_csv = pd.read_csv("data/all-tweets.csv")
         retweet_network = json.load(open("disk/all_retweet_network.json"))
         G = nx.DiGraph()
+
         nodes = tweets_csv["user_id"].tolist()
         edges = []
         dict_tweetid_userid = {}
@@ -275,6 +281,28 @@ class ALL_TWEET(object):
         G.add_edges_from(edges)
         nx.write_gpickle(G, "data/fake_network.gpickle")
 
+    def save_network_gt(self):
+        g = gt.Graph()
+        retweet_network = json.load(open("disk/all_retweet_network.json"))
+        nodes = self.tweets_csv["user_id"].tolist()
+        node_map = {n:i for i, n in enumerate(nodes)}
+
+        dict_tweetid_userid = {}
+        for _, row in self.tweets_csv.iterrows():
+            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
+
+        print("add nodes from ...")
+        vlist = g.add_vertex(len(nodes))
+
+        edges = []
+        print("add edge from ...")
+        for n2, n1 in retweet_network.items():
+            u1 = node_map[dict_tweetid_userid[n1]]
+            u2 = node_map[dict_tweetid_userid[n2]]
+            g.add_edge(g.vertex(u1), g.vertex(u2))
+
+        g.save("disk/alls_network.gt")
+
     def run(self):
         # 找数据
         # self.find_all_tweets()
@@ -291,6 +319,7 @@ class ALL_TWEET(object):
         self.save_url_ts()
         self.save_csv()
         # self.save_network()
+        self.save_network_gt()
 
 
 if __name__ == "__main__":
