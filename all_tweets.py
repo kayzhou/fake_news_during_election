@@ -10,7 +10,7 @@ from datetime import datetime
 
 import graph_tool.all as gt
 
-from fake_identify import Who_is_fake
+from fake_identify import Who_is_fake, Are_you_IRA
 from my_weapon import *
 from SQLite_handler import find_tweet
 
@@ -24,8 +24,6 @@ class ALL_TWEET(object):
         self.tweets = {}
         self.tweets_csv = []
         self.url_timeseries = defaultdict(list)
-        self.IRA_map = json.load(open("data/IRA_map_ele.json"))
-        # self.set_tweets = set()
 
     def find_all_tweets(self):
         # newest
@@ -42,17 +40,13 @@ class ALL_TWEET(object):
             print("start ...")
             for d in tqdm(c.fetchall()):
                 if d[8]:
-                    hostname = d[8]
+                    hostname = d[8].lower()
                     # print(hostname)
-                    labels = judge.identify(hostname)
-                    fake_label = labels[0]
-                    polarity_label = labels[1]
-                    # 既没有极性也不是fake或bias
-                    if fake_label == "GOOD" and polarity_label == -1:
+                    media_type = judge.identify(hostname)
+                    if media_type == -1:
                         continue
                     json_d = {k: v for k, v in zip(col_names, d)}
-                    json_d["fake"] = fake_label
-                    json_d["polarity"] = polarity_label
+                    json_d["media_type"] = media_type
                     f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
                     # self.tweet_ids.append(json_d["tweet_id"])
         conn.close()
@@ -62,18 +56,14 @@ class ALL_TWEET(object):
         with open("disk/all_IRA_tweets.json", "w") as f:
             for line in open("data/ira-final-urls.json"):
                 d = json.loads(line.strip())
-                hostname = d["hostname"]
+                hostname = d["hostname"].lower()
                 # print(hostname)
-                labels = judge.identify(hostname)
-                fake_label = labels[0]
-                polarity_label = labels[1]
-                if fake_label == "GOOD" and polarity_label == -1:
+                media_type = judge.identify(hostname)
+                if media_type == -1:
                     continue
                 cnt += 1
-                d["fake"] = fake_label
-                d["polarity"] = polarity_label
+                d["media_type"] = media_type
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
-                # self.tweet_ids.append(d["tweetid"])
 
         print("count of IRAs:", cnt)
 
@@ -144,18 +134,20 @@ class ALL_TWEET(object):
                 "dt": d["datetime_EST"],
                 "is_first": None,
                 "is_source": None,
-                "is_IRA": 0,
+                "is_IRA": None,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower(),
-                "fake": d["fake"],
-                "polarity": d["polarity"]
+                "media_type": d["media_type"],
+                "retweeted_id": -1
             }
             self.tweets[str(d["tweet_id"])] = tweet
 
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
+
             if str(d["tweetid"]) in self.tweets:
                 self.tweets[d["tweetid"]]["is_IRA"] = 1
+
             else:
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
@@ -166,8 +158,8 @@ class ALL_TWEET(object):
                     "is_IRA": 1,
                     "URL": d["final_url"].lower(),
                     "hostname": d["hostname"].lower(),
-                    "fake": d["fake"],
-                    "polarity": d["polarity"]
+                    "media_type": d["media_type"],
+                    "retweeted_id": -1
                 }
                 self.tweets[str(d["tweetid"])] = tweet
 
@@ -178,6 +170,8 @@ class ALL_TWEET(object):
         for tweet_id, retweetd_id in tqdm(fake_retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
 
+            # tweetid 一定是转发的！
+
             # 新扩展进来的
             if tweetid not in self.tweets:
                 tweet = {
@@ -186,12 +180,13 @@ class ALL_TWEET(object):
                     "dt": None,
                     "is_first": 0,
                     "is_source": 0,
-                    "is_IRA": 0,
+                    "is_IRA": None,
                     "URL": self.tweets[origin_tweetdid]["URL"],
                     "hostname": self.tweets[origin_tweetdid]["hostname"],
-                    "fake": self.tweets[origin_tweetdid]["fake"],
-                    "polarity": self.tweets[origin_tweetdid]["polarity"]
+                    "media_type": self.tweets[origin_tweetdid]["media_type"],
+                    "retweeted_id": origin_tweetdid
                 }
+
                 d = find_tweet(tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
@@ -201,6 +196,7 @@ class ALL_TWEET(object):
             # 原来就存在
             else:
                 self.tweets[tweetid]["is_source"] = 0
+                self.tweets[tweetid]["retweeted_id"] = origin_tweetdid
 
         # 什么是source？没有转发别人的！
         for tweetid in self.tweets.keys():
@@ -209,6 +205,7 @@ class ALL_TWEET(object):
 
 
     def fill_IRA_info(self):
+        putin = Are_you_IRA()
         print("补充IRA数据处理中 ...")
         cnt = 0
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
@@ -217,36 +214,46 @@ class ALL_TWEET(object):
 
             if tweetid in self.tweets:
                 uid = row["userid"]
-                if uid in self.IRA_map:
-                    uid = str(self.IRA_map[uid])
+                if uid in putin._map:
+                    uid = str(putin._map[uid])
 
                 self.tweets[tweetid]["is_IRA"] = 1
                 self.tweets[tweetid]["user_id"] = uid
+
                 if not self.tweets[tweetid]["dt"]:
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
+
+        for tweetid in self.tweets.keys():
+            if self.tweets[tweetid]["is_IRA"] == None:
+                self.tweets[tweetid]["is_IRA"] = 0
+
         print("Count of IRA tweets:", cnt)
+
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
         print(len(self.tweets))
+        url_type = {}
+
         for tweet_id, tweet in tqdm(self.tweets.items()):
-            if tweet["dt"]:
-                self.url_timeseries[tweet["URL"]].append(tweet)
+            self.url_timeseries[tweet["URL"]].append(tweet)
+            url_type[tweet["URL"]] = tweet["media_type"]
 
         sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
         self.url_timeseries = []
+
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
             sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
-            for i in range(len(sorted_tweets_list)):
+            for i, _tweets in enumerate(sorted_tweets_list):
                 if i == 0:
                     sorted_tweets_list[0]["is_first"] = 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
-            self.url_timeseries.append({"url": url, "tweets": sorted_tweets_list})
+            self.url_timeseries.append({"url": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
         for url_ts in self.url_timeseries:
@@ -264,33 +271,81 @@ class ALL_TWEET(object):
         print("*.csv文件保存中 ...")
         pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
-    def save_network(self):
-        tweets_csv = pd.read_csv("data/all-tweets.csv")
-        retweet_network = json.load(open("disk/all_retweet_network.json"))
-        G = nx.DiGraph()
+    # def save_network(self):
+    #     tweets_csv = pd.read_csv("data/all-tweets.csv")
+    #     retweet_network = json.load(open("disk/all_retweet_network.json"))
+    #     G = nx.DiGraph()
 
-        nodes = tweets_csv["user_id"].tolist()
-        edges = []
-        dict_tweetid_userid = {}
-        for _, row in tweets_csv.iterrows():
-            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
+    #     nodes = tweets_csv["user_id"].tolist()
+    #     edges = []
+    #     dict_tweetid_userid = {}
+    #     for _, row in tweets_csv.iterrows():
+    #         dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
 
-        for n2, n1 in retweet_network.items():
-            u1 = dict_tweetid_userid[n1]
-            u2 = dict_tweetid_userid[n2]
-            edges.append((u1, u2))
+    #     for n2, n1 in retweet_network.items():
+    #         u1 = dict_tweetid_userid[n1]
+    #         u2 = dict_tweetid_userid[n2]
+    #         edges.append((u1, u2))
 
-        print("add nodes from ...")
-        G.add_nodes_from(nodes)
-        print("add edge from ...")
-        G.add_edges_from(edges)
-        nx.write_gpickle(G, "data/fake_network.gpickle")
+    #     print("add nodes from ...")
+    #     G.add_nodes_from(nodes)
+    #     print("add edge from ...")
+    #     G.add_edges_from(edges)
+    #     nx.write_gpickle(G, "data/fake_network.gpickle")
 
 
     def load_retweet_network(self):
         r_net = json.load(open("disk/all_retweet_network.json"))
         self.retweet_network = r_net
 
+
+    def load_all_tweets(self):
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
+        all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+        self.tweets_csv = all_tweets
+
+    def make_users(self):
+        self.load_all_tweets()
+        all_tweets = self.tweets_csv
+        users = None
+        map_labels = {
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
+
+        for _type, f_label in map_labels.items():
+            print(_type, "...")
+            tweets = all_tweets[all_tweets["media_type"]==_type]
+
+            user_count = pd.value_counts(tweets["user_id"]).rename(f_label)
+            user_sources_count = tweets["is_source"].groupby(tweets["user_id"]).sum().rename(f_label + "_source")
+            user_first_count = tweets["is_first"].groupby(tweets["user_id"]).sum().rename(f_label + "_first")
+
+            if users is None:
+                users = pd.concat([user_count, user_first_count, user_sources_count], axis=1, sort=False)
+            else:
+                users = pd.concat([users, user_count, user_first_count, user_sources_count], axis=1, sort=False)
+
+        for _type, f_label in map_labels.items():
+            users[f_label + "_source_rate"] = users[f_label + "_source"] / users[f_label]
+            users[f_label + "_first_rate"] = users[f_label + "_first"] / users[f_label]
+            users[f_label + "_first_source_rate"] = users[f_label + "_first"] / users[f_label + "_source"]
+
+        IRA_tweets = all_tweets[all_tweets["is_IRA"]==1]
+        IRA_u = IRA_tweets["is_IRA"].groupby(IRA_tweets["user_id"]).sum().rename("is_IRA")
+        users = pd.concat([users, IRA_u], axis=1, sort=False)
+
+        users.fillna(0, inplace=True)
+        # save data
+
+        users["user_id"] = users.index
+        users.to_csv("data/all-users.csv", index=False)
 
     def save_network_gt(self, _tweets, dict_tweetid_userid, node_map, out_name):
         g = gt.Graph()
@@ -309,21 +364,9 @@ class ALL_TWEET(object):
         g.save(out_name + ".gt")
         print("finished!")
 
-    def get_users(self, tweets):
-        user_count = pd.value_counts(tweets["user_id"]).rename("cnt")
-        user_sources_count = tweets["is_source"].groupby(tweets["user_id"]).sum().sort_values(ascending=False).rename("source_cnt")
-        user_first_count = tweets["is_first"].groupby(tweets["user_id"]).sum().sort_values(ascending=False).rename("first_cnt")
-        users = pd.concat([user_count, user_first_count, user_sources_count], axis=1, sort=False)
-        users["source_rate"] = users["source_cnt"] / users["cnt"]
-        users["first_rate"] = users["first_cnt"] / users["cnt"]
-        users["first_source_rate"] = users["first_cnt"] / users["source_cnt"]
-        users.fillna(0, inplace=True)
-        # print(users.head())
-        return users
-
-    def relation_betw_source_and_CI(self):
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
-        all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+    def make_graph_for_CI(self):
+        self.load_all_tweets()
+        all_tweets = self.tweets_csv
         print("loaded all tweets!")
 
         print("loading retweet network ...")
@@ -337,23 +380,22 @@ class ALL_TWEET(object):
         node_map = {n:i for i, n in enumerate(nodes)}
         json.dump(node_map, open("disk/node_map.json", "w"))
 
-        fake_labels = ["FAKE", "BIAS"]
+        map_labels = {
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
 
-        for f_label in fake_labels:
-            print(f_label, "...")
-            tweets = all_tweets[all_tweets["fake"]==f_label]
-            users = self.get_users(tweets)
-            users.to_csv("data/users_{}.csv".format(f_label))
+        for _type, f_label in map_labels.items():
+            print(_type, "...")
+            tweets = all_tweets[all_tweets["media_type"]==_type]
             self.save_network_gt(set(tweets.tweet_id), dict_tweetid_userid, node_map, "disk/network_{}.gt".format(f_label))
 
-        polarity_labels = ["LEFT", "LEFTCENTER", "CENTER", "RIGHTCENTER", "RIGHT"]
-
-        for p_label in polarity_labels:
-            print(p_label, "...")
-            tweets = all_tweets[all_tweets["polarity"]==p_label]
-            users = self.get_users(tweets)
-            users.to_csv("data/users_{}.csv".format(p_label))
-            self.save_network_gt(set(tweets.tweet_id), dict_tweetid_userid, node_map, "disk/network_{}.gt".format(p_label))
 
     def run(self):
         # 找数据
@@ -370,13 +412,11 @@ class ALL_TWEET(object):
         # 保存
         self.save_url_ts()
         self.save_csv()
-        # self.save_network()
-        # self.save_network_gt()
+
+        self.make_users()
+        self.make_graph_for_CI()
 
 
 if __name__ == "__main__":
     LeBron = ALL_TWEET()
-    # LeBron.run()
-
-    # make graphs and make user dataset
-    LeBron.relation_betw_source_and_CI()
+    LeBron.run()
