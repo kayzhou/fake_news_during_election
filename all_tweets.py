@@ -163,7 +163,7 @@ class ALL_TWEET(object):
         tweets_from_SQL = {}
         retweets_links = json.load(open("disk/all_retweet_network.json"))
         for tweet_id, retweetd_id in tqdm(retweets_links.items()):
-            tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
+            tweetid, origin_tweetid = str(tweet_id), str(retweetd_id)
 
             # tweetid 一定是转发的！
 
@@ -176,10 +176,10 @@ class ALL_TWEET(object):
                     "is_first": 0,
                     "is_source": 0,
                     "is_IRA": -1,
-                    "URL": self.tweets[origin_tweetdid]["URL"],
-                    "hostname": self.tweets[origin_tweetdid]["hostname"],
-                    "media_type": self.tweets[origin_tweetdid]["media_type"],
-                    "retweeted_id": origin_tweetdid
+                    "URL": self.tweets[origin_tweetid]["URL"],
+                    "hostname": self.tweets[origin_tweetid]["hostname"],
+                    "media_type": self.tweets[origin_tweetid]["media_type"],
+                    "retweeted_id": origin_tweetid
                 }
                 d = find_tweet(tweetid)
                 if d:
@@ -195,7 +195,7 @@ class ALL_TWEET(object):
 
             if origin_tweetdid not in self.tweets:
                 tweet = {
-                    "tweet_id": origin_tweetdid,
+                    "tweet_id": origin_tweetid,
                     "user_id": -1,
                     "dt": -1,
                     "is_first": -1,
