@@ -160,7 +160,7 @@ class ALL_TWEET(object):
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
-
+        tweets_from_SQL = {}
         retweets_links = json.load(open("disk/all_retweet_network.json"))
         for tweet_id, retweetd_id in tqdm(retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
@@ -185,6 +185,7 @@ class ALL_TWEET(object):
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
+                    tweets_from_SQL[tweetid] = d
                 self.tweets[tweetid] = tweet
 
             # 原来就存在
@@ -205,15 +206,18 @@ class ALL_TWEET(object):
                     "media_type": self.tweets[tweetid]["media_type"],
                     "retweeted_id": 0
                 }
-                d = find_tweet(tweetid)
+                d = find_tweet(origin_tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
-                self.tweets[tweetid] = tweet
+                    tweets_from_SQL[origin_tweetid] = d
+                self.tweets[origin_tweetid] = tweet
 
             else:
-                self.tweets[tweetid]["is_source"] = 1
-                self.tweets[tweetid]["retweeted_id"] = 0
+                self.tweets[origin_tweetid]["is_source"] = 1
+                self.tweets[origin_tweetid]["retweeted_id"] = 0
+
+        json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json", "w"), indent=2, ensure_ascii=False)
 
         # 什么是source？没有转发别人的！
         for tweetid in self.tweets.keys():
