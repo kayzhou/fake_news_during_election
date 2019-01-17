@@ -114,7 +114,8 @@ class ALL_TWEET(object):
             tid = row["tweetid"]
             re_tid = row["retweet_tweetid"]
             # 寻找双向
-            retweet_link[tid] = re_tid
+            if tid in tweets_ids or re_tid in tweets_ids: 
+                retweet_link[tid] = re_tid
 
         print("IRA -> ", cnt)
 
@@ -150,7 +151,7 @@ class ALL_TWEET(object):
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
                     "user_id": -1,
-                    "dt": -1,
+                    "dt": "1900-01-01 00:00:00",
                     "is_first": -1,
                     "is_source": -1,
                     "is_IRA": 1,
@@ -175,7 +176,7 @@ class ALL_TWEET(object):
                 tweet = {
                     "tweet_id": tweetid,
                     "user_id": -1,
-                    "dt": -1,
+                    "dt": "1900-01-01 00:00:00",
                     "is_first": 0,
                     "is_source": 0,
                     "is_IRA": -1,
@@ -199,7 +200,7 @@ class ALL_TWEET(object):
                 tweet = {
                     "tweet_id": origin_tweetdid,
                     "user_id": -1,
-                    "dt": -1,
+                    "dt": "1900-01-01 00:00:00",
                     "is_first": -1,
                     "is_source": 1,
                     "is_IRA": -1,
@@ -216,7 +217,7 @@ class ALL_TWEET(object):
 
             else:
                 self.tweets[tweetid]["is_source"] = 1
-                self.tweets[tweetid]["retweeted_id"] = -1
+                self.tweets[tweetid]["retweeted_id"] = 0
 
         # 什么是source？没有转发别人的！
         for tweetid in self.tweets.keys():
@@ -242,16 +243,16 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_IRA"] = 1
                 self.tweets[tweetid]["user_id"] = uid
 
-                if not self.tweets[tweetid]["dt"]:
+                if self.tweets[tweetid]["dt"] == "1900-01-01 00:00:00":
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
 
             if retweet_id in self.tweets:
-                if self.tweets[tweetid]["user_id"] == -1:
+                if self.tweets[retweet_id]["user_id"] == -1:
                     r_uid = row["retweet_userid"]
                     if r_uid in putin._map:
                         r_uid = str(putin._map[r_uid])
-                    self.tweets[tweetid]["user_id"] == r_uid
+                    self.tweets[retweet_id]["user_id"] = r_uid
 
         for tweetid in self.tweets.keys():
             if self.tweets[tweetid]["is_IRA"] == -1:
@@ -276,7 +277,7 @@ class ALL_TWEET(object):
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
-            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在-1
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在1900-01-01 00:00:00
             is_first_marked = False
             for i, _tweets in enumerate(sorted_tweets_list):
                 if sorted_tweets_list[i]["is_source"] == 1 and is_first_marked == False:
@@ -395,12 +396,15 @@ class ALL_TWEET(object):
         print("add edge from ...")
         for n2, n1 in tqdm(self.retweet_network.items()):
             if n1 in _tweets:
-                u1 = node_map[dict_tweetid_userid[n1]]
-                u2 = node_map[dict_tweetid_userid[n2]]
-                g.add_edge(g.vertex(u1), g.vertex(u2))
+                try:
+                    u1 = node_map[dict_tweetid_userid[n1]]
+                    u2 = node_map[dict_tweetid_userid[n2]]
+                    g.add_edge(g.vertex(u1), g.vertex(u2))
+                except:
+                    print(n2, n1)
 
         print("saving the graph ...", out_name)
-        g.save(out_name + ".gt")
+        g.save(out_name)
         print("finished!")
 
     def make_graph_for_CI(self):
@@ -414,7 +418,7 @@ class ALL_TWEET(object):
         print("making dict_tweetid_userid ...")
         dict_tweetid_userid = {}
         for _, row in tqdm(all_tweets.iterrows()):
-            dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
+            dict_tweetid_userid[row["tweet_id"]] = str(row["user_id"])
         nodes = all_tweets["user_id"].unique().tolist()
         node_map = {n:i for i, n in enumerate(nodes)}
         json.dump(node_map, open("disk/node_map.json", "w"))
@@ -439,20 +443,20 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         # self.find_all_tweets()
-        self.find_links()
+        # self.find_links()
 
-        self.fill_url_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
+        # self.fill_url_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
 
         # 补充is_first
-        self.convert_url_timeseries()
+        # self.convert_url_timeseries()
 
         # 保存
-        self.save_url_ts()
-        self.save_csv()
+        # self.save_url_ts()
+        # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         self.make_graph_for_CI()
 
 
