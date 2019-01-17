@@ -113,11 +113,9 @@ class ALL_TWEET(object):
         for i, row in data_ira.iterrows():
             tid = row["tweetid"]
             re_tid = row["retweet_tweetid"]
+            # 寻找双向
+            retweet_link[tid] = re_tid
 
-            # if re_tid in tweets_ids or tid in tweets_ids:
-            if re_tid in tweets_ids:
-                retweet_link[tid] = re_tid
-                cnt += 1
         print("IRA -> ", cnt)
 
         json.dump(retweet_link, open("disk/all_retweet_network.json",
@@ -132,9 +130,9 @@ class ALL_TWEET(object):
                 "tweet_id": str(d["tweet_id"]),
                 "user_id": str(d["user_id"]),
                 "dt": d["datetime_EST"],
-                "is_first": None,
-                "is_source": None,
-                "is_IRA": None,
+                "is_first": -1,
+                "is_source": -1,
+                "is_IRA": -1,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower(),
                 "media_type": d["media_type"],
@@ -151,10 +149,10 @@ class ALL_TWEET(object):
             else:
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
-                    "user_id": None,
-                    "dt": None,
-                    "is_first": None,
-                    "is_source": None,
+                    "user_id": -1,
+                    "dt": -1,
+                    "is_first": -1,
+                    "is_source": -1,
                     "is_IRA": 1,
                     "URL": d["final_url"].lower(),
                     "hostname": d["hostname"].lower(),
@@ -176,17 +174,16 @@ class ALL_TWEET(object):
             if tweetid not in self.tweets:
                 tweet = {
                     "tweet_id": tweetid,
-                    "user_id": None,
-                    "dt": None,
+                    "user_id": -1,
+                    "dt": -1,
                     "is_first": 0,
                     "is_source": 0,
-                    "is_IRA": None,
+                    "is_IRA": -1,
                     "URL": self.tweets[origin_tweetdid]["URL"],
                     "hostname": self.tweets[origin_tweetdid]["hostname"],
                     "media_type": self.tweets[origin_tweetdid]["media_type"],
                     "retweeted_id": origin_tweetdid
                 }
-
                 d = find_tweet(tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
@@ -198,9 +195,32 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_source"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetdid
 
+            if origin_tweetdid not in self.tweets:
+                tweet = {
+                    "tweet_id": origin_tweetdid,
+                    "user_id": -1,
+                    "dt": -1,
+                    "is_first": -1,
+                    "is_source": 1,
+                    "is_IRA": -1,
+                    "URL": self.tweets[tweetid]["URL"],
+                    "hostname": self.tweets[tweetid]["hostname"],
+                    "media_type": self.tweets[tweetid]["media_type"],
+                    "retweeted_id": 0
+                }
+                d = find_tweet(tweetid)
+                if d:
+                    tweet["user_id"] = str(d["user_id"])
+                    tweet["dt"] = d["datetime_EST"]
+                self.tweets[tweetid] = tweet
+
+            else:
+                self.tweets[tweetid]["is_source"] = 1
+                self.tweets[tweetid]["retweeted_id"] = -1
+
         # 什么是source？没有转发别人的！
         for tweetid in self.tweets.keys():
-            if self.tweets[tweetid]["is_source"] == None:
+            if self.tweets[tweetid]["is_source"] == -1:
                 self.tweets[tweetid]["is_source"] = 1
 
 
@@ -208,9 +228,11 @@ class ALL_TWEET(object):
         putin = Are_you_IRA()
         print("补充IRA数据处理中 ...")
         cnt = 0
-        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid", "tweet_time"], dtype=str)
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+                        usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
         for i, row in tqdm(IRA_info.iterrows()):
             tweetid = row["tweetid"]
+            retweet_id = row["retweet_tweetid"]
 
             if tweetid in self.tweets:
                 uid = row["userid"]
@@ -224,8 +246,15 @@ class ALL_TWEET(object):
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
 
+            if retweet_id in self.tweets:
+                if self.tweets[tweetid]["user_id"] == -1:
+                    r_uid = row["retweet_userid"]
+                    if r_uid in putin._map:
+                        r_uid = str(putin._map[r_uid])
+                    self.tweets[tweetid]["user_id"] == r_uid
+
         for tweetid in self.tweets.keys():
-            if self.tweets[tweetid]["is_IRA"] == None:
+            if self.tweets[tweetid]["is_IRA"] == -1:
                 self.tweets[tweetid]["is_IRA"] = 0
 
         print("Count of IRA tweets:", cnt)
@@ -247,12 +276,15 @@ class ALL_TWEET(object):
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
-            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在-1
+            is_first_marked = False
             for i, _tweets in enumerate(sorted_tweets_list):
-                if i == 0:
-                    sorted_tweets_list[0]["is_first"] = 1
+                if sorted_tweets_list[i]["is_source"] == 1 and is_first_marked == False:
+                    sorted_tweets_list[i]["is_first"] = 1
+                    is_first_marked = True
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
+
             self.url_timeseries.append({"url": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
@@ -303,6 +335,13 @@ class ALL_TWEET(object):
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
         all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
         self.tweets_csv = all_tweets
+
+
+    def load_all_users(self):
+        all_users = pd.read_csv("disk/all-users.csv", dtype=str)
+        all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+        self.tweets_csv = all_tweets
+
 
     def make_users(self):
         self.load_all_tweets()
