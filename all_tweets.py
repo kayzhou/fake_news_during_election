@@ -191,9 +191,9 @@ class ALL_TWEET(object):
             # 原来就存在
             else:
                 self.tweets[tweetid]["is_source"] = 0
-                self.tweets[tweetid]["retweeted_id"] = origin_tweetdid
+                self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
-            if origin_tweetdid not in self.tweets:
+            if origin_tweetid not in self.tweets:
                 tweet = {
                     "tweet_id": origin_tweetid,
                     "user_id": -1,
