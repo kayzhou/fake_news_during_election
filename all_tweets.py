@@ -110,11 +110,11 @@ class ALL_TWEET(object):
         cnt = 0
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "retweet_tweetid"], dtype=str)
         data_ira = data_ira.dropna()
-        for i, row in data_ira.iterrows():
+        for _, row in data_ira.iterrows():
             tid = row["tweetid"]
             re_tid = row["retweet_tweetid"]
             # 寻找双向
-            if tid in tweets_ids or re_tid in tweets_ids: 
+            if tid in tweets_ids or re_tid in tweets_ids:
                 retweet_link[tid] = re_tid
 
         print("IRA -> ", cnt)
@@ -143,15 +143,11 @@ class ALL_TWEET(object):
 
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
-
-            if str(d["tweetid"]) in self.tweets:
-                self.tweets[d["tweetid"]]["is_IRA"] = 1
-
-            else:
+            if str(d["tweetid"]) not in self.tweets:
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
                     "user_id": -1,
-                    "dt": "1900-01-01 00:00:00",
+                    "dt": -1,
                     "is_first": -1,
                     "is_source": -1,
                     "is_IRA": 1,
@@ -165,8 +161,8 @@ class ALL_TWEET(object):
     def fill_retweets(self):
         print("扩展转发处理中 ...")
 
-        fake_retweets_links = json.load(open("disk/all_retweet_network.json"))
-        for tweet_id, retweetd_id in tqdm(fake_retweets_links.items()):
+        retweets_links = json.load(open("disk/all_retweet_network.json"))
+        for tweet_id, retweetd_id in tqdm(retweets_links.items()):
             tweetid, origin_tweetdid = str(tweet_id), str(retweetd_id)
 
             # tweetid 一定是转发的！
@@ -176,7 +172,7 @@ class ALL_TWEET(object):
                 tweet = {
                     "tweet_id": tweetid,
                     "user_id": -1,
-                    "dt": "1900-01-01 00:00:00",
+                    "dt": -1,
                     "is_first": 0,
                     "is_source": 0,
                     "is_IRA": -1,
@@ -200,7 +196,7 @@ class ALL_TWEET(object):
                 tweet = {
                     "tweet_id": origin_tweetdid,
                     "user_id": -1,
-                    "dt": "1900-01-01 00:00:00",
+                    "dt": -1,
                     "is_first": -1,
                     "is_source": 1,
                     "is_IRA": -1,
@@ -231,7 +227,7 @@ class ALL_TWEET(object):
         cnt = 0
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                         usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
-        for i, row in tqdm(IRA_info.iterrows()):
+        for _, row in tqdm(IRA_info.iterrows()):
             tweetid = row["tweetid"]
             retweet_id = row["retweet_tweetid"]
 
@@ -243,7 +239,7 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_IRA"] = 1
                 self.tweets[tweetid]["user_id"] = uid
 
-                if self.tweets[tweetid]["dt"] == "1900-01-01 00:00:00":
+                if self.tweets[tweetid]["dt"] == -1:
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
 
@@ -267,6 +263,8 @@ class ALL_TWEET(object):
         url_type = {}
 
         for tweet_id, tweet in tqdm(self.tweets.items()):
+            if tweet["dt"] == -1:
+                tweet["dt"] = "2000-01-01 00:00:00"
             self.url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
 
@@ -397,11 +395,13 @@ class ALL_TWEET(object):
         for n2, n1 in tqdm(self.retweet_network.items()):
             if n1 in _tweets:
                 try:
-                    u1 = node_map[dict_tweetid_userid[n1]]
-                    u2 = node_map[dict_tweetid_userid[n2]]
+                    u1 = dict_tweetid_userid[n1]
+                    u1 = node_map[u1]
+                    u2 = dict_tweetid_userid[n2]
+                    u2 = node_map[u2]
                     g.add_edge(g.vertex(u1), g.vertex(u2))
                 except:
-                    print(n2, n1)
+                    print(n2, ">", n1)
 
         print("saving the graph ...", out_name)
         g.save(out_name)
@@ -412,14 +412,17 @@ class ALL_TWEET(object):
         all_tweets = self.tweets_csv
         print("loaded all tweets!")
 
-        print("loading retweet network ...")
         self.load_retweet_network()
+        print("loaded retweet network!")
 
         print("making dict_tweetid_userid ...")
         dict_tweetid_userid = {}
         for _, row in tqdm(all_tweets.iterrows()):
-            dict_tweetid_userid[row["tweet_id"]] = str(row["user_id"])
+            dict_tweetid_userid[str(row["tweet_id"])] = str(row["user_id"])
+
         nodes = all_tweets["user_id"].unique().tolist()
+        print("count of nodes(users):", len(nodes))
+
         node_map = {n:i for i, n in enumerate(nodes)}
         json.dump(node_map, open("disk/node_map.json", "w"))
 
@@ -445,18 +448,18 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        # self.fill_url_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_url_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
-        # self.convert_url_timeseries()
+        self.convert_url_timeseries()
 
         # 保存
-        # self.save_url_ts()
-        # self.save_csv()
+        self.save_url_ts()
+        self.save_csv()
 
-        # self.make_users()
+        self.make_users()
         self.make_graph_for_CI()
 
 
