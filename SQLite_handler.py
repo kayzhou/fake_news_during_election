@@ -319,7 +319,8 @@ def find_source_name(from_db, _id):
 
     return d
 
-def opinion(_id):
+
+def get_tweet_opinion(_id):
     """
     1 是支持trump
     """
