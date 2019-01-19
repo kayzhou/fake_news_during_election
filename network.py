@@ -267,6 +267,51 @@ class analyze_IRA_in_network:
         self.build_network()
 
 
+#-*- coding: utf-8 -*-
+
+"""
+Created on 2019-01-18 19:00:31
+@author: https://kayzhou.github.io/
+"""
+
+# import json
+# import sqlite3
+
+def get_whole_network():
+    out_file = open("disk/all-links.json", "w")
+
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        link = dict(tid = str(d[0]),
+                    r_uid = str(d[1]),
+                    uid = str(d[2]),
+                    r_tid = str(d[3])
+                    )
+        out_file.write(json.dumps(link) + "\n")
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        link = dict(tid = str(d[0]),
+                    r_uid = str(d[1]),
+                    uid = str(d[2]),
+                    r_tid = str(d[3])
+                    )
+        out_file.write(json.dumps(link) + "\n")
+    conn.close()
+
 if __name__ == "__main__":
-    Lebron = analyze_IRA_in_network()
-    Lebron.run()
+    # Lebron = analyze_IRA_in_network()
+    # Lebron.run()
+    get_whole_network()
