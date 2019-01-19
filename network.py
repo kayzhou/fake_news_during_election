@@ -311,7 +311,153 @@ def get_whole_network():
         out_file.write(json.dumps(link) + "\n")
     conn.close()
 
+
+def get_whole_network():
+    out_file = open("disk/all-links.json", "w")
+
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        link = dict(tid = str(d[0]),
+                    r_uid = str(d[1]),
+                    uid = str(d[2]),
+                    r_tid = str(d[3])
+                    )
+        out_file.write(json.dumps(link) + "\n")
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        link = dict(tid = str(d[0]),
+                    r_uid = str(d[1]),
+                    uid = str(d[2]),
+                    r_tid = str(d[3])
+                    )
+        out_file.write(json.dumps(link) + "\n")
+    conn.close()
+
+def get_ret_network(out_name):
+
+    big_data = {}
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2]), str(d[3])]
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2]), str(d[3])]
+    conn.close()
+
+    out_file = open(out_name, "w")
+    json.dump(big_data, out_file, indent=1)
+
+
+def get_quote_network(out_name):
+
+    big_data = {}
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_quoted_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_quoted_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+    conn.close()
+
+    out_file = open(out_name, "w")
+    json.dump(big_data, out_file, indent=1)
+
+
+def get_rep_network(out_name):
+
+    big_data = {}
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_replied_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_replied_uid''')
+
+    for d in c.fetchall():
+        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+    conn.close()
+
+    out_file = open(out_name, "w")
+    json.dump(big_data, out_file, indent=1)
+
+
+def get_mention_network(out_name):
+    out_file = open(out_name, "w")
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_mentioned_uid''')
+
+    for d in c.fetchall():
+        out_file.write(" ".join([str(_d) for _d in d]))
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(
+        "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    c = conn.cursor()
+
+    c.execute('''SELECT * FROM tweet_to_mentioned_uid''')
+
+    for d in c.fetchall():
+        out_file.write(" ".join([str(_d) for _d in d]))
+    conn.close()
+
+
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
-    get_whole_network()
+    get_ret_network("disk/all-ret-links.json")
+    get_rep_network("disk/all-rep-links.json")
+    get_quote_network("disk/all-quo-links.json")
+    get_mention_network("disk/all-men-links.txt")
