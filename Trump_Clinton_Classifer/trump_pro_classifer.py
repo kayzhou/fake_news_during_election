@@ -160,6 +160,8 @@ def is_discuss_trump_hillary(row):
     else:
         return False
 
+tweets = pd.read_csv('../data/ira_tweets_csv_hashed.csv', low_memory=False)
+
 savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_june_sep_signi/trained_classifier/'
 filename = 'sklearn_SGDLogReg_' + suffix + '.pickle'
 
@@ -170,7 +172,6 @@ classifier = cls['sklearn_pipeline']
 label_inv_mapper = cls['label_inv_mapper']
 TweetClass = TweetClassifier(classifier=classifier, label_inv_mapper=label_inv_mapper)
 
-tweets = pd.read_csv('data/ira_tweets_csv_hashed.csv', low_memory=False)
 tws = tweets[tweets["tweet_time"] < "2016-09-01 00:00"]
 
 with open("../data/IRA_support_trump.txt", "a") as f:
@@ -178,8 +179,11 @@ with open("../data/IRA_support_trump.txt", "a") as f:
     for i, row in tqdm(tws.iterrows()):
         # if is_discuss_trump_hillary(row):
         line = row["tweet_text"]
-        predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
-        f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
+        try:
+            predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
+            f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
+        except:
+            print(line)
 
 savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_sep-nov/trained_classifier/'
 filename = 'sklearn_SGDLogReg_' + suffix + '.pickle'
@@ -197,5 +201,8 @@ with open("../data/IRA_support_trump.txt", "a") as f:
     for i, row in tqdm(tws.iterrows()):
         # if is_discuss_trump_hillary(row):
         line = row["tweet_text"]
-        predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
-        f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
+        try:
+            predict_proba = TweetClass.classify_text(line, return_pred_labels=False)
+            f.write("{},{}\n".format(row["tweetid"], predict_proba[0]))
+        except:
+            print(line)

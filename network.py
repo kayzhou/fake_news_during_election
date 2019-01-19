@@ -12,6 +12,7 @@ import sqlite3
 from collections import defaultdict
 from SQLite_handler import get_user_id, find_tweet, find_all_uids
 import graph_tool as gt
+import os
 
 
 class analyze_IRA_in_network:
@@ -348,7 +349,7 @@ def get_whole_network():
 
 def get_ret_network(out_name):
 
-    big_data = {}
+    out_file = open(out_name, "w")
     conn = sqlite3.connect(
         "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
@@ -356,7 +357,7 @@ def get_ret_network(out_name):
     c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2]), str(d[3])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
 
     # 下一个！
@@ -367,16 +368,13 @@ def get_ret_network(out_name):
     c.execute('''SELECT * FROM tweet_to_retweeted_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2]), str(d[3])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
-
-    out_file = open(out_name, "w")
-    json.dump(big_data, out_file, indent=1)
 
 
 def get_quote_network(out_name):
 
-    big_data = {}
+    out_file = open(out_name, "w")
     conn = sqlite3.connect(
         "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
@@ -384,7 +382,7 @@ def get_quote_network(out_name):
     c.execute('''SELECT * FROM tweet_to_quoted_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
 
     # 下一个！
@@ -395,16 +393,13 @@ def get_quote_network(out_name):
     c.execute('''SELECT * FROM tweet_to_quoted_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
-
-    out_file = open(out_name, "w")
-    json.dump(big_data, out_file, indent=1)
 
 
 def get_rep_network(out_name):
 
-    big_data = {}
+    out_file = open(out_name, "w")
     conn = sqlite3.connect(
         "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c = conn.cursor()
@@ -412,7 +407,7 @@ def get_rep_network(out_name):
     c.execute('''SELECT * FROM tweet_to_replied_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
 
     # 下一个！
@@ -423,11 +418,8 @@ def get_rep_network(out_name):
     c.execute('''SELECT * FROM tweet_to_replied_uid''')
 
     for d in c.fetchall():
-        big_data[str(d[0])] = [str(d[1]), str(d[2])]
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
-
-    out_file = open(out_name, "w")
-    json.dump(big_data, out_file, indent=1)
 
 
 def get_mention_network(out_name):
@@ -439,7 +431,7 @@ def get_mention_network(out_name):
     c.execute('''SELECT * FROM tweet_to_mentioned_uid''')
 
     for d in c.fetchall():
-        out_file.write(" ".join([str(_d) for _d in d]))
+        out_file.write(" ".join([str(i) for i in d]) + "\n")
     conn.close()
 
     # 下一个！
@@ -450,14 +442,28 @@ def get_mention_network(out_name):
     c.execute('''SELECT * FROM tweet_to_mentioned_uid''')
 
     for d in c.fetchall():
-        out_file.write(" ".join([str(_d) for _d in d]))
+        out_file.write(" ".join([str(_d) for _d in d]) + "\n")
     conn.close()
+
+def get_bigger_network():
+    in_dir = "/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton"
+    for in_name in os.listdir(in_dir):
+        if not in_name.endswith(".taj"):
+            continue
+        for line in open()
+    
+    
+
 
 
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
-    get_ret_network("disk/all-ret-links.json")
-    get_rep_network("disk/all-rep-links.json")
-    get_quote_network("disk/all-quo-links.json")
+    print("rep")
+    get_ret_network("disk/all-ret-links.txt")
+    print("ret")
+    get_rep_network("disk/all-rep-links.txt")
+    print("quo")
+    get_quote_network("disk/all-quo-links.txt")
+    print("men")
     get_mention_network("disk/all-men-links.txt")
