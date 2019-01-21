@@ -117,3 +117,4 @@ model/
 *.pkl
 *.json
 train_data/
+.idea

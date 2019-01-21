@@ -446,11 +446,37 @@ def get_mention_network(out_name):
     conn.close()
 
 def get_bigger_network():
+    """
+    "id_str"
+
+    "quoted_status_id_str"
+
+    "retweeted_status"
+
+    "in_reply_to_status_id_str"
+    "in_reply_to_user_id_str"
+    """
+
+    def is_retweeted(d):
+        if "retweeted_status" in d:
+            return True
+
+    def is_quoted(d):
+        if "quote_status" in d:
+            return True
+
+    def is_replied(d):
+        if d["in_reply_to_status_id_str"]:
+            return True
+
+
     in_dir = "/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton"
     for in_name in os.listdir(in_dir):
         if not in_name.endswith(".taj"):
             continue
-        for line in open()
+        for line in open(os.path.join(in_dir, in_name)):
+            d = json.loads(line.strip())
+            tid = d["id_str"]
     
     
 
