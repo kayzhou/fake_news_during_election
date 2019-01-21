@@ -1,4 +1,7 @@
 import json
+from tqdm import tqdm
+import pandas as pd
+from SQLite_handler import find_tweet
 
 class Who_is_fake(object):
     def __init__(self):
@@ -157,7 +160,9 @@ class Who_is_fake(object):
         else:
             return False
 
+
 class Are_you_IRA(object):
+
     def __init__(self):
         self._map = json.load(open("data/IRA_map.json"))
         self.IRA_users_before_set = set(self._map.keys())
@@ -166,10 +171,31 @@ class Are_you_IRA(object):
     def fuck(self, ht):
         return ht in self.IRA_user_set
 
+    def cal_IRA_map(self):
+        data = []
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+                        usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
+        with open("data/IRA-tweets.json", "w") as f:
+            for _, row in tqdm(IRA_info.iterrows()):
+                tweetid = row["tweetid"]
+                uid = row["userid"]
+                # retweet_id = row["retweet_tweetid"]
+                d = find_tweet(tweetid)
+                d["IRA_userid"] = uid
+                data.append(d)
+                f.write(json.dumps(d, ensure_ascii=False) + "\n")
+        
+        IRA_map = {}
+        for d in data:
+            IRA_map[str(d["user_id"])] = d["IRA_userid"]
+        json.dump(IRA_map, open("data/IRA_map.json", "w"), ensure_ascii=False, indent=2)
+
 
 if __name__ == "__main__":
-    who = Who_is_fake()
-    print(who.identify("baidu.com"))
+    # who = Who_is_fake()
+    # print(who.identify("baidu.com"))
+    putin = Are_you_IRA()
+    putin.cal_IRA_map()
 
 
 
