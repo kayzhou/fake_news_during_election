@@ -477,11 +477,8 @@ def get_bigger_network():
         for line in open(os.path.join(in_dir, in_name)):
             d = json.loads(line.strip())
             tid = d["id_str"]
-    
-    
 
-
-
+            
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
