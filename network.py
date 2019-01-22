@@ -766,6 +766,29 @@ def nx2gt(nxG):
     # Done, finally!
     return gtG
 
+
+def change_network():
+    print("chaning networks ... ")
+    n = nx.write_gpickle(all_net, out_file_pre + '-all.gpickle')
+    nx2gt(n).save(out_file_pre + '-all.gt')
+    # n1 = nx.DiGraph()
+    # n1.add_edges_from(net_1)
+    n = nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
+    nx2gt(n).save(out_file_pre + '-ret.gt')
+    # n2 = nx.DiGraph()
+    # n2.add_edges_from(net_2)
+    n = nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
+    nx2gt(n).save(out_file_pre + '-quo.gt')
+    # n3 = nx.DiGraph()
+    # n3.add_edges_from(net_3)
+    n = nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
+    nx2gt(n).save(out_file_pre + '-rep.gt')
+    # n4 = nx.DiGraph()
+    # n4.add_edges_from(net_4)
+    n = nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+    nx2gt(n).save(out_file_pre + '-men.gt')
+
+
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
@@ -786,4 +809,5 @@ if __name__ == "__main__":
     #     ira_tweet_ids.append(tweet_id)
     # get_all_network(ira_tweet_ids, "disk/ira")
 
-    make_all_network("disk/whole")
+    # make_all_network("disk/whole")
+    change_network("disk/whole")
