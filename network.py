@@ -7,12 +7,15 @@ Created on 2018-11-16 09:01:28
 12th week in NY
 """
 
-from my_weapon import *
+import gc
+import os
 import sqlite3
 from collections import defaultdict
-from SQLite_handler import get_user_id, find_tweet, find_all_uids
+
 import graph_tool as gt
-import os
+
+from my_weapon import *
+from SQLite_handler import find_all_uids, find_tweet, get_user_id
 
 
 class analyze_IRA_in_network:
@@ -569,22 +572,22 @@ def get_all_network(user_ids, out_file_pre):
 
 def make_all_network(out_file_pre):
     # retweet
-    # net_1 = []
-    # for line in tqdm(open("disk/all-ret-links.txt")):
-    #     w = line.strip().split()
-    #     net_1.append((int(w[1]), int(w[2])))
+    net_1 = []
+    for line in tqdm(open("disk/all-ret-links.txt")):
+        w = line.strip().split()
+        net_1.append((int(w[1]), int(w[2])))
 
     # quote
-    # net_2 = []
-    # for line in tqdm(open("disk/all-quo-links.txt")):
-    #     w = line.strip().split()
-    #     net_2.append((int(w[1]), int(w[2])))
+    net_2 = []
+    for line in tqdm(open("disk/all-quo-links.txt")):
+        w = line.strip().split()
+        net_2.append((int(w[1]), int(w[2])))
 
     # reply
-    # net_3 = []
-    # for line in tqdm(open("disk/all-rep-links.txt")):
-    #     w = line.strip().split()
-    #     net_3.append((int(w[1]), int(w[2])))
+    net_3 = []
+    for line in tqdm(open("disk/all-rep-links.txt")):
+        w = line.strip().split()
+        net_3.append((int(w[1]), int(w[2])))
 
     # mention
     net_4 = []
@@ -603,9 +606,29 @@ def make_all_network(out_file_pre):
     # n_all.add_edges_from(net_3)
     # n_all.add_edges_from(net_4)
 
+    set_net = set()
+    for n1, n2 in net_1:
+        set_net.add(str(n1) + "-" + str(n2))
+    for n1, n2 in net_2:
+        set_net.add(str(n1) + "-" + str(n2))
+    for n1, n2 in net_3:
+        set_net.add(str(n1) + "-" + str(n2))
+    for n1, n2 in net_4:
+        set_net.add(str(n1) + "-" + str(n2))
+
+    del net_1
+    del net_2
+    del net_3
+    del net_4
+    gc.collect()
+    all_net = []
+    for n in list(set_net):
+        w = n.split("-")
+        all_net.append((w[0], w[1]))
+
     # 网络保存中
     print("saving networks ... ")
-    # nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
+    nx.write_gpickle(all_net, out_file_pre + '-all.gpickle')
 
     # n1 = nx.DiGraph()
     # n1.add_edges_from(net_1)
