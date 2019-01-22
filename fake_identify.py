@@ -136,8 +136,6 @@ class Who_is_fake(object):
                 "usuncut.com": 7
             }
 
-
-
     def identify(self, ht):
         ht = ht.lower()
         # labels = []
@@ -185,7 +183,7 @@ class Are_you_IRA(object):
                     d["IRA_userid"] = uid
                     data.append(d)
                     f.write(json.dumps(d, ensure_ascii=False) + "\n")
-        
+
         IRA_map = {}
         for d in data:
             IRA_map[str(d["user_id"])] = d["IRA_userid"]

@@ -342,12 +342,6 @@ class ALL_TWEET(object):
         self.tweets_csv = all_tweets
 
 
-    def load_all_users(self):
-        all_users = pd.read_csv("disk/all-users.csv", dtype=str)
-        all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
-        self.tweets_csv = all_tweets
-
-
     def make_users(self):
         self.load_all_tweets()
         all_tweets = self.tweets_csv
