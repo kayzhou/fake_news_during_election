@@ -580,17 +580,17 @@ def make_all_network(out_file_pre):
     #     w = line.strip().split()
     #     net_2.append((int(w[1]), int(w[2])))
 
-    # # reply
-    net_3 = []
-    for line in tqdm(open("disk/all-rep-links.txt")):
-        w = line.strip().split()
-        net_3.append((int(w[1]), int(w[2])))
-
-    # # mention
-    # net_4 = []
-    # for line in tqdm(open("disk/all-men-links.txt")):
+    # reply
+    # net_3 = []
+    # for line in tqdm(open("disk/all-rep-links.txt")):
     #     w = line.strip().split()
-    #     net_4.append((int(w[1]), int(w[2])))
+    #     net_3.append((int(w[1]), int(w[2])))
+
+    # mention
+    net_4 = []
+    for line in tqdm(open("disk/all-men-links.txt")):
+        w = line.strip().split()
+        net_4.append((int(w[1]), int(w[2])))
 
     # json.dump(net_1, open(out_file_pre + "-ret.txt"))
     # json.dump(net_2, open(out_file_pre + "-quo.txt"))
@@ -615,13 +615,13 @@ def make_all_network(out_file_pre):
     # n2.add_edges_from(net_2)
     # nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
 
-    n3 = nx.DiGraph()
-    n3.add_edges_from(net_3)
-    nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
+    # n3 = nx.DiGraph()
+    # n3.add_edges_from(net_3)
+    # nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
 
-    # n4 = nx.DiGraph()
-    # n4.add_edges_from(net_4)
-    # nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+    n4 = nx.DiGraph()
+    n4.add_edges_from(net_4)
+    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
 def get_prop_type(value, key=None):
