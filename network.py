@@ -626,9 +626,12 @@ def make_all_network(out_file_pre):
         w = n.split("-")
         all_net.append((w[0], w[1]))
 
+    n0 = nx.DiGraph()
+    n0.add_edges_from(all_net)
+
     # 网络保存中
     print("saving networks ... ")
-    nx.write_gpickle(all_net, out_file_pre + '-all.gpickle')
+    nx.write_gpickle(n0, out_file_pre + '-all.gpickle')
 
     # n1 = nx.DiGraph()
     # n1.add_edges_from(net_1)
@@ -772,20 +775,16 @@ def change_network(out_file_pre):
     n = nx.read_gpickle(out_file_pre + '-all.gpickle')
     print(type(n))
     nx2gt(n).save(out_file_pre + '-all.gt')
-    # n1 = nx.DiGraph()
-    # n1.add_edges_from(net_1)
+
     n = nx.read_gpickle(out_file_pre + '-ret.gpickle')
     nx2gt(n).save(out_file_pre + '-ret.gt')
-    # n2 = nx.DiGraph()
-    # n2.add_edges_from(net_2)
+
     n = nx.read_gpickle(out_file_pre + '-quo.gpickle')
     nx2gt(n).save(out_file_pre + '-quo.gt')
-    # n3 = nx.DiGraph()
-    # n3.add_edges_from(net_3)
+
     n = nx.read_gpickle(out_file_pre + '-rep.gpickle')
     nx2gt(n).save(out_file_pre + '-rep.gt')
-    # n4 = nx.DiGraph()
-    # n4.add_edges_from(net_4)
+
     n = nx.read_gpickle(out_file_pre + '-men.gpickle')
     nx2gt(n).save(out_file_pre + '-men.gt')
 
@@ -810,5 +809,5 @@ if __name__ == "__main__":
     #     ira_tweet_ids.append(tweet_id)
     # get_all_network(ira_tweet_ids, "disk/ira")
 
-    # make_all_network("disk/whole")
+    make_all_network("disk/whole")
     change_network("disk/whole")
