@@ -642,9 +642,9 @@ def make_all_network(out_file_pre):
     # n3.add_edges_from(net_3)
     # nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
 
-    n4 = nx.DiGraph()
-    n4.add_edges_from(net_4)
-    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+    # n4 = nx.DiGraph()
+    # n4.add_edges_from(net_4)
+    # nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
 def get_prop_type(value, key=None):
