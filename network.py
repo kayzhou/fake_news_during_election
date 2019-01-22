@@ -445,6 +445,68 @@ def get_mention_network(out_name):
         out_file.write(" ".join([str(_d) for _d in d]) + "\n")
     conn.close()
 
+
+def get_all_network(tweet_ids, out_file_pre):
+    set_tweet_ids = set(tweet_ids)
+
+    # retweet
+    net_1 = []
+    for line in open("disk/all-ret-link.txt"):
+        w = line.strip().split()
+        if w[0] in set_tweet_ids:
+            net_1.append((w[1], w[2]))
+
+    # quote
+    net_2 = []
+    for line in open("disk/all-quo-link.txt"):
+        w = line.strip().split()
+        if w[0] in set_tweet_ids:
+            net_1.append((w[1], w[2]))
+
+
+    # reply
+    net_3 = []
+    for line in open("disk/all-rep-link.txt"):
+        w = line.strip().split()
+        if w[0] in set_tweet_ids:
+            net_1.append((w[1], w[2]))
+
+    # mention
+    net_4 = []
+    for line in open("disk/all-men-link.txt"):
+        w = line.strip().split()
+        if w[0] in set_tweet_ids:
+            net_1.append((w[2], w[1]))
+
+    # json.dump(net_1, open(out_file_pre + "-ret.txt"))
+    # json.dump(net_2, open(out_file_pre + "-quo.txt"))
+    # json.dump(net_3, open(out_file_pre + "-rep.txt"))
+    # json.dump(net_4, open(out_file_pre + "-men.txt"))
+
+    n_all = nx.DiGraph()
+    n_all.add_edges_from(net_1)
+    n_all.add_edges_from(net_2)
+    n_all.add_edges_from(net_3)
+    n_all.add_edges_from(net_4)
+    nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
+
+    n1 = nx.DiGraph()
+    n1.add_edges_from(net_1)
+    nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
+
+    n2 = nx.DiGraph()
+    n2.add_edges_from(net_2)
+    nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
+
+    n3 = nx.DiGraph()
+    n3.add_edges_from(net_3)
+    nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
+
+    n4 = nx.DiGraph()
+    n4.add_edges_from(net_4)
+    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+
+
 def get_bigger_network():
     """
     "id_str"
@@ -466,8 +528,9 @@ def get_bigger_network():
             return True
 
     def is_replied(d):
-        if d["in_reply_to_status_id_str"]:
-            return True
+        user_id = d["in_reply_to_user_id"]
+        tweet_id = d["in_reply_to_status_id"]
+        return tweet_id, user_id
 
 
     in_dir = "/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton"
@@ -478,15 +541,23 @@ def get_bigger_network():
             d = json.loads(line.strip())
             tid = d["id_str"]
 
-            
+
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
-    print("rep")
-    get_ret_network("disk/all-ret-links.txt")
-    print("ret")
-    get_rep_network("disk/all-rep-links.txt")
-    print("quo")
-    get_quote_network("disk/all-quo-links.txt")
-    print("men")
-    get_mention_network("disk/all-men-links.txt")
+
+    # print("rep")
+    # get_ret_network("disk/all-ret-links.txt")
+    # print("ret")
+    # get_rep_network("disk/all-rep-links.txt")
+    # print("quo")
+    # get_quote_network("disk/all-quo-links.txt")
+    # print("men")
+    # get_mention_network("disk/all-men-links.txt")
+
+    # build IRA all network
+    ira_tweet_ids = []
+    for line in open("data/IRA-tweets.json"):
+        tweet_id = str(json.loads(line.strip())["tweet_id"])
+        ira_tweet_ids.append(tweet_id)
+    get_all_network(ira_tweet_ids, "disk/ira")
