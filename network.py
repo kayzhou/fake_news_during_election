@@ -597,15 +597,15 @@ def make_all_network(out_file_pre):
     # json.dump(net_3, open(out_file_pre + "-rep.txt"))
     # json.dump(net_4, open(out_file_pre + "-men.txt"))
 
-    n_all = nx.DiGraph()
-    n_all.add_edges_from(net_1)
-    n_all.add_edges_from(net_2)
-    n_all.add_edges_from(net_3)
-    n_all.add_edges_from(net_4)
+    # n_all = nx.DiGraph()
+    # n_all.add_edges_from(net_1)
+    # n_all.add_edges_from(net_2)
+    # n_all.add_edges_from(net_3)
+    # n_all.add_edges_from(net_4)
 
     # 网络保存中
     print("saving networks ... ")
-    nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
+    # nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
 
     n1 = nx.DiGraph()
     n1.add_edges_from(net_1)
