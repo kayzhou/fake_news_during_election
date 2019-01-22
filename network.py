@@ -568,7 +568,6 @@ def get_all_network(user_ids, out_file_pre):
 
 
 def make_all_network(out_file_pre):
-    set_user_ids = set(user_ids)
     # retweet
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
