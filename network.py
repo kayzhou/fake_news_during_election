@@ -572,25 +572,25 @@ def make_all_network(out_file_pre):
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
         w = line.strip().split()
-        net_1.append((w[1], w[2]))
+        net_1.append((int(w[1]), int(w[2])))
 
     # quote
     net_2 = []
     for line in tqdm(open("disk/all-quo-links.txt")):
         w = line.strip().split()
-        net_2.append((w[1], w[2]))
+        net_2.append((int(w[1]), int(w[2])))
 
     # reply
     net_3 = []
     for line in tqdm(open("disk/all-rep-links.txt")):
         w = line.strip().split()
-        net_3.append((w[1], w[2]))
+        net_3.append((int(w[1]), int(w[2])))
 
     # mention
     net_4 = []
     for line in tqdm(open("disk/all-men-links.txt")):
         w = line.strip().split()
-        net_4.append((w[2], w[1]))
+        net_4.append((int(w[1]), int(w[2])))
 
     # json.dump(net_1, open(out_file_pre + "-ret.txt"))
     # json.dump(net_2, open(out_file_pre + "-quo.txt"))
