@@ -567,6 +567,61 @@ def get_all_network(user_ids, out_file_pre):
     nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
+def make_all_network(out_file_pre):
+    set_user_ids = set(user_ids)
+    # retweet
+    net_1 = []
+    for line in tqdm(open("disk/all-ret-links.txt")):
+        w = line.strip().split()
+        net_1.append((w[1], w[2]))
+
+    # quote
+    net_2 = []
+    for line in tqdm(open("disk/all-quo-links.txt")):
+        w = line.strip().split()
+        net_2.append((w[1], w[2]))
+
+    # reply
+    net_3 = []
+    for line in tqdm(open("disk/all-rep-links.txt")):
+        w = line.strip().split()
+        net_3.append((w[1], w[2]))
+
+    # mention
+    net_4 = []
+    for line in tqdm(open("disk/all-men-links.txt")):
+        w = line.strip().split()
+        net_4.append((w[2], w[1]))
+
+    # json.dump(net_1, open(out_file_pre + "-ret.txt"))
+    # json.dump(net_2, open(out_file_pre + "-quo.txt"))
+    # json.dump(net_3, open(out_file_pre + "-rep.txt"))
+    # json.dump(net_4, open(out_file_pre + "-men.txt"))
+
+    n_all = nx.DiGraph()
+    n_all.add_edges_from(net_1)
+    n_all.add_edges_from(net_2)
+    n_all.add_edges_from(net_3)
+    n_all.add_edges_from(net_4)
+    nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
+
+    n1 = nx.DiGraph()
+    n1.add_edges_from(net_1)
+    nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
+
+    n2 = nx.DiGraph()
+    n2.add_edges_from(net_2)
+    nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
+
+    n3 = nx.DiGraph()
+    n3.add_edges_from(net_3)
+    nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
+
+    n4 = nx.DiGraph()
+    n4.add_edges_from(net_4)
+    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+
+
 def get_bigger_network():
     """
     "id_str"
@@ -616,8 +671,10 @@ if __name__ == "__main__":
     # get_mention_network("disk/all-men-links.txt")
 
     # build IRA all network
-    ira_tweet_ids = []
-    for line in open("data/IRA-tweets.json"):
-        tweet_id = str(json.loads(line.strip())["user_id"])
-        ira_tweet_ids.append(tweet_id)
-    get_all_network(ira_tweet_ids, "disk/ira")
+    # ira_tweet_ids = []
+    # for line in open("data/IRA-tweets.json"):
+    #     tweet_id = str(json.loads(line.strip())["user_id"])
+    #     ira_tweet_ids.append(tweet_id)
+    # get_all_network(ira_tweet_ids, "disk/ira")
+
+    make_all_network("disk/whole")
