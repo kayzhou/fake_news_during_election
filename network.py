@@ -249,7 +249,7 @@ class analyze_IRA_in_network:
         nodes = self.load_node()
         # self.cal_degree()
         edges = self.load_edge()
-        g = Graph(directed=True)
+        g = gt.Graph(directed=True)
 
         print("add nodes from ...")
         g.add_vertex(len(nodes))
@@ -602,6 +602,9 @@ def make_all_network(out_file_pre):
     n_all.add_edges_from(net_2)
     n_all.add_edges_from(net_3)
     n_all.add_edges_from(net_4)
+
+    # 网络保存中
+    print("saving networks ... ")
     nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
 
     n1 = nx.DiGraph()
@@ -619,10 +622,6 @@ def make_all_network(out_file_pre):
     n4 = nx.DiGraph()
     n4.add_edges_from(net_4)
     nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
-
-
-import networkx as nx
-import graph_tool as gt
 
 
 def get_prop_type(value, key=None):
