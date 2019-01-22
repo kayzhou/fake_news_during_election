@@ -767,7 +767,7 @@ def nx2gt(nxG):
     return gtG
 
 
-def change_network():
+def change_network(out_file_pre):
     print("chaning networks ... ")
     n = nx.write_gpickle(all_net, out_file_pre + '-all.gpickle')
     nx2gt(n).save(out_file_pre + '-all.gt')
