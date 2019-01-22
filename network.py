@@ -514,28 +514,28 @@ def get_all_network(user_ids, out_file_pre):
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
         w = line.strip().split()
-        if w[1] in set_user_ids or w[2] in set_user_id:
+        if w[1] in set_user_ids or w[2] in set_user_ids:
             net_1.append((w[1], w[2]))
 
     # quote
     net_2 = []
     for line in tqdm(open("disk/all-quo-links.txt")):
         w = line.strip().split()
-        if w[1] in set_user_ids or w[2] in set_user_id:
+        if w[1] in set_user_ids or w[2] in set_user_ids:
             net_2.append((w[1], w[2]))
 
     # reply
     net_3 = []
     for line in tqdm(open("disk/all-rep-links.txt")):
         w = line.strip().split()
-        if w[1] in set_user_ids or w[2] in set_user_id:
+        if w[1] in set_user_ids or w[2] in set_user_ids:
             net_3.append((w[1], w[2]))
 
     # mention
     net_4 = []
     for line in tqdm(open("disk/all-men-links.txt")):
         w = line.strip().split()
-        if w[1] in set_user_ids or w[2] in set_user_id:
+        if w[1] in set_user_ids or w[2] in set_user_ids:
             net_4.append((w[2], w[1]))
 
     # json.dump(net_1, open(out_file_pre + "-ret.txt"))
@@ -618,6 +618,6 @@ if __name__ == "__main__":
     # build IRA all network
     ira_tweet_ids = []
     for line in open("data/IRA-tweets.json"):
-        tweet_id = str(json.loads(line.strip())["tweet_id"])
+        tweet_id = str(json.loads(line.strip())["user_id"])
         ira_tweet_ids.append(tweet_id)
     get_all_network(ira_tweet_ids, "disk/ira")
