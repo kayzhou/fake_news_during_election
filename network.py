@@ -770,6 +770,7 @@ def nx2gt(nxG):
 def change_network(out_file_pre):
     print("chaning networks ... ")
     n = nx.read_gpickle(out_file_pre + '-all.gpickle')
+    print(type(n))
     nx2gt(n).save(out_file_pre + '-all.gt')
     # n1 = nx.DiGraph()
     # n1.add_edges_from(net_1)
