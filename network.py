@@ -569,16 +569,16 @@ def get_all_network(user_ids, out_file_pre):
 
 def make_all_network(out_file_pre):
     # retweet
-    net_1 = []
-    for line in tqdm(open("disk/all-ret-links.txt")):
-        w = line.strip().split()
-        net_1.append((int(w[1]), int(w[2])))
+    # net_1 = []
+    # for line in tqdm(open("disk/all-ret-links.txt")):
+    #     w = line.strip().split()
+    #     net_1.append((int(w[1]), int(w[2])))
 
     # quote
-    # net_2 = []
-    # for line in tqdm(open("disk/all-quo-links.txt")):
-    #     w = line.strip().split()
-    #     net_2.append((int(w[1]), int(w[2])))
+    net_2 = []
+    for line in tqdm(open("disk/all-quo-links.txt")):
+        w = line.strip().split()
+        net_2.append((int(w[1]), int(w[2])))
 
     # # reply
     # net_3 = []
@@ -607,13 +607,13 @@ def make_all_network(out_file_pre):
     print("saving networks ... ")
     # nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
 
-    n1 = nx.DiGraph()
-    n1.add_edges_from(net_1)
-    nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
+    # n1 = nx.DiGraph()
+    # n1.add_edges_from(net_1)
+    # nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
 
-    # n2 = nx.DiGraph()
-    # n2.add_edges_from(net_2)
-    # nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
+    n2 = nx.DiGraph()
+    n2.add_edges_from(net_2)
+    nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
 
     # n3 = nx.DiGraph()
     # n3.add_edges_from(net_3)
