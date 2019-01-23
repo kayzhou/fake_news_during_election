@@ -12,7 +12,7 @@ import os
 import sqlite3
 from collections import defaultdict
 
-import graph_tool as gt
+import graph_tool.all as gt
 
 from my_weapon import *
 from SQLite_handler import find_all_uids, find_tweet, get_user_id
@@ -788,6 +788,61 @@ def change_network(out_file_pre):
     nx2gt(n).save(out_file_pre + '-men.gt')
 
 
+def save_network_gt():
+
+    set_net = set()
+    node_map = {}
+    for line in tqdm(open("disk/all-ret-links.txt")):
+        w = line.strip().split()
+        set_net.add("{}-{}".format(w[1], w[2]))
+        if w[1] not in node_map:
+            node_map[w[1]] = len(node_map)
+        if w[2] not in node_map:
+            node_map[w[2]] = len(node_map)
+    # quote
+    for line in tqdm(open("disk/all-quo-links.txt")):
+        w = line.strip().split()
+        set_net.add("{}-{}".format(w[1], w[2]))
+        if w[1] not in node_map:
+            node_map[w[1]] = len(node_map)
+        if w[2] not in node_map:
+            node_map[w[2]] = len(node_map)
+    # reply
+    for line in tqdm(open("disk/all-rep-links.txt")):
+        w = line.strip().split()
+        set_net.add("{}-{}".format(w[1], w[2]))
+        if w[1] not in node_map:
+            node_map[w[1]] = len(node_map)
+        if w[2] not in node_map:
+            node_map[w[2]] = len(node_map)
+
+    # mention
+    for line in tqdm(open("disk/all-men-links.txt")):
+        w = line.strip().split()
+        set_net.add("{}-{}".format(w[2], w[1]))
+        if w[1] not in node_map:
+            node_map[w[1]] = len(node_map)
+        if w[2] not in node_map:
+            node_map[w[2]] = len(node_map)
+
+
+    g = gt.Graph()
+
+    print("add nodes from ...")
+    vlist = g.add_vertex(len(node_map))
+
+    print("add edge from ...")
+    for n in tqdm(set_net):
+        n1, n2 = n.split("-")
+        u1 = node_map[n1]
+        u2 = node_map[n2]
+        g.add_edge(g.vertex(u1), g.vertex(u2))
+
+    print("saving the graph ...")
+    g.save("disk/whole-all.gt")
+    print("finished!")
+
+
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
@@ -808,5 +863,6 @@ if __name__ == "__main__":
     #     ira_tweet_ids.append(tweet_id)
     # get_all_network(ira_tweet_ids, "disk/ira")
 
-    make_all_network("disk/whole")
-    change_network("disk/whole")
+    # make_all_network("disk/whole")
+    # change_network("disk/whole")
+    save_network_gt()
