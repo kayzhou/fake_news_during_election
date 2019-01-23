@@ -450,6 +450,9 @@ def get_mention_network(out_name):
 
 
 def get_all_network(tweet_ids, out_file_pre):
+
+    # IRA
+
     set_tweet_ids = set(tweet_ids)
 
     # retweet
@@ -512,6 +515,8 @@ def get_all_network(tweet_ids, out_file_pre):
 
 
 def get_all_network(user_ids, out_file_pre):
+    # IRAs
+
     set_user_ids = set(user_ids)
     # retweet
     net_1 = []
@@ -571,6 +576,8 @@ def get_all_network(user_ids, out_file_pre):
 
 
 def make_all_network(out_file_pre):
+    # for all users
+
     # retweet
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
@@ -593,7 +600,7 @@ def make_all_network(out_file_pre):
     net_4 = []
     for line in tqdm(open("disk/all-men-links.txt")):
         w = line.strip().split()
-        net_4.append((int(w[1]), int(w[2])))
+        net_4.append((int(w[2]), int(w[1])))
 
     # json.dump(net_1, open(out_file_pre + "-ret.txt"))
     # json.dump(net_2, open(out_file_pre + "-quo.txt"))
