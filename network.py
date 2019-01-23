@@ -621,13 +621,15 @@ def make_all_network(out_file_pre):
     del net_3
     del net_4
     gc.collect()
-    all_net = []
-    for n in list(set_net):
-        w = n.split("-")
-        all_net.append((w[0], w[1]))
 
     n0 = nx.DiGraph()
-    n0.add_edges_from(all_net)
+
+    for n in set_net:
+        w = n.split("-")
+        n0.add_edge(int(w[0]), int(w[1]))
+
+    del set_net
+    gc.collect()
 
     # 网络保存中
     print("saving networks ... ")
@@ -690,6 +692,7 @@ def nx2gt(nxG):
     Converts a networkx graph to a graph-tool graph.
     """
     # Phase 0: Create a directed or undirected graph-tool Graph
+    print("Converting ...")
     gtG = gt.Graph(directed=nxG.is_directed())
 
     # Add the Graph properties as "internal properties"
@@ -773,8 +776,12 @@ def nx2gt(nxG):
 def change_network(out_file_pre):
     print("chaning networks ... ")
     n = nx.read_gpickle(out_file_pre + '-all.gpickle')
-    nx2gt(n).save(out_file_pre + '-all.gt')
+    g = nx2gt(n)
+    del n
+    gc.collect()
+    g.save(out_file_pre + '-all.gt')
 
+    """
     n = nx.read_gpickle(out_file_pre + '-ret.gpickle')
     nx2gt(n).save(out_file_pre + '-ret.gt')
 
@@ -786,6 +793,7 @@ def change_network(out_file_pre):
 
     n = nx.read_gpickle(out_file_pre + '-men.gpickle')
     nx2gt(n).save(out_file_pre + '-men.gt')
+    """
 
 
 def save_network_gt():
