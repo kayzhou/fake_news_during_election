@@ -281,7 +281,7 @@ class ALL_TWEET(object):
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
-            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在1900-01-01 00:00:00
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在2000-01-01 00:00:00
             is_first_marked = False
             for i, _tweets in enumerate(sorted_tweets_list):
                 if sorted_tweets_list[i]["is_source"] == 1 and is_first_marked == False:
