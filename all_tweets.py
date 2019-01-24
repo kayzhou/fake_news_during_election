@@ -265,6 +265,9 @@ class ALL_TWEET(object):
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
+        if self.tweets is None:
+            self.tweets = self.load_all_tweets()
+
         print(len(self.tweets))
         url_type = {}
 
@@ -284,7 +287,7 @@ class ALL_TWEET(object):
             sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在2000-01-01 00:00:00
             is_first_marked = False
             for i, _tweets in enumerate(sorted_tweets_list):
-                if sorted_tweets_list[i]["is_source"] == 1 and is_first_marked == False:
+                if sorted_tweets_list[i]["is_source"] == 1 and not is_first_marked:
                     sorted_tweets_list[i]["is_first"] = 1
                     is_first_marked = True
                 else:
@@ -293,16 +296,32 @@ class ALL_TWEET(object):
             self.url_timeseries.append({"url": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
-        for url_ts in self.url_timeseries:
-            for tweet in url_ts["tweets"]:
-                self.tweets_csv.append(tweet)
+        if self.tweets_csv is None:
+            for url_ts in self.url_timeseries:
+                for tweet in url_ts["tweets"]:
+                    self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
 
 
     # -- save -- #
     def save_url_ts(self):
-        if self.url_timeseries:
-            json.dump(self.url_timeseries, open("disk/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
+
+        if self.url_timeseries is None:
+            return 0
+
+        # json.dump(self.url_timeseries, open("disk/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
+        data_group = [list(), list(), list(), list(), list(), list(), list(), list()]
+
+
+        for d in self.url_timeseries:
+            url = d["url"]
+            media_type = int(d["media_type"])
+            data_group[media_type].append(d)
+
+        for i in range(8):
+            print("saving url_ts ...")
+            json.dump(data_group[i], open("disk/url_ts_media_{}.json".format(i), "w"), ensure_ascii=False, indent=1)
+
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
@@ -340,6 +359,7 @@ class ALL_TWEET(object):
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
         all_tweets = all_tweets.astype({"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
         self.tweets_csv = all_tweets
+        return all_tweets
 
 
     def make_users(self):
@@ -448,19 +468,19 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_url_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
+        # self.fill_url_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
 
         # 补充is_first
         self.convert_url_timeseries()
 
         # 保存
-        self.save_url_ts()
-        self.save_csv()
+        self.save_url_ts() # too large file
+        # self.save_csv()
 
-        self.make_users()
-        self.make_graph_for_CI()
+        # self.make_users()
+        # self.make_graph_for_CI()
 
 
 if __name__ == "__main__":
