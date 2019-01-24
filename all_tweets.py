@@ -136,7 +136,7 @@ class ALL_TWEET(object):
                 "is_first": -1,
                 "is_source": -1,
                 "is_IRA": -1,
-                "url": d["final_url"].lower(),
+                "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower(),
                 "media_type": d["media_type"],
                 "retweeted_id": -1
@@ -153,7 +153,7 @@ class ALL_TWEET(object):
                     "is_first": -1,
                     "is_source": -1,
                     "is_IRA": 1,
-                    "url": d["final_url"].lower(),
+                    "URL": d["final_url"].lower(),
                     "hostname": d["hostname"].lower(),
                     "media_type": d["media_type"],
                     "retweeted_id": -1
@@ -178,7 +178,7 @@ class ALL_TWEET(object):
                     "is_first": 0,
                     "is_source": 0,
                     "is_IRA": -1,
-                    "url": self.tweets[origin_tweetid]["URL"],
+                    "URL": self.tweets[origin_tweetid]["URL"],
                     "hostname": self.tweets[origin_tweetid]["hostname"],
                     "media_type": self.tweets[origin_tweetid]["media_type"],
                     "retweeted_id": origin_tweetid
@@ -203,7 +203,7 @@ class ALL_TWEET(object):
                     "is_first": -1,
                     "is_source": 1,
                     "is_IRA": -1,
-                    "url": self.tweets[tweetid]["URL"],
+                    "URL": self.tweets[tweetid]["URL"],
                     "hostname": self.tweets[tweetid]["hostname"],
                     "media_type": self.tweets[tweetid]["media_type"],
                     "retweeted_id": 0
@@ -275,8 +275,8 @@ class ALL_TWEET(object):
             print("count of tweets:", len(self.tweets))
 
             for tweet_id, tweet in tqdm(self.tweets.iterrows()):
-                url_timeseries[tweet["url"]].append(tweet)
-                url_type[tweet["url"]] = tweet["media_type"]
+                url_timeseries[tweet["URL"]].append(tweet)
+                url_type[tweet["URL"]] = tweet["media_type"]
 
         else:
             # 一气呵成
@@ -286,8 +286,8 @@ class ALL_TWEET(object):
                 if tweet["dt"] == -1:
                     tweet["dt"] = "2000-01-01 00:00:00"
 
-                url_timeseries[tweet["url"]].append(tweet)
-                url_type[tweet["url"]] = tweet["media_type"]
+                url_timeseries[tweet["URL"]].append(tweet)
+                url_type[tweet["URL"]] = tweet["media_type"]
 
         sorted_url = sorted(url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
@@ -303,7 +303,7 @@ class ALL_TWEET(object):
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
-            self.url_timeseries.append({"url": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
+            self.url_timeseries.append({"URL": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
         if not self.tweets_csv:
@@ -325,7 +325,7 @@ class ALL_TWEET(object):
 
 
         for d in self.url_timeseries:
-            url = d["url"]
+            url = d["URL"]
             media_type = int(d["media_type"])
             data_group[media_type].append(d)
 
