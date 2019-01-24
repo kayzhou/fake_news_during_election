@@ -265,7 +265,7 @@ class ALL_TWEET(object):
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
-        if self.tweets is None:
+        if self.tweets:
             self.tweets = self.load_all_tweets()
 
         print(len(self.tweets))
@@ -296,17 +296,18 @@ class ALL_TWEET(object):
             self.url_timeseries.append({"url": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
-        if self.tweets_csv is None:
+        if not self.tweets_csv:
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
+        print("Finished!")
 
 
     # -- save -- #
     def save_url_ts(self):
 
-        if self.url_timeseries is None:
+        if not self.url_timeseries:
             return 0
 
         # json.dump(self.url_timeseries, open("disk/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
