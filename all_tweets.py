@@ -265,10 +265,10 @@ class ALL_TWEET(object):
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
-        if self.tweets:
+        if not self.tweets:
             self.tweets = self.load_all_tweets()
 
-        print(len(self.tweets))
+        print("count of tweets:", len(self.tweets))
         url_type = {}
 
         for tweet_id, tweet in tqdm(self.tweets.items()):
