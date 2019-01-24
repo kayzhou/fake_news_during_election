@@ -265,6 +265,7 @@ class ALL_TWEET(object):
 
     def convert_url_timeseries(self):
         print("转换成时间序列 ...")
+
         if not self.tweets:
             self.tweets = self.load_all_tweets()
 
@@ -273,8 +274,8 @@ class ALL_TWEET(object):
 
         url_timeseries = defaultdict(list)
         for tweet_id, tweet in tqdm(self.tweets.items()):
-            if tweet["dt"] == -1:
-                tweet["dt"] = "2000-01-01 00:00:00"
+            # if tweet["dt"] == -1:
+            #     tweet["dt"] = "2000-01-01 00:00:00"
             url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
 
