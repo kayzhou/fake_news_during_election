@@ -25,7 +25,7 @@ class ALL_TWEET(object):
         self.tweet_ids = []
         self.tweets = {}
         self.tweets_csv = []
-        self.url_timeseries = defaultdict(list)
+        self.url_timeseries = []
 
     def find_all_tweets(self):
         # newest
@@ -271,15 +271,14 @@ class ALL_TWEET(object):
         print("count of tweets:", len(self.tweets))
         url_type = {}
 
+        url_timeseries = defaultdict(list)
         for tweet_id, tweet in tqdm(self.tweets.items()):
             if tweet["dt"] == -1:
                 tweet["dt"] = "2000-01-01 00:00:00"
-            self.url_timeseries[tweet["URL"]].append(tweet)
+            url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
 
-        sorted_url = sorted(self.url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
-
-        self.url_timeseries = []
+        sorted_url = sorted(url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
         for v in tqdm(sorted_url):
             url = v[0]
