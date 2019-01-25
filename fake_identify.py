@@ -164,7 +164,7 @@ class Are_you_IRA(object):
     def __init__(self):
         self._map = json.load(open("data/IRA_map.json"))
         # self.IRA_users_before_set = pd.read_csv("data/ira_users_csv_hashed.csv", usecols=["userid"], dtype=str)["userid"]
-        self.IRA_user_set = set(json.load(open("data/IRA_(re)user_list.json")))
+        # self.IRA_user_set = set(json.load(open("data/IRA_(re)user_list.json")))
 
     def fuck(self, ht):
         return ht in self.IRA_user_set
