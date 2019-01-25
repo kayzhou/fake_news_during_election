@@ -280,35 +280,23 @@ class ALL_TWEET(object):
         if not self.tweets:
             # 半路出家
             self.tweets = self.load_all_tweets()
-            print("count of tweets:", len(self.tweets))
 
-            for tweet_id, tweet in tqdm(self.tweets.iterrows()):
-                tweet = dict(tweet)
-                URL = tweet["URL"]
-                url_type[URL] = tweet["media_type"]
-                del tweet["URL"]
-                del tweet["media_type"]
-                del tweet["hostname"]
-                url_timeseries[URL].append(tweet)
+        print("count of tweets:", len(self.tweets))
 
-        else:
-            # 一气呵成
-            print("count of tweets:", len(self.tweets))
-            url_timeseries = defaultdict(list)
-            for tweet_id, tweet in tqdm(self.tweets.items()):
-                if tweet["dt"] == -1:
-                    tweet["dt"] = "2000-01-01 00:00:00"
-
-                url_timeseries[tweet["URL"]].append(tweet)
-                url_type[tweet["URL"]] = tweet["media_type"]
+        # 一气呵成
+        for tweet_id, tweet in tqdm(self.tweets.items()):
+            url_timeseries[tweet["URL"]].append(tweet)
+            url_type[tweet["URL"]] = tweet["media_type"]
 
         sorted_url = sorted(url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
+        # For first
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
             sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在2000-01-01 00:00:00
             is_first_marked = False
+
             for i, _tweets in enumerate(sorted_tweets_list):
                 if sorted_tweets_list[i]["is_source"] == 1 and not is_first_marked:
                     sorted_tweets_list[i]["is_first"] = 1
@@ -319,14 +307,12 @@ class ALL_TWEET(object):
             self.url_timeseries.append({"URL": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
-        """
         if not self.tweets_csv:
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
         print("Finished!")
-        """
 
 
     # -- save -- #
@@ -338,10 +324,13 @@ class ALL_TWEET(object):
         # json.dump(self.url_timeseries, open("disk/all-url-tweets.json", "w"), ensure_ascii=False, indent=2)
         data_group = [list(), list(), list(), list(), list(), list(), list(), list()]
 
-
         for d in self.url_timeseries:
             url = d["URL"]
             media_type = int(d["media_type"])
+            for i, tweet in enumerate(d["tweets"]):
+                del d["tweets"][i]["URL"]
+                del d["tweets"][i]["media_type"]
+                del d["tweets"][i]["hostname"]
             data_group[media_type].append(d)
 
         for i in range(8):
@@ -492,22 +481,22 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        # self.find_all_tweets()
-        # self.find_links()
+        self.find_all_tweets()
+        self.find_links()
 
-        # self.fill_url_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
         self.convert_url_timeseries()
 
         # 保存
         self.save_url_ts() # too large file
-        # self.save_csv()
+        self.save_csv()
 
-        # self.make_users()
-        # self.make_graph_for_CI()
+        self.make_users()
+        self.make_graph_for_CI()
 
 
 if __name__ == "__main__":
