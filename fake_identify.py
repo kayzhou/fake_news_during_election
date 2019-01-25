@@ -185,11 +185,11 @@ class Are_you_IRA(object):
                     data.append(d)
                     f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
-                print(retweet_id)
-                d = find_tweet(retweet_id)
-                if d:
-                    d["IRA_userid"] = row["retweet_userid"]
-                    data.append(d)
+                if retweet_id:
+                    d = find_tweet(retweet_id)
+                    if d:
+                        d["IRA_userid"] = row["retweet_userid"]
+                        data.append(d)
 
         IRA_map = {}
         for d in data:
