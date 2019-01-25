@@ -3,8 +3,6 @@
 """
 Created on 2018-12-01 17:02:07
 @author: https://kayzhou.github.io/
-
-My Best Code??
 """
 import sqlite3
 from collections import defaultdict
@@ -443,10 +441,29 @@ class ALL_TWEET(object):
         g.save(out_name)
         print("finished!")
 
+    def save_network_nx(self, _tweets, dict_tweetid_userid, out_name):
+        g = nx.DiGraph()
+
+        print("add edge from ...")
+        for n2, n1 in tqdm(self.retweet_network.items()):
+            if n1 in _tweets:
+                try:
+                    u1 = dict_tweetid_userid[n1]
+                    u2 = dict_tweetid_userid[n2]
+                    g.add_edge(u1, u2)
+                except:
+                    print(n2, ">", n1)
+
+        print("saving the graph ...", out_name)
+        nx.write_gpickle(n2, out_name)
+        print("finished!")
+
+
     def make_graph_for_CI(self):
-        self.load_all_tweets()
-        all_tweets = self.tweets_csv
-        print("loaded all tweets!")
+        if not self.tweets_csv:
+            self.load_all_tweets()
+            all_tweets = self.tweets_csv
+            print("loaded all tweets!")
 
         self.load_retweet_network()
         print("loaded retweet network!")
@@ -456,11 +473,11 @@ class ALL_TWEET(object):
         for _, row in tqdm(all_tweets.iterrows()):
             dict_tweetid_userid[str(row["tweet_id"])] = str(row["user_id"])
 
-        nodes = all_tweets["user_id"].unique().tolist()
-        print("count of nodes(users):", len(nodes))
+        # nodes = all_tweets["user_id"].unique().tolist()
+        # print("count of nodes(users):", len(nodes))
 
-        node_map = {n:i for i, n in enumerate(nodes)}
-        json.dump(node_map, open("disk/node_map.json", "w"))
+        # node_map = {n:i for i, n in enumerate(nodes)}
+        # json.dump(node_map, open("disk/node_map.json", "w"))
 
         map_labels = {
             "0": "fake",
@@ -476,7 +493,7 @@ class ALL_TWEET(object):
         for _type, f_label in map_labels.items():
             print(_type, "...")
             tweets = all_tweets[all_tweets["media_type"]==_type]
-            self.save_network_gt(set(tweets.tweet_id), dict_tweetid_userid, node_map, "disk/network_{}.gt".format(f_label))
+            self.save_network_nx(set(tweets.tweet_id), dict_tweetid_userid, "disk/network_{}.gpickle".format(f_label))
 
 
     def run(self):
