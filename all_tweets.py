@@ -198,12 +198,12 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_source"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
-            # 原始的不在里面，只可能是IRA-tweets里面发现的，但是我不知道详细的信息，所以这里暂时不需要
+            # 原始的不在里面，只可能是IRA-tweets里面发现的。但是我不知道详细的信息，所以这里暂时不需要
             if origin_tweetid not in self.tweets:
                 tweet = {
                     "tweet_id": origin_tweetid,
                     "user_id": -1,
-                    "dt": -1,
+                    "dt": "2000-01-01 00:00:00",
                     "is_first": -1,
                     "is_source": 1,
                     "is_IRA": -1,
@@ -257,14 +257,12 @@ class ALL_TWEET(object):
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
                 cnt += 1
 
-            '''
             if retweet_id in self.tweets:
                 if self.tweets[retweet_id]["user_id"] == -1:
                     r_uid = row["retweet_userid"]
                     if r_uid in putin._map:
                         r_uid = str(putin._map[r_uid])
                     self.tweets[retweet_id]["user_id"] = r_uid
-            '''
 
         for tweetid in self.tweets.keys():
             if self.tweets[tweetid]["is_IRA"] == -1:
