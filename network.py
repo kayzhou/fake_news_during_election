@@ -28,7 +28,7 @@ class analyze_IRA_in_network:
         self.G = nx.DiGraph()
 
     def find_IRA_map(self):
-        data = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"], dtype=str)
+        tottt = pd.read_csv("data/ira_tweets_csv_hashed.csv", usecols=["tweetid", "userid"], dtype=str)
         with open("data/IRA_map_v3.json", "w") as f:
             for _, row in tqdm(data.iterrows()):
                 tweet_id = row["tweetid"]
@@ -578,12 +578,14 @@ def get_all_network(user_ids, out_file_pre):
 def make_all_network(out_file_pre):
     # for all users
 
+    """
     # retweet
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
         w = line.strip().split()
         net_1.append((int(w[1]), int(w[2])))
 
+    """
     # quote
     net_2 = []
     for line in tqdm(open("disk/all-quo-links.txt")):
@@ -607,56 +609,23 @@ def make_all_network(out_file_pre):
     # json.dump(net_3, open(out_file_pre + "-rep.txt"))
     # json.dump(net_4, open(out_file_pre + "-men.txt"))
 
-    # n_all = nx.DiGraph()
-    # n_all.add_edges_from(net_1)
-    # n_all.add_edges_from(net_2)
-    # n_all.add_edges_from(net_3)
-    # n_all.add_edges_from(net_4)
+    """
+    n1 = nx.DiGraph()
+    n1.add_edges_from(net_1)
+    nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
 
-    set_net = set()
-    for n1, n2 in net_1:
-        set_net.add(str(n1) + "-" + str(n2))
-    for n1, n2 in net_2:
-        set_net.add(str(n1) + "-" + str(n2))
-    for n1, n2 in net_3:
-        set_net.add(str(n1) + "-" + str(n2))
-    for n1, n2 in net_4:
-        set_net.add(str(n1) + "-" + str(n2))
+    """
+    n2 = nx.DiGraph()
+    n2.add_edges_from(net_2)
+    nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
 
-    del net_1
-    del net_2
-    del net_3
-    del net_4
-    gc.collect()
+    n3 = nx.DiGraph()
+    n3.add_edges_from(net_3)
+    nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
 
-    n0 = nx.DiGraph()
-
-    for n in set_net:
-        w = n.split("-")
-        n0.add_edge(int(w[0]), int(w[1]))
-
-    del set_net
-    gc.collect()
-
-    # 网络保存中
-    print("saving networks ... ")
-    nx.write_gpickle(n0, out_file_pre + '-all.gpickle')
-
-    # n1 = nx.DiGraph()
-    # n1.add_edges_from(net_1)
-    # nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
-
-    # n2 = nx.DiGraph()
-    # n2.add_edges_from(net_2)
-    # nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
-
-    # n3 = nx.DiGraph()
-    # n3.add_edges_from(net_3)
-    # nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
-
-    # n4 = nx.DiGraph()
-    # n4.add_edges_from(net_4)
-    # nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+    n4 = nx.DiGraph()
+    n4.add_edges_from(net_4)
+    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
 def get_prop_type(value, key=None):
@@ -782,12 +751,6 @@ def nx2gt(nxG):
 
 def change_network(out_file_pre):
     print("chaning networks ... ")
-    n = nx.read_gpickle(out_file_pre + '-all.gpickle')
-    g = nx2gt(n)
-    del n
-    gc.collect()
-    g.save(out_file_pre + '-all.gt')
-
     """
     n = nx.read_gpickle(out_file_pre + '-ret.gpickle')
     nx2gt(n).save(out_file_pre + '-ret.gt')
@@ -797,10 +760,10 @@ def change_network(out_file_pre):
 
     n = nx.read_gpickle(out_file_pre + '-rep.gpickle')
     nx2gt(n).save(out_file_pre + '-rep.gt')
+    """
 
     n = nx.read_gpickle(out_file_pre + '-men.gpickle')
     nx2gt(n).save(out_file_pre + '-men.gt')
-    """
 
 
 def save_network_gt():
@@ -840,18 +803,27 @@ def save_network_gt():
         if w[2] not in node_map:
             node_map[w[2]] = len(node_map)
 
-
     g = gt.Graph()
 
     print("add nodes from ...")
     vlist = g.add_vertex(len(node_map))
+
+    vprop = g.new_vertex_property("int")
+    g.vp.name = vprop
 
     print("add edge from ...")
     for n in tqdm(set_net):
         n1, n2 = n.split("-")
         u1 = node_map[n1]
         u2 = node_map[n2]
-        g.add_edge(g.vertex(u1), g.vertex(u2))
+
+        node1 = g.vertex(u1)
+        node2 = g.vertex(u2)
+
+        g.vp.name[node1] = int(u1)
+        g.vp.name[node2] = int(u2)
+
+        g.add_edge(node1, node2)
 
     print("saving the graph ...")
     g.save("disk/whole-all.gt")
@@ -879,5 +851,5 @@ if __name__ == "__main__":
     # get_all_network(ira_tweet_ids, "disk/ira")
 
     # make_all_network("disk/whole")
-    # change_network("disk/whole")
-    save_network_gt()
+    change_network("disk/whole")
+    # save_network_gt()

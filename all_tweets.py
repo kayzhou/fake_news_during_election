@@ -275,8 +275,13 @@ class ALL_TWEET(object):
             print("count of tweets:", len(self.tweets))
 
             for tweet_id, tweet in tqdm(self.tweets.iterrows()):
-                url_timeseries[tweet["URL"]].append(tweet)
-                url_type[tweet["URL"]] = tweet["media_type"]
+                tweet = dict(tweet)
+                URL = tweet["URL"]
+                url_type[URL] = tweet["media_type"]
+                del tweet["URL"]
+                del tweet["media_type"]
+                del tweet["hostname"]
+                url_timeseries[URL].append(tweet)
 
         else:
             # 一气呵成
@@ -306,12 +311,14 @@ class ALL_TWEET(object):
             self.url_timeseries.append({"URL": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
 
         # for csv
+        """
         if not self.tweets_csv:
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
         print("Finished!")
+        """
 
 
     # -- save -- #
@@ -331,6 +338,7 @@ class ALL_TWEET(object):
 
         for i in range(8):
             print("saving url_ts ...")
+            print(type(data_group[i]))
             json.dump(data_group[i], open("disk/url_ts_media_{}.json".format(i), "w"), ensure_ascii=False, indent=1)
 
 
