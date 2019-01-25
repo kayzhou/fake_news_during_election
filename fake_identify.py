@@ -163,8 +163,8 @@ class Are_you_IRA(object):
 
     def __init__(self):
         self._map = json.load(open("data/IRA_map.json"))
-        self.IRA_users_before_set = set(self._map.keys())
-        self.IRA_user_set = set(self._map.values())
+        # self.IRA_users_before_set = pd.read_csv("data/ira_users_csv_hashed.csv", usecols=["userid"], dtype=str)["userid"]
+        self.IRA_user_set = set(json.load(open("data/IRA_(re)user_list.json")))
 
     def fuck(self, ht):
         return ht in self.IRA_user_set
@@ -173,20 +173,39 @@ class Are_you_IRA(object):
         data = []
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                         usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
-        with open("data/IRA-tweets.json", "w") as f:
+        with open("data/IRA-(re)tweets-in-SQLite.json", "w") as f:
             for _, row in tqdm(IRA_info.iterrows()):
                 tweetid = row["tweetid"]
                 uid = row["userid"]
-                # retweet_id = row["retweet_tweetid"]
+                retweet_id = row["retweet_tweetid"]
+
                 d = find_tweet(tweetid)
                 if d:
                     d["IRA_userid"] = uid
                     data.append(d)
                     f.write(json.dumps(d, ensure_ascii=False) + "\n")
 
+                print(retweet_id)
+                d = find_tweet(retweet_id)
+                if d:
+                    d["IRA_userid"] = row["retweet_userid"]
+                    data.append(d)
+
         IRA_map = {}
         for d in data:
-            IRA_map[str(d["user_id"])] = d["IRA_userid"]
+            if len(d["IRA_userid"]) == 64:
+                IRA_map[str(d["IRA_userid"])] = d["user_id"]
+
+
+        IRA_user_list = []
+        data_ira_users = pd.read_csv("data/ira_users_csv_hashed.csv", usecols=["userid"], dtype=str)
+        for _, row in tqdm(data_ira_users.iterrows()):
+            uid = row["userid"]
+            IRA_user_list.append(uid)
+            if uid in IRA_map:
+                IRA_user_list.append(IRA_map[uid])
+
+        json.dump(IRA_user_list, open("data/IRA_(re)user_list.json", "w"), ensure_ascii=False, indent=2)
         json.dump(IRA_map, open("data/IRA_map.json", "w"), ensure_ascii=False, indent=2)
 
 
