@@ -858,7 +858,7 @@ if __name__ == "__main__":
     for _type, f_label in map_labels.items():
         print(_type, "...")
         nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-        print("type(n) = ", type(nt))
+        print("type(n) =", type(nt))
         _gt = nx2gt(nt)
         _gt.save("disk/network_{}.gt".format(f_label))
 
