@@ -843,6 +843,23 @@ if __name__ == "__main__":
     # print("men")
     # get_mention_network("disk/all-men-links.txt")
 
+    # media network
+    map_labels = {
+        "0": "fake",
+        "1": "extreme bias (right)",
+        "2": "right",
+        "3": "right leaning",
+        "4": "center",
+        "5": "left leaning",
+        "6": "left",
+        "7": "extreme bias (left)"
+    }
+
+    for _type, f_label in map_labels.items():
+        print(_type, "...")
+        n = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+        nx2gt(n).save("disk/network_{}.gt".format(f_label))
+
     # build IRA all network
     # ira_tweet_ids = []
     # for line in open("data/IRA-tweets.json"):
@@ -851,5 +868,5 @@ if __name__ == "__main__":
     # get_all_network(ira_tweet_ids, "disk/ira")
 
     # make_all_network("disk/whole")
-    change_network("disk/whole")
+    # change_network("disk/whole")
     # save_network_gt()
