@@ -503,7 +503,7 @@ class ALL_TWEET(object):
 
             print("saving the graph ...", out_name)
             nx.write_gpickle(g, out_name)
-            print("finished!")
+            # print("finished!")
 
         map_labels = {
             "0": "fake",
