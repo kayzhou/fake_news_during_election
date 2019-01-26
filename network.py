@@ -843,7 +843,7 @@ if __name__ == "__main__":
     # print("men")
     # get_mention_network("disk/all-men-links.txt")
 
-    # media network
+    # media network~
     map_labels = {
         "0": "fake",
         "1": "extreme bias (right)",
