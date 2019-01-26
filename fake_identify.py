@@ -165,13 +165,18 @@ class Are_you_IRA(object):
     def __init__(self):
         self._map = json.load(open("data/IRA_map.json"))
         # self.IRA_users_before_set = pd.read_csv("data/ira_users_csv_hashed.csv", usecols=["userid"], dtype=str)["userid"]
-        # self.IRA_user_set = set(json.load(open("data/IRA_(re)user_list.json")))
+        self.IRA_user_set = set(json.load(open("data/IRA_user_list.json")))
 
     def fuck(self, ht):
         return ht in self.IRA_user_set
 
     def cal_IRA_map(self):
         data = []
+        for line in open("data/IRA-(re)tweets-in-SQLite.json"):
+            d = json.loads(line.strip())
+            data.append(d)
+
+        """
         IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                         usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
         with open("data/IRA-(re)tweets-in-SQLite.json", "w") as f:
@@ -191,11 +196,12 @@ class Are_you_IRA(object):
                     if d:
                         d["IRA_userid"] = row["retweet_userid"]
                         data.append(d)
+        """
 
         IRA_map = {}
         for d in data:
             if len(d["IRA_userid"]) == 64:
-                IRA_map[str(d["IRA_userid"])] = d["user_id"]
+                IRA_map[str(d["IRA_userid"])] = str(d["user_id"])
 
 
         IRA_user_list = []
@@ -206,7 +212,7 @@ class Are_you_IRA(object):
             if uid in IRA_map:
                 IRA_user_list.append(IRA_map[uid])
 
-        json.dump(IRA_user_list, open("data/IRA_(re)user_list.json", "w"), ensure_ascii=False, indent=2)
+        json.dump(IRA_user_list, open("data/IRA_user_list.json", "w"), ensure_ascii=False, indent=2)
         json.dump(IRA_map, open("data/IRA_map.json", "w"), ensure_ascii=False, indent=2)
 
 
@@ -214,8 +220,7 @@ if __name__ == "__main__":
     # who = Who_is_fake()
     # print(who.identify("baidu.com"))
     putin = Are_you_IRA()
-    putin.cal_IRA_map()
-
-
+    # putin.cal_IRA_map()
+    print(putin._map)
 
 
