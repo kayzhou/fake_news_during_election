@@ -519,8 +519,8 @@ class ALL_TWEET(object):
         for _type, f_label in map_labels.items():
             print(_type, "...")
             tweets = all_tweets[all_tweets["media_type"] == _type]
-            self.save_network_nx(set(tweets.tweet_id),
-                                 "disk/network_{}.gpickle".format(f_label))
+            save_network_nx(set(tweets.tweet_id),
+                            "disk/network_{}.gpickle".format(f_label))
 
     def run(self):
         # 找数据
