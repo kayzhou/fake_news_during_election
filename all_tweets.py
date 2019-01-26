@@ -241,7 +241,7 @@ class ALL_TWEET(object):
             if self.tweets[tweetid]["is_source"] == -1:
                 self.tweets[tweetid]["is_source"] = 1
             if self.tweets[tweetid]["retweeted_id"] == -1:
-                self.tweets[tweetid]["retweetd_id"] = 0
+                self.tweets[tweetid]["retweeted_id"] = 0
 
     def fill_IRA_info(self):
         putin = Are_you_IRA()
