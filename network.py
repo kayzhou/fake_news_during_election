@@ -668,7 +668,7 @@ def nx2gt(nxG):
     Converts a networkx graph to a graph-tool graph.
     """
     # Phase 0: Create a directed or undirected graph-tool Graph
-    print("Converting ...")
+    print("converting ...")
     gtG = gt.Graph(directed=nxG.is_directed())
 
     # Add the Graph properties as "internal properties"
@@ -858,7 +858,8 @@ if __name__ == "__main__":
     for _type, f_label in map_labels.items():
         print(_type, "...")
         n = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-        nx2gt(n).save("disk/network_{}.gt".format(f_label))
+        _gt = nx2gt(n)
+        _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA all network
     # ira_tweet_ids = []
