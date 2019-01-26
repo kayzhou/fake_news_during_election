@@ -68,43 +68,6 @@ class ALL_TWEET(object):
         print("count of IRA tweets:", cnt)
 
 
-    def fill_tweets(self):
-        print("原始数据处理中 ...")
-
-        for line in tqdm(open("disk/all_tweets.json")):
-            d = json.loads(line.strip())
-            tweet = {
-                "tweet_id": str(d["tweet_id"]),
-                "user_id": str(d["user_id"]),
-                "dt": d["datetime_EST"],
-                "is_first": -1,
-                "is_source": -1,
-                "is_IRA": -1,
-                "URL": d["final_url"].lower(),
-                "hostname": d["final_hostname"].lower(),
-                "media_type": d["media_type"],
-                "retweeted_id": -1
-            }
-            self.tweets[str(d["tweet_id"])] = tweet
-
-        for line in tqdm(open("disk/all_IRA_tweets.json")):
-            d = json.loads(line.strip())
-            if str(d["tweetid"]) not in self.tweets:
-                tweet = {
-                    "tweet_id": str(d["tweetid"]),
-                    "user_id": -1,
-                    "dt": "2000-01-01 00:00:00",
-                    "is_first": -1,
-                    "is_source": -1,
-                    "is_IRA": 1,
-                    "URL": d["final_url"].lower(),
-                    "hostname": d["hostname"].lower(),
-                    "media_type": d["media_type"],
-                    "retweeted_id": -1
-                }
-                self.tweets[str(d["tweetid"])] = tweet
-
-
     def find_links(self):
         if not self.tweet_ids:
             for line in open("disk/all_tweets.json"):
@@ -158,10 +121,53 @@ class ALL_TWEET(object):
         json.dump(retweet_link, open("disk/all_retweet_network.json",
                                     "w"), ensure_ascii=False, indent=2)
 
+                                
+    def fill_tweets(self):
+        print("原始数据处理中 ...")
+
+        for line in tqdm(open("disk/all_tweets.json")):
+            d = json.loads(line.strip())
+            tweet = {
+                "tweet_id": str(d["tweet_id"]),
+                "user_id": str(d["user_id"]),
+                "dt": d["datetime_EST"],
+                "is_first": -1,
+                "is_source": -1,
+                "is_IRA": -1,
+                "URL": d["final_url"].lower(),
+                "hostname": d["final_hostname"].lower(),
+                "media_type": d["media_type"],
+                "retweeted_id": -1
+            }
+            self.tweets[str(d["tweet_id"])] = tweet
+
+        cnt = 0
+        for line in tqdm(open("disk/all_IRA_tweets.json")):
+            d = json.loads(line.strip())
+            if str(d["tweetid"]) not in self.tweets:
+                tweet = {
+                    "tweet_id": str(d["tweetid"]),
+                    "user_id": -1,
+                    "dt": "2000-01-01 00:00:00",
+                    "is_first": -1,
+                    "is_source": -1,
+                    "is_IRA": 1,
+                    "URL": d["final_url"].lower(),
+                    "hostname": d["hostname"].lower(),
+                    "media_type": d["media_type"],
+                    "retweeted_id": -1
+                }
+                self.tweets[str(d["tweetid"])] = tweet
+            else:
+                cnt += 1
+        print("IRA已经存在！", cnt)
+
+
     def fill_retweets(self):
         print("扩展转发处理中 ...")
         tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
         retweets_links = json.load(open("disk/all_retweet_network.json"))
+
         for tweet_id, retweetd_id in tqdm(retweets_links.items()):
             tweetid, origin_tweetid = str(tweet_id), str(retweetd_id)
 
@@ -183,12 +189,14 @@ class ALL_TWEET(object):
                 }
                 if tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[tweetid]
+                    if not d:
+                        print("fatal error!")
                 else:
                     d = find_tweet(tweetid)
-                    if d:
-                        tweet["user_id"] = str(d["user_id"])
-                        tweet["dt"] = d["datetime_EST"]
-                        tweets_from_SQL[tweetid] = d
+                if d:
+                    tweet["user_id"] = str(d["user_id"])
+                    tweet["dt"] = d["datetime_EST"]
+                    tweets_from_SQL[tweetid] = d
                 self.tweets[tweetid] = tweet
 
             # 原来就存在
@@ -212,12 +220,14 @@ class ALL_TWEET(object):
                 }
                 if origin_tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[origin_tweetid]
+                    if not d:
+                        print("fatal error!")
                 else:
                     d = find_tweet(origin_tweetid)
-                    if d:
-                        tweet["user_id"] = str(d["user_id"])
-                        tweet["dt"] = d["datetime_EST"]
-                        tweets_from_SQL[origin_tweetid] = d
+                if d:
+                    tweet["user_id"] = str(d["user_id"])
+                    tweet["dt"] = d["datetime_EST"]
+                    tweets_from_SQL[origin_tweetid] = d
 
                 self.tweets[origin_tweetid] = tweet
 
@@ -231,6 +241,8 @@ class ALL_TWEET(object):
         for tweetid in self.tweets.keys():
             if self.tweets[tweetid]["is_source"] == -1:
                 self.tweets[tweetid]["is_source"] = 1
+            if self.tweets[tweetid]["retweeted_id"] == -1:
+                self.tweets[tweetid]["retweetd_id"] = 0
 
 
     def fill_IRA_info(self):
@@ -286,6 +298,7 @@ class ALL_TWEET(object):
             url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
 
+        # 涉及到url的tweets数量排序
         sorted_url = sorted(url_timeseries.items(), key=lambda d: len(d[1]), reverse=True)
 
         # For first
@@ -295,14 +308,18 @@ class ALL_TWEET(object):
             sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"]) # 有可能存在2000-01-01 00:00:00
             is_first_marked = False
 
-            for i, _tweets in enumerate(sorted_tweets_list):
-                if sorted_tweets_list[i]["is_source"] == 1 and not is_first_marked:
+            for i, _tweet in enumerate(sorted_tweets_list):
+                if _tweet["dt"] == "2000-01-01 00:00:00":
+                    sorted_tweets_list[i]["is_first"] = 0
+                elif sorted_tweets_list[i]["is_source"] == 1 and not is_first_marked:
                     sorted_tweets_list[i]["is_first"] = 1
                     is_first_marked = True
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
             self.url_timeseries.append({"URL": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
+        print("convert ts finished!")
+
 
         # for csv
         if not self.tweets_csv:
@@ -310,7 +327,9 @@ class ALL_TWEET(object):
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
-        print("Finished!")
+        print("convert ts finished!")
+        self.save_csv()
+        self.save_url_ts()
 
 
     # -- save -- #
@@ -498,8 +517,8 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        self.find_all_tweets()
-        self.find_links()
+        # self.find_all_tweets()
+        # self.find_links()
 
         self.fill_tweets()
         self.fill_retweets()
@@ -508,9 +527,9 @@ class ALL_TWEET(object):
         # 补充is_first
         self.convert_url_timeseries()
 
-        # 保存
-        self.save_url_ts() # too large file
-        self.save_csv()
+        # 保存，已经放在covert里面
+        # self.save_url_ts() # too large file
+        # self.save_csv()
 
         self.make_users()
         self.make_graph_for_CI()
