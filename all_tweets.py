@@ -526,18 +526,18 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
 
         # 补充is_first
-        self.convert_url_timeseries()
+        # self.convert_url_timeseries()
 
         # 保存，已经放在covert里面
         # self.save_url_ts() # too large file
         # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         self.make_graph_for_CI()
 
 
