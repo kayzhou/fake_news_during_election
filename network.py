@@ -857,8 +857,9 @@ if __name__ == "__main__":
 
     for _type, f_label in map_labels.items():
         print(_type, "...")
-        n = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-        _gt = nx2gt(n)
+        nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+        print("type(n) = ", type(nt))
+        _gt = nx2gt(nt)
         _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA all network
