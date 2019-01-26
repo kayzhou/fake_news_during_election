@@ -326,7 +326,8 @@ class ALL_TWEET(object):
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
         print(len(self.tweets_csv))
-        print("convert ts finished!")
+        
+        # saving!
         self.save_csv()
         self.save_url_ts()
 
