@@ -1,7 +1,9 @@
-import ujson as json
 import os
-from SQLite_handler import *
+
 from tqdm import tqdm
+
+import ujson as json
+from SQLite_handler import *
 
 in_dir = "/mnt/kay_data/alex_avocado/data"
 user_ids_set = set()

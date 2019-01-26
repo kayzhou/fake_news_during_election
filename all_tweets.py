@@ -445,6 +445,7 @@ class ALL_TWEET(object):
         users["user_id"] = users.index
         users.to_csv("data/all-users.csv", index=False)
 
+    # abandon
     def save_network_gt(self, _tweets, dict_tweetid_userid, node_map, out_name):
         g = gt.Graph()
 
@@ -467,24 +468,8 @@ class ALL_TWEET(object):
         g.save(out_name)
         print("finished!")
 
-    def save_network_nx(self, _tweets, out_name):
-        g = nx.DiGraph()
-
-        print("add edge from ...")
-        for n2, n1 in tqdm(self.retweet_network.items()):
-            if n1 in _tweets:
-                try:
-                    u1 = self.tweets_csv[self.tweets_csv.tweet_id == n1].user_id
-                    u2 = self.tweets_csv[self.tweets_csv.tweet_id == n2].user_id
-                    g.add_edge(u1, u2)
-                except:
-                    print(n2, ">", n1)
-
-        print("saving the graph ...", out_name)
-        nx.write_gpickle(g, out_name)
-        print("finished!")
-
     def make_graph_for_CI(self):
+
         if not self.tweets_csv:
             self.load_all_tweets()
             all_tweets = self.tweets_csv
@@ -493,16 +478,32 @@ class ALL_TWEET(object):
         self.load_retweet_network()
         print("loaded retweet network!")
 
-        # print("making dict_tweetid_userid ...")
-        # dict_tweetid_userid = {}
-        # for _, row in tqdm(all_tweets.iterrows()):
-        #     dict_tweetid_userid[str(row["tweet_id"])] = str(row["user_id"])
+        print("making dict_tweetid_userid ...")
+        dict_tweetid_userid = {}
+        for _, row in tqdm(all_tweets.iterrows()):
+            dict_tweetid_userid[str(row["tweet_id"])] = str(row["user_id"])
 
         # nodes = all_tweets["user_id"].unique().tolist()
         # print("count of nodes(users):", len(nodes))
-
         # node_map = {n:i for i, n in enumerate(nodes)}
         # json.dump(node_map, open("disk/node_map.json", "w"))
+
+        def save_network_nx(_tweets, out_name):
+            g = nx.DiGraph()
+
+            print("add edge from ...")
+            for n2, n1 in tqdm(self.retweet_network.items()):
+                if n1 in _tweets:
+                    try:
+                        u1 = dict_tweetid_userid[n1]
+                        u2 = dict_tweetid_userid[n2]
+                        g.add_edge(u1, u2)
+                    except:
+                        print(n2, ">", n1)
+
+            print("saving the graph ...", out_name)
+            nx.write_gpickle(g, out_name)
+            print("finished!")
 
         map_labels = {
             "0": "fake",
