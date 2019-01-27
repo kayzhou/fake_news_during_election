@@ -26,20 +26,16 @@ conn = sqlite3.connect(
 c = conn.cursor()
 c.execute('''SELECT text FROM tweet LIMIT 100''')
 texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
-dictionary = Dictionary(texts)
-# print(texts[0])
-# print(dictionary.doc2bow(texts[0]))
-# print(lda[dictionary.doc2bow(texts[0])])
 conn.close()
 
 conn = sqlite3.connect(
     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
 c = conn.cursor()
 c.execute('''SELECT text FROM tweet LIMIT 100''')
-texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
-dictionary.add_documents(texts)
+texts.extend([tokenizer.tokenize(d[0]) for d in c.fetchall()])
 conn.close()
 
+dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
 lda = LdaModel(corpus, num_topics=10)
 
