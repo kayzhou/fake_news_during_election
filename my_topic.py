@@ -39,11 +39,10 @@ dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
 lda = LdaModel(corpus, num_topics=10)
 
-# print(texts[0])
-# print(dictionary.doc2bow(texts[0]))
-# print(lda[dictionary.doc2bow(texts[0])])
+print(texts[0])
+print(dictionary.doc2bow(texts[0]))
+print(lda[dictionary.doc2bow(texts[0])])
 
-temp_file = datapath("model")
-lda.save(temp_file)
+lda.save("model/topic.m")
 
 
