@@ -24,14 +24,14 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 conn = sqlite3.connect(
     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
 c = conn.cursor()
-c.execute('''SELECT text FROM tweet LIMIT 100''')
+c.execute('''SELECT text FROM tweet''')
 texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
 conn.close()
 
 conn = sqlite3.connect(
     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
 c = conn.cursor()
-c.execute('''SELECT text FROM tweet LIMIT 100''')
+c.execute('''SELECT text FROM tweet''')
 texts.extend([tokenizer.tokenize(d[0]) for d in c.fetchall()])
 conn.close()
 
