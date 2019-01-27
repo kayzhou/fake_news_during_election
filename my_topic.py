@@ -23,7 +23,7 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 conn = sqlite3.connect(
     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
 c = conn.cursor()
-c.execute('''SELECT text FROM tweet LIMIT 10''')
+c.execute('''SELECT text FROM tweet LIMIT 100''')
 texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
 dictionary = Dictionary(texts)
 
@@ -32,7 +32,7 @@ lda = LdaModel(corpus, num_topics=10)
 
 print(texts[0])
 print(dictionary.doc2bow(texts[0]))
-# print(lda[texts[0]])
+print(lda[dictionary.doc2bow(texts[0])])
 conn.close()
 
 # conn = sqlite3.connect(
