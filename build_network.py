@@ -611,7 +611,7 @@ if __name__ == "__main__":
             else:
                 print("wo cao")
         except:
-            if len(uid) != 64
+            if len(uid) != 64:
                 ira_user_set.add(uid)
 
     print(len(ira_user_set))
