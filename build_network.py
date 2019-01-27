@@ -15,6 +15,7 @@ from collections import defaultdict
 import graph_tool.all as gt
 
 from my_weapon import *
+from fake_identify import Are_you_IRA
 from SQLite_handler import find_all_uids, find_tweet, get_user_id
 
 
@@ -187,7 +188,7 @@ def get_mention_network(out_name):
     conn.close()
 
 
-def get_all_network(tweet_ids, out_file_pre):
+def get_all_network_by_tweet(tweet_ids, out_file_pre):
 
     # IRA
     set_tweet_ids = set(tweet_ids)
@@ -251,7 +252,7 @@ def get_all_network(tweet_ids, out_file_pre):
     nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
-def get_all_network(user_ids, out_file_pre):
+def get_all_network_by_user(user_ids, out_file_pre):
     # IRAs 针对用户id而构造网络
 
     set_user_ids = set(user_ids)
@@ -601,11 +602,10 @@ if __name__ == "__main__":
     #     _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA all network
-    ira_tweet_ids = []
-    for line in open("data/IRA-tweets.json"):
-        tweet_id = str(json.loads(line.strip())["user_id"])
-        ira_tweet_ids.append(tweet_id)
-    get_all_network(ira_tweet_ids, "disk/ira")
+    putin = Are_you_IRA()
+    ira_user_list = set(str([Are_you_IRA._map[uid]) for uid in putin.IRA_user_set])
+
+    # get_all_network(ira_tweet_ids, "disk/ira")
 
     # make_all_network("disk/whole")
     # change_network("disk/whole")
