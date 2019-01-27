@@ -490,7 +490,9 @@ def nx2gt(nxG):
 
 def change_network(out_file_pre):
     print("chaning networks ... ")
-    """
+    n = nx.read_gpickle(out_file_pre + '-all.gpickle')
+    nx2gt(n).save(out_file_pre + '-all.gt')
+
     n = nx.read_gpickle(out_file_pre + '-ret.gpickle')
     nx2gt(n).save(out_file_pre + '-ret.gt')
 
@@ -499,7 +501,6 @@ def change_network(out_file_pre):
 
     n = nx.read_gpickle(out_file_pre + '-rep.gpickle')
     nx2gt(n).save(out_file_pre + '-rep.gt')
-    """
 
     n = nx.read_gpickle(out_file_pre + '-men.gpickle')
     nx2gt(n).save(out_file_pre + '-men.gt')
@@ -601,7 +602,7 @@ if __name__ == "__main__":
     #     _gt = nx2gt(nt)
     #     _gt.save("disk/network_{}.gt".format(f_label))
 
-    # build IRA all network
+    # build IRA network
     putin = Are_you_IRA()
     ira_user_set = set()
     for uid in putin.IRA_user_set:
@@ -612,9 +613,8 @@ if __name__ == "__main__":
             if len(uid) != 64:
                 ira_user_set.add(uid)
 
-    print(len(ira_user_set))
-
-    # get_all_network(ira_tweet_ids, "disk/ira")
+    get_all_network_by_user(ira_user_set, "data/network/ira")
+    change_network("data/network/ira")
 
     # make_all_network("disk/whole")
     # change_network("disk/whole")
