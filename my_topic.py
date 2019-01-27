@@ -29,6 +29,8 @@ dictionary = Dictionary(texts)
 
 corpus = [dictionary.doc2bow(t) for t in texts]
 lda = LdaModel(corpus, num_topics=10)
+
+print(lda[texts[0]])
 conn.close()
 
 # conn = sqlite3.connect(
