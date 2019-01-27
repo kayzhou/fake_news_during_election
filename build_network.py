@@ -603,7 +603,7 @@ if __name__ == "__main__":
 
     # build IRA all network
     putin = Are_you_IRA()
-    ira_user_list = set(str([Are_you_IRA._map[uid]) for uid in putin.IRA_user_set])
+    ira_user_list = set([str(Are_you_IRA._map[uid]) for uid in putin.IRA_user_set])
 
     # get_all_network(ira_tweet_ids, "disk/ira")
 
