@@ -607,9 +607,7 @@ if __name__ == "__main__":
     for uid in putin.IRA_user_set:
         try:
             if len(putin._map[uid]) != 64:
-                ira_user_set.add(putin._map[uid])
-            else:
-                print("wo cao")
+                ira_user_set.add(str(putin._map[uid]))
         except:
             if len(uid) != 64:
                 ira_user_set.add(uid)
