@@ -606,9 +606,14 @@ if __name__ == "__main__":
     ira_user_set = set()
     for uid in putin.IRA_user_set:
         try:
-            ira_user_set.add(putin._map[uid])
+            if len(putin._map[uid]) != 64:
+                ira_user_set.add(putin._map[uid])
+            else:
+                print("wo cao")
         except:
-            ira_user_set.add(uid)
+            if len(uid) != 64
+                ira_user_set.add(uid)
+
     print(len(ira_user_set))
 
     # get_all_network(ira_tweet_ids, "disk/ira")
