@@ -190,7 +190,6 @@ def get_mention_network(out_name):
 def get_all_network(tweet_ids, out_file_pre):
 
     # IRA
-
     set_tweet_ids = set(tweet_ids)
 
     # retweet
@@ -253,7 +252,7 @@ def get_all_network(tweet_ids, out_file_pre):
 
 
 def get_all_network(user_ids, out_file_pre):
-    # IRAs
+    # IRAs 针对用户id而构造网络
 
     set_user_ids = set(user_ids)
     # retweet
@@ -594,19 +593,19 @@ if __name__ == "__main__":
         "7": "extreme bias (left)"
     }
 
-    for _type, f_label in map_labels.items():
-        print(_type, "...")
-        nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-        print("type(n) =", type(nt))
-        _gt = nx2gt(nt)
-        _gt.save("disk/network_{}.gt".format(f_label))
+    # for _type, f_label in map_labels.items():
+    #     print(_type, "...")
+    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+    #     print("type(n) =", type(nt))
+    #     _gt = nx2gt(nt)
+    #     _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA all network
-    # ira_tweet_ids = []
-    # for line in open("data/IRA-tweets.json"):
-    #     tweet_id = str(json.loads(line.strip())["user_id"])
-    #     ira_tweet_ids.append(tweet_id)
-    # get_all_network(ira_tweet_ids, "disk/ira")
+    ira_tweet_ids = []
+    for line in open("data/IRA-tweets.json"):
+        tweet_id = str(json.loads(line.strip())["user_id"])
+        ira_tweet_ids.append(tweet_id)
+    get_all_network(ira_tweet_ids, "disk/ira")
 
     # make_all_network("disk/whole")
     # change_network("disk/whole")

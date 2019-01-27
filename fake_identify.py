@@ -170,6 +170,18 @@ class Are_you_IRA(object):
     def fuck(self, ht):
         return ht in self.IRA_user_set
 
+    def find_IRA_tweets(self):
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+                        usecols=["tweetid", "userid"], dtype=str)
+        with open("data/IRA-tweets-in-SQLite.json", "w") as f:
+            for _, row in tqdm(IRA_info.iterrows()):
+                tweetid = row["tweetid"]
+                uid = row["userid"]
+
+                d = find_tweet(tweetid)
+                if d:
+                    f.write("{},{}\n".format(tweetid, uid))
+
     def cal_IRA_map(self):
         data = []
         for line in open("data/IRA-(re)tweets-in-SQLite.json"):
@@ -190,7 +202,7 @@ class Are_you_IRA(object):
                     d["IRA_userid"] = uid
                     data.append(d)
                     f.write(json.dumps(d, ensure_ascii=False) + "\n")
-
+``
                 if type(retweet_id) == str:
                     d = find_tweet(retweet_id)
                     if d:
@@ -220,7 +232,8 @@ if __name__ == "__main__":
     # who = Who_is_fake()
     # print(who.identify("baidu.com"))
     putin = Are_you_IRA()
+    putin.find_IRA_tweets()
     # putin.cal_IRA_map()
-    print(putin._map)
+    # print(putin._map)
 
 
