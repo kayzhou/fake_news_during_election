@@ -47,7 +47,7 @@ lda = LdaModel(corpus, num_topics=10)
 # print(dictionary.doc2bow(texts[0]))
 # print(lda[dictionary.doc2bow(texts[0])])
 
-temp_file = datapath("model/topic.model")
+temp_file = datapath("model")
 lda.save(temp_file)
 
 
