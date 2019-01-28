@@ -97,6 +97,7 @@ class ALL_TWEET(object):
                 '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
             for previous_d in c.fetchall():
                 previous_id = str(previous_d[0])
+                print(previous_id)
                 retweet_link[str(_id)] = previous_d
 
         conn.close()
@@ -180,11 +181,11 @@ class ALL_TWEET(object):
     def fill_retweets(self):
         print("扩展转发处理中 ...")
         tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
-        retweets_links = json.load(open("disk/all_retweet_network.json"))
+        retweets_links = json.load(open("data/all_retweet_network.json"))
 
-        for tweet_id, retweetd_id in tqdm(retweets_links.items()):
-            tweetid, origin_tweetid = str(tweet_id), str(retweetd_id)
-
+        for tweet_id, origin_tweetid in tqdm(retweets_links.items()):
+            tweet_id = str(tweet_id)
+            origin_tweetid = str(origin_tweetid)
             # tweetid 一定是转发的！
 
             # 新扩展进来的
@@ -538,7 +539,7 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         # self.find_all_tweets()
-        # self.find_links()
+        self.find_links()
 
         self.fill_tweets()
         self.fill_retweets()

@@ -142,58 +142,6 @@ def find_tweets(tweet_ids):
     return new_ds
 
 
-def find_tweets_text():
-
-    new_ds = []
-
-    conn1 = sqlite3.connect(DB1_NAME)
-    conn2 = sqlite3.connect(DB2_NAME)
-    c1 = conn1.cursor()
-    c2 = conn2.cursor()
-
-    for _id in tweet_ids:
-        new_d = {}
-        c1.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
-        d = c1.fetchone()
-
-        if d:
-            col_name = [t[0] for t in c1.description]
-            for k, v in zip(col_name, d):
-                new_d[k] = v
-        else:
-            c2.execute('''SELECT * FROM tweet WHERE tweet_id=={}'''.format(_id))
-            d = c2.fetchone()
-            if d:
-                col_name = [t[0] for t in c2.description]
-                for k, v in zip(col_name, d):
-                    new_d[k] = v
-
-        if not new_d:
-            c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-            d = c1.fetchone()
-            if d:
-                col_name = [t[0] for t in c1.description]
-                for k, v in zip(col_name, d):
-                    new_d[k] = v
-
-            else:
-                c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
-                d = c2.fetchone()
-                if d:
-                    col_name = [t[0] for t in c2.description]
-                    for k, v in zip(col_name, d):
-                        new_d[k] = v
-
-        if not new_d:
-            new_d = {"tweet_id": _id, "error": "not found"}
-
-        new_ds.append(new_d)
-
-    conn2.close()
-    conn1.close()
-    return new_ds
-
-
 def find_tweets_by_users(uids):
     """
     通过用户id找到与之相关的全部tweets
