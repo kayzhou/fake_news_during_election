@@ -270,7 +270,7 @@ class ALL_TWEET(object):
         # 半路出家
         if not self.tweets:
             self.load_all_tweets()
-            for _, tweet in self.tweets_csv.iterrows():
+            for _, tweet in tqdm(self.tweets_csv.iterrows()):
                 tweet = tweet.to_dict()
                 url_timeseries[tweet["URL"]].append(tweet)
                 url_type[tweet["URL"]] = tweet["media_type"]
@@ -296,6 +296,8 @@ class ALL_TWEET(object):
             for i, _tweet in enumerate(sorted_tweets_list):
                 if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
+                    if sorted_tweets_list[0]["is_source"] != 1:
+                        cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
