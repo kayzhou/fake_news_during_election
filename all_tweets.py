@@ -515,8 +515,8 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
-        # self.make_graph_for_CI()
+        self.make_users()
+        self.make_graph_for_CI()
 
 
 if __name__ == "__main__":
