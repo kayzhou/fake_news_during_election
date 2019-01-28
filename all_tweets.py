@@ -440,10 +440,9 @@ class ALL_TWEET(object):
 
     def make_graph_for_CI(self):
 
-        if not self.tweets_csv:
-            self.load_all_tweets()
-            all_tweets = self.tweets_csv
-            print("loaded all tweets!")
+        self.load_all_tweets()
+        all_tweets = self.tweets_csv
+        print("loaded all tweets!")
 
         self.load_retweet_network()
         print("loaded retweet network!")
