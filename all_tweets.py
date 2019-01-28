@@ -282,7 +282,7 @@ class ALL_TWEET(object):
                 if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
                     if sorted_tweets_list[0]["is_source"] != 1:
-                        print("fatal error, please check! tweet_id =", sorted_tweets_list[0]["tweet_id"])
+                        # print("fatal error, please check! tweet_id =", sorted_tweets_list[0]["tweet_id"])
                         cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
@@ -296,7 +296,7 @@ class ALL_TWEET(object):
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
-        print(len(self.tweets_csv))
+        # print(len(self.tweets_csv))
 
         # saving!
         self.save_csv()
