@@ -213,6 +213,15 @@ class ALL_TWEET(object):
             if self.tweets[tweetid]["retweeted_id"] == -1:
                 self.tweets[tweetid]["retweeted_id"] = 0
 
+
+        # fix URL
+        for tweetid in self.tweets.keys():
+            ret_id = self.tweets[tweetid]["retweetd_id"]
+            if ret_id != 0:
+                self.tweets[tweetid]["URL"] = self.tweets[ret_id]["URL"]
+                self.tweets[tweetid]["media_type"] = self.tweets[ret_id]["media_type"]
+
+
     def fill_IRA_info(self):
         putin = Are_you_IRA()
         print("补充IRA数据处理中 ...")
@@ -256,9 +265,9 @@ class ALL_TWEET(object):
         url_type = {}
         url_timeseries = defaultdict(list)
 
-        # if not self.tweets:
-        #     # 半路出家
-        #     self.tweets = self.load_all_tweets()
+        if not self.tweets:
+            # 半路出家
+            self.tweets = self.load_all_tweets()
 
         print("count of tweets:", len(self.tweets))
 
@@ -266,6 +275,7 @@ class ALL_TWEET(object):
         for _, tweet in tqdm(self.tweets.items()):
             url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
+
 
         # 涉及到url的tweets数量排序
         sorted_url = sorted(url_timeseries.items(),
@@ -281,9 +291,6 @@ class ALL_TWEET(object):
             for i, _tweet in enumerate(sorted_tweets_list):
                 if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
-                    if sorted_tweets_list[0]["is_source"] != 1:
-                        # print("fatal error, please check! tweet_id =", sorted_tweets_list[0]["tweet_id"])
-                        cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
@@ -323,8 +330,7 @@ class ALL_TWEET(object):
             data_group[media_type].append(d)
 
         for i in range(8):
-            print("saving url_ts ...")
-            print(type(data_group[i]))
+            print("saving url_ts ...", i)
             json.dump(data_group[i], open(
                 "disk/url_ts_media_{}.json".format(i), "w"), ensure_ascii=False, indent=1)
 
@@ -507,8 +513,8 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
-        self.make_graph_for_CI()
+        # self.make_users()
+        # self.make_graph_for_CI()
 
 
 if __name__ == "__main__":
