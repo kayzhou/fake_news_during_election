@@ -91,6 +91,14 @@ class ALL_TWEET(object):
             for next_d in c.fetchall():
                 next_id = str(next_d[0])
                 retweet_link[next_id] = str(_id)
+
+            # 我转发了谁？
+            c.execute(
+                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+            for previous_d in c.fetchall():
+                previous_id = str(previous_d[0])
+                retweet_link[str(_id)] = previous_d
+
         conn.close()
 
         # 下一个！
@@ -105,6 +113,14 @@ class ALL_TWEET(object):
             for next_d in c.fetchall():
                 next_id = str(next_d[0])
                 retweet_link[next_id] = str(_id)
+
+            # 我转发了谁？
+            c.execute(
+                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+            for previous_d in c.fetchall():
+                previous_id = str(previous_d[0])
+                retweet_link[str(_id)] = previous_d
+
         conn.close()
 
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
@@ -304,15 +320,12 @@ class ALL_TWEET(object):
             url = v[0]
             tweet_list = v[1]
             # 有可能存在2000-01-01 00:00:00
-            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["dt"])
-            is_first_marked = False
-
+            sorted_tweets_list = sorted(tweet_list, key=lambda d: d["tweet_id"])
             for i, _tweet in enumerate(sorted_tweets_list):
-                if _tweet["dt"] == "2000-01-01 00:00:00":
-                    sorted_tweets_list[i]["is_first"] = 0
-                elif sorted_tweets_list[i]["is_source"] == 1 and not is_first_marked:
+                if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
-                    is_first_marked = True
+                    if sorted_tweets_list[0]["is_source"] != 1:
+                        print("fatal error, please check!, tweet_id =", sorted_tweets_list[0]["tweet_id"])
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
@@ -525,20 +538,20 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         # self.find_all_tweets()
-        # self.find_links()
+        self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
-        # self.convert_url_timeseries()
+        self.convert_url_timeseries()
 
         # 保存，已经放在covert里面
         # self.save_url_ts() # too large file
         # self.save_csv()
 
-        # self.make_users()
+        self.make_users()
         self.make_graph_for_CI()
 
 
