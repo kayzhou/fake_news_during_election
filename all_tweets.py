@@ -87,17 +87,17 @@ class ALL_TWEET(object):
         for _id in tqdm(tweets_ids):
             # 找到谁转发了我？
             c.execute(
-                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', (_id))
             for next_d in c.fetchall():
                 next_id = str(next_d[0])
                 retweet_link[next_id] = str(_id)
 
             # 我转发了谁？
             c.execute(
-                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', (_id))
             for previous_d in c.fetchall():
                 previous_id = str(previous_d[0])
-                print(previous_id)
+                print(type(previous_id))
                 retweet_link[str(_id)] = previous_d
 
         conn.close()
@@ -110,19 +110,21 @@ class ALL_TWEET(object):
         for _id in tqdm(tweets_ids):
             # 找到谁转发了我？
             c.execute(
-                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={};'''.format(_id))
+                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', (_id))
             for next_d in c.fetchall():
                 next_id = str(next_d[0])
                 retweet_link[next_id] = str(_id)
 
             # 我转发了谁？
             c.execute(
-                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={};'''.format(_id))
+                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', (_id))
             for previous_d in c.fetchall():
                 previous_id = str(previous_d[0])
+                print(type(previous_id))
                 retweet_link[str(_id)] = previous_d
 
         conn.close()
+
 
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                                usecols=["tweetid", "retweet_tweetid"], dtype=str)
