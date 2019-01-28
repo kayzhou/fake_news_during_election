@@ -20,7 +20,7 @@ def find_tweet(_id):
 
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
+    c1.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (_id))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -33,7 +33,7 @@ def find_tweet(_id):
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
+        c2.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (_id))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
@@ -57,7 +57,7 @@ def find_retweeted(_id):
 
     conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (_id))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -71,7 +71,7 @@ def find_retweeted(_id):
     else:
         conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
+        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (_id))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
