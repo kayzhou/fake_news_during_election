@@ -172,14 +172,14 @@ def find_retweet_network(tweets_ids):
     for _id in tqdm(tweets_ids):
         # 找到谁转发了我？
         c.execute(
-            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', int(_id))
+            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id={}'''.format(_id))
         for next_d in c.fetchall():
             next_id = str(next_d[0])
             retweet_link[next_id] = str(_id)
 
         # 我转发了谁？
         c.execute(
-            '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', int(_id))
+            '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id={}'''.format(_id))
         for previous_d in c.fetchall():
             # print(type(previous_d[0]))
             previous_id = str(previous_d[0])

@@ -139,9 +139,7 @@ class ALL_TWEET(object):
         tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
         retweets_links = json.load(open("data/all_retweet_network.json"))
 
-        for tweet_id, origin_tweetid in tqdm(retweets_links.items()):
-            tweet_id = str(tweet_id)
-            origin_tweetid = str(origin_tweetid)
+        for tweetid, origin_tweetid in tqdm(retweets_links.items()):
             # tweetid 一定是转发的！
 
             # 新扩展进来的
