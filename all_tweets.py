@@ -503,9 +503,8 @@ class ALL_TWEET(object):
 
         # 补充is_first
         self.convert_url_timeseries()
-
         # 保存，已经放在covert里面
-        # self.save_url_ts() # too large file
+        # self.save_url_ts()
         # self.save_csv()
 
         self.make_users()
