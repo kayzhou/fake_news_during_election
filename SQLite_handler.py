@@ -159,8 +159,8 @@ def find_retweet_network(tweets_ids):
         c.execute(
             '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', int(_id))
         for previous_d in c.fetchall():
+            print(type(previous_d))
             previous_id = str(previous_d[0])
-            print(type(previous_id))
             retweet_link[str(_id)] = previous_d
 
     conn.close()
@@ -181,8 +181,8 @@ def find_retweet_network(tweets_ids):
         c.execute(
             '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', int(_id))
         for previous_d in c.fetchall():
+            print(type(previous_d))
             previous_id = str(previous_d[0])
-            print(type(previous_id))
             retweet_link[str(_id)] = previous_d
 
     conn.close()
