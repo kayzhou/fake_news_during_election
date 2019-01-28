@@ -182,6 +182,19 @@ class Are_you_IRA(object):
                 if d:
                     f.write("{},{}\n".format(tweetid, uid))
 
+    def find_IRA_retweets(self):
+        IRA_info = pd.read_csv("data/ira_retweets_csv_hashed.csv",
+                        usecols=["retweet_tweetid", "retweet_userid"], dtype=str)
+        with open("data/IRA-tweets-in-SQLite.json", "w") as f:
+            for _, row in tqdm(IRA_info.iterrows()):
+                tweetid = row["retweet_tweetid"]
+                uid = row["retweet_userid"]
+                if type(tweetid) == str:
+                    d = find_tweet(tweetid)
+                    if d:
+                        f.write("{},{}\n".format(tweetid, uid))
+
+
     def cal_IRA_map(self):
         data = []
         for line in open("data/IRA-(re)tweets-in-SQLite.json"):
