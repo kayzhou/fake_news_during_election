@@ -159,8 +159,6 @@ class ALL_TWEET(object):
                 d = {}
                 if tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[tweetid]
-                    if not d:
-                        del tweets_from_SQL[tweetid]
                 else:
                     d = find_tweet(tweetid)
                 if d:
@@ -172,6 +170,7 @@ class ALL_TWEET(object):
             # 原来就存在
             else:
                 self.tweets[tweetid]["is_source"] = 0
+                self.tweets[tweetid]["is_first"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
             # 原始的不在里面，只可能是IRA-tweets里面发现的。但是我不知道详细的信息，所以这里暂时不需要 ???
@@ -191,11 +190,8 @@ class ALL_TWEET(object):
                 d = {}
                 if origin_tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[origin_tweetid]
-                    if not d:
-                        del tweets_from_SQL[origin_tweetid]
                 else:
                     d = find_tweet(origin_tweetid)
-
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
@@ -233,10 +229,12 @@ class ALL_TWEET(object):
                     uid = str(putin._map[uid])
 
                 self.tweets[tweetid]["is_IRA"] = 1
-                self.tweets[tweetid]["user_id"] = uid
 
+                if self.tweets[tweetid]["user_id"] == -1:
+                    self.tweets[tweetid]["user_id"] = uid
                 if self.tweets[tweetid]["dt"] == "2000-01-01 00:00:00":
                     self.tweets[tweetid]["dt"] = row["tweet_time"] + ":00"
+
                 cnt += 1
 
             if retweet_id in self.tweets:
@@ -258,14 +256,14 @@ class ALL_TWEET(object):
         url_type = {}
         url_timeseries = defaultdict(list)
 
-        if not self.tweets:
-            # 半路出家
-            self.tweets = self.load_all_tweets()
+        # if not self.tweets:
+        #     # 半路出家
+        #     self.tweets = self.load_all_tweets()
 
         print("count of tweets:", len(self.tweets))
 
         # 一气呵成
-        for tweet_id, tweet in tqdm(self.tweets.items()):
+        for _, tweet in tqdm(self.tweets.items()):
             url_timeseries[tweet["URL"]].append(tweet)
             url_type[tweet["URL"]] = tweet["media_type"]
 
@@ -273,7 +271,8 @@ class ALL_TWEET(object):
         sorted_url = sorted(url_timeseries.items(),
                             key=lambda d: len(d[1]), reverse=True)
 
-        # For first
+        cnt = 0
+        # find first
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
@@ -283,13 +282,14 @@ class ALL_TWEET(object):
                 if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
                     if sorted_tweets_list[0]["is_source"] != 1:
-                        print("fatal error, please check!, tweet_id =", sorted_tweets_list[0]["tweet_id"])
+                        print("fatal error, please check! tweet_id =", sorted_tweets_list[0]["tweet_id"])
+                        cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
 
             self.url_timeseries.append(
                 {"URL": url, "media_type": url_type[url], "tweets": sorted_tweets_list})
-        print("convert ts finished!")
+        print("convert ts finished! error:", cnt)
 
         # for csv
         if not self.tweets_csv:
