@@ -215,8 +215,9 @@ class ALL_TWEET(object):
 
 
         # fix URL
+        print("fixing URL ...")
         for tweetid in self.tweets.keys():
-            ret_id = self.tweets[tweetid]["retweetd_id"]
+            ret_id = self.tweets[tweetid]["retweeted_id"]
             if ret_id != 0:
                 self.tweets[tweetid]["URL"] = self.tweets[ret_id]["URL"]
                 self.tweets[tweetid]["media_type"] = self.tweets[ret_id]["media_type"]
