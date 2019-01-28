@@ -269,9 +269,8 @@ class ALL_TWEET(object):
 
         # 半路出家
         if not self.tweets:
-
-            self.tweets = self.load_all_tweets()
-            for _, tweet in self.tweets.iterrows():
+            self.load_all_tweets()
+            for _, tweet in self.tweets_csv.iterrows():
                 tweet = tweet.to_dict()
                 url_timeseries[tweet["URL"]].append(tweet)
                 url_type[tweet["URL"]] = tweet["media_type"]
@@ -309,10 +308,9 @@ class ALL_TWEET(object):
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
-        # print(len(self.tweets_csv))
+            self.save_csv()
 
         # saving!
-        self.save_csv()
         self.save_url_ts()
 
     # -- save -- #
@@ -349,11 +347,12 @@ class ALL_TWEET(object):
         self.retweet_network = r_net
 
     def load_all_tweets(self):
+        print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
-        all_tweets = all_tweets.astype(
+        self.tweets_csv = all_tweets.astype(
             {"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
-        self.tweets_csv = all_tweets
-        return all_tweets
+        print("finished!")
+        return self.tweets_csv
 
     def make_users(self):
         self.load_all_tweets()
