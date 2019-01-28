@@ -267,16 +267,20 @@ class ALL_TWEET(object):
         url_type = {}
         url_timeseries = defaultdict(list)
 
+        # 半路出家
         if not self.tweets:
-            # 半路出家
-            self.tweets = self.load_all_tweets()
 
-        print("count of tweets:", len(self.tweets))
+            self.tweets = self.load_all_tweets()
+            for _, tweet in self.tweets.iterrows():
+                tweet = tweet.to_dict()
+                url_timeseries[tweet["URL"]].append(tweet)
+                url_type[tweet["URL"]] = tweet["media_type"]
 
         # 一气呵成
-        for _, tweet in tqdm(self.tweets.items()):
-            url_timeseries[tweet["URL"]].append(tweet)
-            url_type[tweet["URL"]] = tweet["media_type"]
+        else:
+            for _, tweet in tqdm(self.tweets.items()):
+                url_timeseries[tweet["URL"]].append(tweet)
+                url_type[tweet["URL"]] = tweet["media_type"]
 
 
         # 涉及到url的tweets数量排序
