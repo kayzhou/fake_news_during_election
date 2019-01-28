@@ -183,9 +183,9 @@ class Are_you_IRA(object):
                     f.write("{},{}\n".format(tweetid, uid))
 
     def find_IRA_retweets(self):
-        IRA_info = pd.read_csv("data/ira_retweets_csv_hashed.csv",
+        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                         usecols=["retweet_tweetid", "retweet_userid"], dtype=str)
-        with open("data/IRA-tweets-in-SQLite.json", "w") as f:
+        with open("data/IRA-retweets-in-SQLite.json", "w") as f:
             for _, row in tqdm(IRA_info.iterrows()):
                 tweetid = row["retweet_tweetid"]
                 uid = row["retweet_userid"]
@@ -245,6 +245,7 @@ if __name__ == "__main__":
     # who = Who_is_fake()
     # print(who.identify("baidu.com"))
     putin = Are_you_IRA()
+    putin.find_IRA_retweets()
     putin.find_IRA_tweets()
     # putin.cal_IRA_map()
     # print(putin._map)
