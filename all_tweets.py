@@ -218,7 +218,7 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_source"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
-            # 原始的不在里面，只可能是IRA-tweets里面发现的。但是我不知道详细的信息，所以这里暂时不需要
+            # 原始的不在里面，只可能是IRA-tweets里面发现的。但是我不知道详细的信息，所以这里暂时不需要 ???
             if origin_tweetid not in self.tweets:
                 tweet = {
                     "tweet_id": origin_tweetid,
@@ -538,7 +538,7 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         # self.find_all_tweets()
-        self.find_links()
+        # self.find_links()
 
         self.fill_tweets()
         self.fill_retweets()
