@@ -340,28 +340,6 @@ class ALL_TWEET(object):
         print("*.csv文件保存中 ...")
         pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
-    # def save_network(self):
-    #     tweets_csv = pd.read_csv("data/all-tweets.csv")
-    #     retweet_network = json.load(open("disk/all_retweet_network.json"))
-    #     G = nx.DiGraph()
-
-    #     nodes = tweets_csv["user_id"].tolist()
-    #     edges = []
-    #     dict_tweetid_userid = {}
-    #     for _, row in tweets_csv.iterrows():
-    #         dict_tweetid_userid[row["tweet_id"]] = row["user_id"]
-
-    #     for n2, n1 in retweet_network.items():
-    #         u1 = dict_tweetid_userid[n1]
-    #         u2 = dict_tweetid_userid[n2]
-    #         edges.append((u1, u2))
-
-    #     print("add nodes from ...")
-    #     G.add_nodes_from(nodes)
-    #     print("add edge from ...")
-    #     G.add_edges_from(edges)
-    #     nx.write_gpickle(G, "data/fake_network.gpickle")
-
     def load_retweet_network(self):
         r_net = json.load(open("disk/all_retweet_network.json"))
         self.retweet_network = r_net
@@ -498,7 +476,7 @@ class ALL_TWEET(object):
             print(_type, "...")
             tweets = all_tweets[all_tweets["media_type"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "disk/network_{}.gpickle".format(f_label))
+                            "disk/network/network_{}.gpickle".format(f_label))
 
     def run(self):
         # 找数据
