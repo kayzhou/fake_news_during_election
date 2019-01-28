@@ -135,7 +135,7 @@ class ALL_TWEET(object):
                 retweet_link[tid] = re_tid
 
         print("saving retweet network ...")
-        json.dump(retweet_link, open("disk/all_retweet_network.json",
+        json.dump(retweet_link, open("data/all_retweet_network.json",
                                      "w"), ensure_ascii=False, indent=2)
 
     def fill_tweets(self):
