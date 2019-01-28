@@ -11,6 +11,9 @@ import pendulum
 import json
 from collections import defaultdict
 
+DB1_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite"
+DB2_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite"
+
 
 def find_tweet(_id):
     """
@@ -18,9 +21,9 @@ def find_tweet(_id):
     """
     new_d = {}
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (_id))
+    c1.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (int(_id)))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -31,9 +34,9 @@ def find_tweet(_id):
         return new_d
 
     else:
-        conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        conn2 = sqlite3.connect(DB2_NAME)
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (_id))
+        c2.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (int(_id)))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
@@ -55,9 +58,9 @@ def find_tweet(_id):
 def find_retweeted(_id):
     new_d = {}
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (_id))
+    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (int(_id)))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -69,9 +72,9 @@ def find_retweeted(_id):
         return new_d
 
     else:
-        conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        conn2 = sqlite3.connect(DB2_NAME)
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (_id))
+        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (int(_id)))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
@@ -91,8 +94,8 @@ def find_tweets(tweet_ids):
 
     new_ds = []
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -143,8 +146,8 @@ def find_tweets_text():
 
     new_ds = []
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -196,8 +199,8 @@ def find_tweets_by_users(uids):
     通过用户id找到与之相关的全部tweets
     """
     dict_uids_tweetids = defaultdict(list)
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -226,14 +229,14 @@ def find_all_uids():
     '''
     uids = []
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
     c1.execute('''SELECT user_id FROM user''')
     for d in c1.fetchall():
         uids.append(str(d[0]))
     conn1.close()
 
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn2 = sqlite3.connect(DB2_NAME)
     c2 = conn2.cursor()
     c2.execute('''SELECT user_id FROM user''')
     for d in c2.fetchall():
@@ -246,8 +249,8 @@ def find_all_uids():
 def find_users(uids):
     new_ds = []
 
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -299,8 +302,8 @@ def find_users_from_large(uids):
 
 
 def find_original_tweetid(_id):
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
@@ -358,9 +361,9 @@ def find_source(tweet_ids):
 
 def find_source_name(from_db, _id):
     if from_db == "1":
-        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+        conn = sqlite3.connect(DB1_NAME)
     elif from_db == "2":
-        conn = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+        conn = sqlite3.connect(DB2_NAME)
     else:
         return "error"
 
@@ -426,8 +429,8 @@ def get_hashtag_tweet_user():
     """
     获取训练数据
     """
-    conn1 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-    conn2 = sqlite3.connect("/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
