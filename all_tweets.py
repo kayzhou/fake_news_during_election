@@ -78,7 +78,7 @@ class ALL_TWEET(object):
 
         tweets_ids = set(self.tweet_ids)
         print("目前所有tweets的量", len(tweets_ids))
-        retweet_link = find_retweet_network(tweet_ids)
+        retweet_link = find_retweet_network(tweets_ids)
 
         # IRA
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
