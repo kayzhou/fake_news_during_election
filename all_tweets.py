@@ -156,10 +156,11 @@ class ALL_TWEET(object):
                     "media_type": self.tweets[origin_tweetid]["media_type"],
                     "retweeted_id": origin_tweetid
                 }
+                d = {}
                 if tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[tweetid]
                     if not d:
-                        print("fatal error!")
+                        del tweets_from_SQL[tweetid]
                 else:
                     d = find_tweet(tweetid)
                 if d:
@@ -187,12 +188,14 @@ class ALL_TWEET(object):
                     "media_type": self.tweets[tweetid]["media_type"],
                     "retweeted_id": 0
                 }
+                d = {}
                 if origin_tweetid in tweets_from_SQL:
                     d = tweets_from_SQL[origin_tweetid]
                     if not d:
-                        print("fatal error!")
+                        del tweets_from_SQL[origin_tweetid]
                 else:
                     d = find_tweet(origin_tweetid)
+
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
