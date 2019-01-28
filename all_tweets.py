@@ -203,8 +203,9 @@ class ALL_TWEET(object):
                 self.tweets[origin_tweetid]["is_source"] = 1
                 self.tweets[origin_tweetid]["retweeted_id"] = 0
 
-        json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
-                                        "w"), indent=2, ensure_ascii=False)
+        print("saving tweets_from_SQL ...")
+        # json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
+        #                                 "w"), indent=2, ensure_ascii=False)
 
         # 什么是source？没有转发别人的！其他的全部为源！
         for tweetid in self.tweets.keys():
