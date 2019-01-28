@@ -11,7 +11,7 @@ from datetime import datetime
 import graph_tool.all as gt
 from fake_identify import Are_you_IRA, Who_is_fake
 from my_weapon import *
-from SQLite_handler import find_tweet
+from SQLite_handler import find_tweet, find_retweet_network
 
 
 class ALL_TWEET(object):
@@ -78,61 +78,15 @@ class ALL_TWEET(object):
 
         tweets_ids = set(self.tweet_ids)
         print("目前所有tweets的量", len(tweets_ids))
-        retweet_link = {}
+        retweet_link = find_retweet_network(tweet_ids)
 
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-        c = conn.cursor()
-
-        for _id in tqdm(tweets_ids):
-            # 找到谁转发了我？
-            c.execute(
-                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', (_id))
-            for next_d in c.fetchall():
-                next_id = str(next_d[0])
-                retweet_link[next_id] = str(_id)
-
-            # 我转发了谁？
-            c.execute(
-                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', (_id))
-            for previous_d in c.fetchall():
-                previous_id = str(previous_d[0])
-                print(type(previous_id))
-                retweet_link[str(_id)] = previous_d
-
-        conn.close()
-
-        # 下一个！
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-        c = conn.cursor()
-
-        for _id in tqdm(tweets_ids):
-            # 找到谁转发了我？
-            c.execute(
-                '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', (_id))
-            for next_d in c.fetchall():
-                next_id = str(next_d[0])
-                retweet_link[next_id] = str(_id)
-
-            # 我转发了谁？
-            c.execute(
-                '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', (_id))
-            for previous_d in c.fetchall():
-                previous_id = str(previous_d[0])
-                print(type(previous_id))
-                retweet_link[str(_id)] = previous_d
-
-        conn.close()
-
-
+        # IRA
         data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
                                usecols=["tweetid", "retweet_tweetid"], dtype=str)
         data_ira = data_ira.dropna()
         for _, row in data_ira.iterrows():
             tid = row["tweetid"]
             re_tid = row["retweet_tweetid"]
-            # 寻找双向
             if tid in tweets_ids or re_tid in tweets_ids:
                 retweet_link[tid] = re_tid
 

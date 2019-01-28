@@ -142,6 +142,52 @@ def find_tweets(tweet_ids):
     return new_ds
 
 
+def find_retweet_network(tweets_ids):
+    retweet_link = {}
+    conn = sqlite3.connect(DB1_NAME)
+    c = conn.cursor()
+
+    for _id in tqdm(tweets_ids):
+        # 找到谁转发了我？
+        c.execute(
+            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', int(_id))
+        for next_d in c.fetchall():
+            next_id = str(next_d[0])
+            retweet_link[next_id] = str(_id)
+
+        # 我转发了谁？
+        c.execute(
+            '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', int(_id))
+        for previous_d in c.fetchall():
+            previous_id = str(previous_d[0])
+            print(type(previous_id))
+            retweet_link[str(_id)] = previous_d
+
+    conn.close()
+
+    # 下一个！
+    conn = sqlite3.connect(DB2_NAME)
+    c = conn.cursor()
+
+    for _id in tqdm(tweets_ids):
+        # 找到谁转发了我？
+        c.execute(
+            '''SELECT tweet_id FROM tweet_to_retweeted_uid WHERE retweet_id=?''', int(_id))
+        for next_d in c.fetchall():
+            next_id = str(next_d[0])
+            retweet_link[next_id] = str(_id)
+
+        # 我转发了谁？
+        c.execute(
+            '''SELECT retweet_id FROM tweet_to_retweeted_uid WHERE tweet_id=?''', int(_id))
+        for previous_d in c.fetchall():
+            previous_id = str(previous_d[0])
+            print(type(previous_id))
+            retweet_link[str(_id)] = previous_d
+
+    conn.close()
+    return retweet_link
+
 def find_tweets_by_users(uids):
     """
     通过用户id找到与之相关的全部tweets
