@@ -23,7 +23,7 @@ def find_tweet(_id):
 
     conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (int(_id)))
+    c1.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -36,7 +36,7 @@ def find_tweet(_id):
     else:
         conn2 = sqlite3.connect(DB2_NAME)
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM tweet WHERE tweet_id=?''', (int(_id)))
+        c2.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
@@ -60,7 +60,7 @@ def find_retweeted(_id):
 
     conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
-    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (int(_id)))
+    c1.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
     d = c1.fetchone()
     if d:
         col_name = [t[0] for t in c1.description]
@@ -74,7 +74,7 @@ def find_retweeted(_id):
     else:
         conn2 = sqlite3.connect(DB2_NAME)
         c2 = conn2.cursor()
-        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id=?''', (int(_id)))
+        c2.execute('''SELECT * FROM retweeted_status WHERE tweet_id={}'''.format(_id))
         d = c2.fetchone()
         if d:
             col_name = [t[0] for t in c2.description]
@@ -133,7 +133,7 @@ def find_tweets(tweet_ids):
                         new_d[k] = v
 
         if not new_d:
-            new_d = {"tweet_id": _id, "error": "not found"}
+            new_d = {"tweet_id": _id, "error": 1}
 
         new_ds.append(new_d)
 
