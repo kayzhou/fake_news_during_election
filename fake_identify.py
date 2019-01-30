@@ -182,22 +182,27 @@ class Are_you_IRA(object):
         #         if d:
         #             f.write("{},{}\n".format(tweetid, uid))
         with open("data/IRA-tweets-in-SQLite-v2.json", "w") as f:
-            for line in open("data/IRA-tweets-in-SQLite.json"):
+            for line in tqdm(open("data/IRA-tweets-in-SQLite.json")):
                 tid, uid = line.strip().split(",")
                 real_uid = str(find_tweet(tid)["user_id"])
-                f.write("{},{}\n".format(tid, real_uid, uid))
+                f.write("{},{},{}\n".format(tid, real_uid, uid))
 
     def find_IRA_retweets(self):
-        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
-                        usecols=["retweet_tweetid", "retweet_userid"], dtype=str)
-        with open("data/IRA-retweets-in-SQLite.json", "w") as f:
-            for _, row in tqdm(IRA_info.iterrows()):
-                tweetid = row["retweet_tweetid"]
-                uid = row["retweet_userid"]
-                if type(tweetid) == str:
-                    d = find_tweet(tweetid)
-                    if d:
-                        f.write("{},{}\n".format(tweetid, uid))
+        # IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+        #                 usecols=["retweet_tweetid", "retweet_userid"], dtype=str)
+        # with open("data/IRA-retweets-in-SQLite.json", "w") as f:
+        #     for _, row in tqdm(IRA_info.iterrows()):
+        #         tweetid = row["retweet_tweetid"]
+        #         uid = row["retweet_userid"]
+        #         if type(tweetid) == str:
+        #             d = find_tweet(tweetid)
+        #             if d:
+        #                 f.write("{},{}\n".format(tweetid, uid))
+        with open("data/IRA-retweets-in-SQLite-v2.json", "w") as f:
+            for line in tqdm(open("data/IRA-retweets-in-SQLite.json")):
+                tid, uid = line.strip().split(",")
+                real_uid = str(find_tweet(tid)["user_id"])
+                f.write("{},{},{}\n".format(tid, real_uid, uid))
 
 
     def cal_IRA_map(self):
@@ -250,7 +255,7 @@ if __name__ == "__main__":
     # who = Who_is_fake()
     # print(who.identify("baidu.com"))
     putin = Are_you_IRA()
-    # putin.find_IRA_retweets()
+    putin.find_IRA_retweets()
     putin.find_IRA_tweets()
     # putin.cal_IRA_map()
     # print(putin._map)
