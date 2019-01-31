@@ -267,6 +267,8 @@ class ALL_TWEET(object):
         url_type = {}
         url_timeseries = defaultdict(list)
 
+        shit = False
+
         # 半路出家
         if not self.tweets:
             self.load_all_tweets()
@@ -278,6 +280,7 @@ class ALL_TWEET(object):
         # 一气呵成
         else:
             for _, tweet in tqdm(self.tweets.items()):
+                shit = True
                 url_timeseries[tweet["URL"]].append(tweet)
                 url_type[tweet["URL"]] = tweet["media_type"]
 
@@ -306,7 +309,8 @@ class ALL_TWEET(object):
         print("convert ts finished! error:", cnt)
 
         # for csv
-        if not self.tweets_csv:
+        if shit:
+            self.tweets_csv = []
             for url_ts in self.url_timeseries:
                 for tweet in url_ts["tweets"]:
                     self.tweets_csv.append(tweet)
@@ -345,7 +349,7 @@ class ALL_TWEET(object):
         pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
     def load_retweet_network(self):
-        r_net = json.load(open("disk/all_retweet_network.json"))
+        r_net = json.load(open("data/all_retweet_network.json"))
         self.retweet_network = r_net
 
     def load_all_tweets(self):
@@ -481,7 +485,7 @@ class ALL_TWEET(object):
             print(_type, "...")
             tweets = all_tweets[all_tweets["media_type"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "disk/network/network_{}.gpickle".format(f_label))
+                            "disk/network_{}.gpickle".format(f_label))
 
     def run(self):
         # 找数据
@@ -493,7 +497,7 @@ class ALL_TWEET(object):
         # self.fill_IRA_info()
 
         # 补充is_first
-        self.convert_url_timeseries()
+        # self.convert_url_timeseries()
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()

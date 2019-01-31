@@ -595,14 +595,15 @@ if __name__ == "__main__":
         "7": "extreme bias (left)"
     }
 
-    # for _type, f_label in map_labels.items():
-    #     print(_type, "...")
-    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-    #     print("type(n) =", type(nt))
-    #     _gt = nx2gt(nt)
-    #     _gt.save("disk/network_{}.gt".format(f_label))
+    for _type, f_label in map_labels.items():
+        print(_type, "...")
+        nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+        print("type(n) =", type(nt))
+        _gt = nx2gt(nt)
+        _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA network
+    """
     putin = Are_you_IRA()
     ira_user_set = set()
     for uid in putin.IRA_user_set:
@@ -615,6 +616,7 @@ if __name__ == "__main__":
 
     get_all_network_by_user(ira_user_set, "data/network/ira")
     change_network("data/network/ira")
+    """
 
     # make_all_network("disk/whole")
     # change_network("disk/whole")
