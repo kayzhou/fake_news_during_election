@@ -490,7 +490,7 @@ class ALL_TWEET(object):
             print(_type, "...")
             tweets = all_tweets[all_tweets["media_type"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "disk/network_{}.gpickle".format(f_label))
+                            "data/network/network_{}.gpickle".format(f_label))
 
     def run(self):
         # 找数据
