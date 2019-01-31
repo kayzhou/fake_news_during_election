@@ -259,5 +259,3 @@ if __name__ == "__main__":
     putin.find_IRA_tweets()
     # putin.cal_IRA_map()
     # print(putin._map)
-
-
