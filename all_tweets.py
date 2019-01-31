@@ -111,6 +111,9 @@ class ALL_TWEET(object):
                 "media_type": d["media_type"],
                 "retweeted_id": -1
             }
+            if tweet["URL"].endswith("/"):
+                tweet["URL"] = tweet["URL"][:-1]
+
             self.tweets[str(d["tweet_id"])] = tweet
 
         cnt = 0
@@ -129,6 +132,8 @@ class ALL_TWEET(object):
                     "media_type": d["media_type"],
                     "retweeted_id": -1
                 }
+                if tweet["URL"].endswith("/"):
+                    tweet["URL"] = tweet["URL"][:-1]
                 self.tweets[str(d["tweetid"])] = tweet
             else:
                 cnt += 1
