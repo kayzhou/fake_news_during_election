@@ -492,14 +492,82 @@ class ALL_TWEET(object):
             save_network_nx(set(tweets.tweet_id),
                             "data/network/network_{}.gpickle".format(f_label))
 
+    def load_all_users(self):
+        print("Loading all users ...")
+        map_labels = {
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
+
+        users = pd.read_csv("data/all-users.csv", index_col="user_id", dtype={"user_id": str})
+
+        # change the type
+        f_labels = [map_labels[k] for k in map_labels]
+        users = users.astype({"is_IRA": int})
+
+        for label in f_labels:
+            users = users.astype({label: int, label + "_source": int, label + "_first": int, 
+                                label + "_source_rate": float, label + "_first_rate": float,
+                                label + "_first_source_rate": float,})
+        print("Finished!")
+        
+        return users
+
+
+    def for_fake_clique(self):
+        self.load_retweet_network()
+        self.load_all_tweets()
+ 
+
+        retweet_network = self.retweet_network
+        all_tweets = self.tweets_csv
+
+        all_users = self.load_all_tweets()
+
+        retweeted_count = defaultdict(int)
+
+        for k, v in retweet_network.items():
+            retweeted_count[v] += 1
+
+        dict_tweetid_userid = defaultdict(list)
+        for _, row in all_tweets.iterrows():
+            if row["media_type"] == "0":
+                dict_tweetid_userid[row["user_id"]].append(row["tweet_id"])
+
+        def get_num_of_retweets_for_user(uid):
+            """
+            uid作为源的次数及被转总次数
+            """
+            # print(uid)
+            tids = dict_tweetid_userid[uid]
+            num_of_retweets = [retweeted_count[tid] for tid in tids]
+            _sum = sum(num_of_retweets)
+            return len(tids), _sum
+
+        cnt = 0
+        with open("data/CI_clique.txt", "w") as f:
+            for uid in all_users.index:
+                cnt += 1
+                rst = get_num_of_retweeted_for_user(uid)
+                print(rst[0], rst[1], file=f, sep=",")
+                if cnt % 100 == 0:
+                    print(cnt)
+
+
     def run(self):
         # 找数据
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
 
         # 补充is_first
         # self.convert_url_timeseries()
@@ -507,8 +575,11 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
-        self.make_graph_for_CI()
+        # self.make_users()
+        # self.make_graph_for_CI()
+
+        # 2019-02-05 遵照Hernan的指示，增加实验
+        self.for_fake_clique()
 
 
 if __name__ == "__main__":
