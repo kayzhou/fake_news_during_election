@@ -554,7 +554,7 @@ class ALL_TWEET(object):
             for uid in tqdm(all_users.index):
                 cnt += 1
                 rst = get_num_of_retweets_for_user(uid)
-                print(rst[0], rst[1], file=f, sep=",")
+                print(uid, rst[0], rst[1], file=f, sep=",")
                 if cnt % 100 == 0:
                     print(cnt)
 

@@ -29,12 +29,12 @@ f = open("disk/all_texts.txt", "w")
 
 for d in tqdm(c.fetchall()):
     words = tokenizer.tokenize(d[0])
-    if words[0] == "RT":
+    if words[0] == "rt":
         continue
     f.write(" ".join(words) + "\n") 
 
 print("loaded!")
-# conn.close()
+conn.close()
 
 # dictionary = Dictionary(texts)
 # corpus = [dictionary.doc2bow(t) for t in texts]
@@ -47,7 +47,7 @@ c.execute('''SELECT text FROM tweet''')
 
 for d in tqdm(c.fetchall()):
     words = tokenizer.tokenize(d[0])
-    if words[0] == "RT":
+    if words[0] == "rt":
         continue
     f.write(" ".join(words) + "\n") 
 
