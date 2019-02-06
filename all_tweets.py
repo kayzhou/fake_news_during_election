@@ -524,11 +524,10 @@ class ALL_TWEET(object):
         self.load_retweet_network()
         self.load_all_tweets()
  
-
         retweet_network = self.retweet_network
         all_tweets = self.tweets_csv
 
-        all_users = self.load_all_tweets()
+        all_users = self.load_all_users()
 
         retweeted_count = defaultdict(int)
 
@@ -536,7 +535,7 @@ class ALL_TWEET(object):
             retweeted_count[v] += 1
 
         dict_tweetid_userid = defaultdict(list)
-        for _, row in all_tweets.iterrows():
+        for _, row in tqdm(all_tweets.iterrows()):
             if row["media_type"] == "0":
                 dict_tweetid_userid[row["user_id"]].append(row["tweet_id"])
 
