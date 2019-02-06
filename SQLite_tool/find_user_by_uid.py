@@ -76,7 +76,8 @@ for in_dir in in_dirs:
         for line in open(in_name):
             d = json.loads(line.strip())
             user = d["user"]
-            if user["id_str"] in target_uids:
-                uid_name[uid] = user["screen_name"]
+            id_str = user["id_str"]
+            if id_str in target_uids:
+                uid_name[id_str] = user["screen_name"]
 
 json.dump(uid_name, open("user_name.txt", "w"), indent=2)
