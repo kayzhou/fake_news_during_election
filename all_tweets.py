@@ -551,13 +551,12 @@ class ALL_TWEET(object):
 
         cnt = 0
         with open("data/CI_clique.txt", "w") as f:
-            for uid in all_users.index:
+            for uid in tqdm(all_users.index):
                 cnt += 1
-                rst = get_num_of_retweeted_for_user(uid)
+                rst = get_num_of_retweets_for_user(uid)
                 print(rst[0], rst[1], file=f, sep=",")
                 if cnt % 100 == 0:
                     print(cnt)
-
 
     def run(self):
         # 找数据
