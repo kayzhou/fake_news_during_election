@@ -32,7 +32,7 @@ def get_15min(dt):
         return t3
 
 
-def cal_ts(dts, resolution="1Min"):
+def cal_ts(dts, resolution="15Min"):
     """
     真的牛逼！
     """
