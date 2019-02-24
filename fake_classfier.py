@@ -10,7 +10,7 @@ def get_train_data():
     """
     获取训练文本
     """
-    all_tweets = pd.read_csv("all-tweets.csv", nrows=100)
+    all_tweets = pd.read_csv("disk/all-tweets.csv", nrows=100)
     map_labels = {
         "0": "fake",
         "1": "extreme bias (right)",
