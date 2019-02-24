@@ -99,7 +99,7 @@ def find_tweets(tweet_ids):
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
-    for _id in tweet_ids:
+    for _id in tqdm(tweet_ids):
         new_d = {}
         c1.execute('''SELECT * FROM tweet WHERE tweet_id={}'''.format(_id))
         d = c1.fetchone()

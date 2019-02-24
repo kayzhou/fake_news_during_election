@@ -10,7 +10,7 @@ def get_train_data():
     获取训练文本
     """
     print("loading all tweets_csv ...")
-    all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, nrows=100, usecols=["tweet_id", "media_type"])
+    all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["tweet_id", "media_type"])
     print("finished!")
 
     map_labels = {
@@ -28,10 +28,13 @@ def get_train_data():
         print(_type, "...")
         tweets_id = all_tweets[all_tweets["media_type"] == _type].tweet_id
         rst = SQLite_handler.find_tweets(tweets_id)
+        print(len(rst))
         with open("disk/train_data_fake/{}.txt".format(_type), "w") as f:
             for d in rst:
-                if d["text"].startswith("RT"):
+                if "text" not in d:
                     continue
+                # elif d["text"].startswith("RT"):
+                #     continue
                 f.write(d["text"] + "\n")
             
 
