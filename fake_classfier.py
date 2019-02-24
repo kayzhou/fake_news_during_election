@@ -32,3 +32,6 @@ def get_train_data():
                     continue
                 f.write(d["text"] + "\n")
             
+
+if __name__ == "__main__":
+    get_train_data()
