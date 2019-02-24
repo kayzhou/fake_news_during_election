@@ -5,12 +5,14 @@
 from my_weapon import *
 import SQLite_handler
 
-
 def get_train_data():
     """
     获取训练文本
     """
-    all_tweets = pd.read_csv("disk/all-tweets.csv", nrows=100)
+    print("loading all tweets_csv ...")
+    all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, nrows=100, usecols=["tweet_id", "media_type"])
+    print("finished!")
+
     map_labels = {
         "0": "fake",
         "1": "extreme bias (right)",
