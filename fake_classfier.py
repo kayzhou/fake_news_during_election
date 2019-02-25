@@ -184,8 +184,8 @@ class Fake_Classifer(object):
 
         # 模型评估
         y_pred = []
-        for i in range(len(X_test)):
-            y_hat = clf.predict(X_test[i].reshape(1, -1))
+        for _x in X_test:
+            y_hat = clf.predict(_x.reshape(1, -1))
             y_pred.append(y_hat[0])
         print(classification_report(y_test, y_pred))
 
