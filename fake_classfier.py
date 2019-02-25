@@ -147,35 +147,36 @@ class Fake_Classifer(object):
             self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
-        original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
-                        'min_samples_split': 5}
+        # original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
+        #                 'min_samples_split': 5}
 
         # for GDBT
-        for i, setting in enumerate([{'learning_rate': 1.0, 'subsample': 1.0},
-                        {'learning_rate': 0.1, 'subsample': 1.0},
-                        {'learning_rate': 1.0, 'subsample': 0.5},
-                        {'learning_rate': 0.1, 'subsample': 0.5},
-                        {'learning_rate': 0.1, 'max_features': 2}]):
-            print('******************* {} ********************'.format(i))
-            params = dict(original_params)
-            params.update(setting)
+        # for i, setting in enumerate([{'learning_rate': 1.0, 'subsample': 1.0},
+        #                 {'learning_rate': 0.1, 'subsample': 1.0},
+        #                 {'learning_rate': 1.0, 'subsample': 0.5},
+        #                 {'learning_rate': 0.1, 'subsample': 0.5},
+        #                 {'learning_rate': 0.1, 'max_features': 2}]):
+        #     print('******************* {} ********************'.format(i))
+        #     params = dict(original_params)
+        #     params.update(setting)
 
-            clf = GradientBoostingClassifier(**params)
-            clf.fit(X_train, y_train)
-            self.evaluate(clf, X_train, y_train, X_test, y_test)
+        #     clf = GradientBoostingClassifier(**params)
+        #     clf.fit(X_train, y_train)
+        #     self.evaluate(clf, X_train, y_train, X_test, y_test)
 
-        original_params = {}
+
+        # original_params = {}
 
         # LinearSVC
-        for i, setting in enumerate([{'C':0.125}, {'C': 0.25}, {'C':0.5}, {'C':1.0}, {'C':2.0}, {'C': 4.0}, {'C':8.0}]):
-            print('******************* {} ********************'.format(i))
-            print(setting)
-            params = dict(original_params)
-            params.update(setting)
+        # for i, setting in enumerate([{'C':0.125}, {'C': 0.25}, {'C':0.5}, {'C':1.0}, {'C':2.0}, {'C': 4.0}, {'C':8.0}]):
+        #     print('******************* {} ********************'.format(i))
+        #     print(setting)
+        #     params = dict(original_params)
+        #     params.update(setting)
 
-            clf = LinearSVC(**params)
-            clf.fit(X_train, y_train)
-            self.evaluate(clf, X_train, y_train, X_test, y_test)
+        #     clf = LinearSVC(**params)
+        #     clf.fit(X_train, y_train)
+        #     self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
     def evaluate(self, clf, X, y, X_test, y_test):
