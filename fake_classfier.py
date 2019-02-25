@@ -101,7 +101,7 @@ class Fake_Classifer(object):
                 if i > 2:
                     break
                 w = line.strip().split()
-                X.append(w)
+                X.append(np.array(w))
                 y.append(y_i)
         print("reading data finished!")
 
