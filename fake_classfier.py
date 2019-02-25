@@ -183,4 +183,5 @@ class Fake_Classifer(object):
 if __name__ == "__main__":
     Lebron = Fake_Classifer()
     # get_train_data()
-    Lebron.get_tokens()
+    # Lebron.get_tokens()
+    Lebron.train()
