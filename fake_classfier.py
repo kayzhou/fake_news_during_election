@@ -115,8 +115,8 @@ class Fake_Classifer(object):
 
         # build one hot embedding
         print(X_train)
-        v = DictVectorizer(sparse=False)
-        X_train = v.transform(X_train)
+        v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
+        X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
         print("building one hot embedding finished!")
 
