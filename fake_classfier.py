@@ -91,7 +91,7 @@ class Fake_Classifer(object):
         # read data
         X = []
         y = []
-        for _type, f_label in self.MAP_LABELS.items():
+        for _type, f_label in tqdm(self.MAP_LABELS.items()):
             if f_label == "fake":
                 y_i = 0
             elif f_label in ["extreme bias (right)", "right", "right leaning"]:
