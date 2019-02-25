@@ -6,7 +6,7 @@ from itertools import chain
 
 from nltk import ngrams
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.feature_extraction import DictVectorizer
 
 import SQLite_handler
 from my_weapon import *
@@ -105,8 +105,7 @@ class Fake_Classifer(object):
                 if i > 2:
                     break
                 w = line.strip().split()
-                print(bag_of_words_and_bigrams(w))
-                X.append(np.array(w))
+                X.append(bag_of_words_and_bigrams(w))
                 y.append(y_i)
         print("reading data finished!")
 
@@ -115,10 +114,9 @@ class Fake_Classifer(object):
         print("splitting data finished!")
 
         # build one hot embedding
-        one_hot = OneHotEncoder()
-        one_hot.fit(X_train)
-        X_train = one_hot.transform(X_train)
-        X_test = one_hot.transform(X_test)
+        v = DictVectorizer(sparse=False)
+        X_train = v.transform(X_train)
+        X_test = v.transform(X_test)
         print("building one hot embedding finished!")
 
         # machine learning model
