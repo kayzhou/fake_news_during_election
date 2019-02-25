@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 
 import SQLite_handler
 from my_weapon import *
+from myclf import *
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
 class Fake_Classifer(object):
@@ -108,14 +109,75 @@ class Fake_Classifer(object):
         one_hot = OneHotEncoder()
         one_hot.fit(X_train)
         X_train = one_hot.transform(X_train)
-        print(X_train[0])
+        X_test = one_hot.transform(X_test)
 
         # machine learning model
+        list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
+        classifiers = {
+            'NB':naive_bayes_classifier,
+            'KNN':knn_classifier,
+            'LR':logistic_regression_classifier,
+            'RF':random_forest_classifier,
+            'DT':decision_tree_classifier,
+            'SVM':svm_classifier,
+            'SVMCV':svm_cross_validation,
+            'GBDT':gradient_boosting_classifier
+        }
 
-        # train and cross validation
+        for classifier in list_classifiers:
+            print('******************* {} ********************'.format(classifier))
+            if classifier == "GBDT":
+                clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
+                clf.fit(X_train, y_train)
+            if classifier == "LR":
+                clf = LogisticRegression(penalty='l2')
+                clf.fit(X_train, y_train)
+            else:
+                clf = classifiers[classifier](X_train, y_train)
+            self.evaluate(clf, X, y, X_test, y_test)
 
-        # test 
 
+        original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
+                        'min_samples_split': 5}
+
+        # for GDBT
+        for i, setting in enumerate([{'learning_rate': 1.0, 'subsample': 1.0},
+                        {'learning_rate': 0.1, 'subsample': 1.0},
+                        {'learning_rate': 1.0, 'subsample': 0.5},
+                        {'learning_rate': 0.1, 'subsample': 0.5},
+                        {'learning_rate': 0.1, 'max_features': 2}]):
+            print('******************* {} ********************'.format(i))
+            params = dict(original_params)
+            params.update(setting)
+
+            clf = GradientBoostingClassifier(**params)
+            clf.fit(X_train, y_train)
+            self.evaluate(clf, X, y, X_test, y_test)
+
+        original_params = {}
+
+        # LinearSVC
+        for i, setting in enumerate([{'C':0.125}, {'C': 0.25}, {'C':0.5}, {'C':1.0}, {'C':2.0}, {'C': 4.0}, {'C':8.0}]):
+            print('******************* {} ********************'.format(i))
+            print(setting)
+            params = dict(original_params)
+            params.update(setting)
+
+            clf = LinearSVC(**params)
+            clf.fit(X_train, y_train)
+            self.evaluate(clf, X, y, X_test, y_test)
+
+
+    def evaluate(self, clf, X, y, X_test, y_test):
+        # CV
+        print('accuracy of CV:', cross_val_score(clf, X, y, cv=5).mean())
+
+        # 模型评估
+        y_pred = []
+        for i in range(len(X_test)):
+            y_hat = clf.predict(X_test[i].reshape(1, -1))
+            y_pred.append(y_hat[0])
+        print(classification_report(y_test, y_pred))
 
 
 if __name__ == "__main__":
