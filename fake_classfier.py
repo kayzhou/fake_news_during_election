@@ -103,9 +103,11 @@ class Fake_Classifer(object):
                 w = line.strip().split()
                 X.append(w)
                 y.append(y_i)
+        print("reading data finished!")
 
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        print("spliting data finished!")
 
         # build one hot embedding
         one_hot = OneHotEncoder()
