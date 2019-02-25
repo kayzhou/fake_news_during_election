@@ -101,7 +101,7 @@ class Fake_Classifer(object):
             elif f_label in ["extreme bias (left)", "left", "left leaning"]:
                 y_i = 3
 
-            for _, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
+            for _, line in tqdm(enumerate(open("disk/tokens_fake/{}.txt".format(_type)))):
                 w = line.strip().split()
                 X.append(bag_of_words_and_bigrams(w))
                 y.append(y_i)
@@ -112,7 +112,7 @@ class Fake_Classifer(object):
         print("splitting data finished!")
 
         # build one hot embedding
-        print(X_train)
+        # print(X_train)
         v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
