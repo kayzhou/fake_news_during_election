@@ -4,7 +4,7 @@
 
 from my_weapon import *
 import SQLite_handler
-from Trump_Clinton_Classifer.TwClassifier import CustomTweetTokenizer
+from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
 def get_train_data():
     """
@@ -59,6 +59,8 @@ def get_tokens():
                 print(words)
                 break
 
+def (self, parameter_list):
+    pass
 if __name__ == "__main__":
     # get_train_data()
     get_tokens()
