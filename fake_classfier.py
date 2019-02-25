@@ -112,6 +112,7 @@ class Fake_Classifer(object):
         one_hot.fit(X_train)
         X_train = one_hot.transform(X_train)
         X_test = one_hot.transform(X_test)
+        print("building one hot embedding finished!")
 
         # machine learning model
         list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
@@ -136,7 +137,8 @@ class Fake_Classifer(object):
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
-            self.evaluate(clf, X, y, X_test, y_test)
+
+            self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
         original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
@@ -154,7 +156,7 @@ class Fake_Classifer(object):
 
             clf = GradientBoostingClassifier(**params)
             clf.fit(X_train, y_train)
-            self.evaluate(clf, X, y, X_test, y_test)
+            self.evaluate(clf, X_train, y_train, X_test, y_test)
 
         original_params = {}
 
@@ -167,7 +169,7 @@ class Fake_Classifer(object):
 
             clf = LinearSVC(**params)
             clf.fit(X_train, y_train)
-            self.evaluate(clf, X, y, X_test, y_test)
+            self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
     def evaluate(self, clf, X, y, X_test, y_test):
