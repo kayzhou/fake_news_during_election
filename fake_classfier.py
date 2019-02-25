@@ -59,8 +59,7 @@ def get_tokens():
                 print(words)
                 break
 
-def (self, parameter_list):
-    pass
+
 if __name__ == "__main__":
     # get_train_data()
     get_tokens()
