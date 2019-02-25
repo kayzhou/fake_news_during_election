@@ -6,61 +6,66 @@ from my_weapon import *
 import SQLite_handler
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
-def get_train_data():
-    """
-    获取训练文本
-    """
-    print("loading all tweets_csv ...")
-    all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["tweet_id", "media_type"])
-    print("finished!")
+class Fake_Classifer(object):
+    def __init__(self):
+        pass
 
-    map_labels = {
-        "0": "fake",
-        "1": "extreme bias (right)",
-        "2": "right",
-        "3": "right leaning",
-        "4": "center",
-        "5": "left leaning",
-        "6": "left",
-        "7": "extreme bias (left)"
-    }
+    def get_train_data(self):
+        """
+        获取训练文本
+        """
+        print("loading all tweets_csv ...")
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["tweet_id", "media_type"])
+        print("finished!")
 
-    for _type, f_label in map_labels.items():
-        print(_type, "...")
-        tweets_id = all_tweets[all_tweets["media_type"] == _type].tweet_id
-        rst = SQLite_handler.find_tweets(tweets_id)
-        print(len(rst))
-        with open("disk/train_data_fake/{}.txt".format(_type), "w") as f:
-            for d in rst:
-                if "text" not in d:
-                    continue
-                # elif d["text"].startswith("RT"):
-                #     continue
-                f.write(d["text"] + "\n")
-            
+        map_labels = {
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
 
-def get_tokens():
-    """
-    text > tokens
-    """
-    map_labels = {
-        "0": "fake",
-        "1": "extreme bias (right)",
-        "2": "right",
-        "3": "right leaning",
-        "4": "center",
-        "5": "left leaning",
-        "6": "left",
-        "7": "extreme bias (left)"
-    }
-    tokenizer = CustomTweetTokenizer()
-    with open("disk/tokens_fake/{}.txt".format(_type), "w") as f:
         for _type, f_label in map_labels.items():
-            for line in open("disk/train_data_fake/{}.txt".format(_type)):
-                words = tokenizer.tokenize(line.strip())
-                f.write(" ".join(words) + "\n")
+            print(_type, "...")
+            tweets_id = all_tweets[all_tweets["media_type"] == _type].tweet_id
+            rst = SQLite_handler.find_tweets(tweets_id)
+            print(len(rst))
+            with open("disk/train_data_fake/{}.txt".format(_type), "w") as f:
+                for d in rst:
+                    if "text" not in d:
+                        continue
+                    # elif d["text"].startswith("RT"):
+                    #     continue
+                    f.write(d["text"] + "\n")
+
+    def get_tokens(self):
+        """
+        text > tokens
+        """
+        map_labels = {
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
+        tokenizer = CustomTweetTokenizer()
+
+        for _type, f_label in map_labels.items():
+            with open("disk/tokens_fake/{}.txt".format(_type), "w") as f:
+                for line in open("disk/train_data_fake/{}.txt".format(_type)):
+                    words = tokenizer.tokenize(line.strip())
+                    f.write(" ".join(words) + "\n")
 
 
 if __name__ == "__main__":
+    Lebron = Fake_Classifer()
     # get_train_data()
-    get_tokens()
+    Lebron.get_tokens()
