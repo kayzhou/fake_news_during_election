@@ -40,7 +40,9 @@ def get_train_data():
             
 
 def get_tokens():
-
+    """
+    text > tokens
+    """
     map_labels = {
         "0": "fake",
         "1": "extreme bias (right)",
@@ -52,12 +54,11 @@ def get_tokens():
         "7": "extreme bias (left)"
     }
     tokenizer = CustomTweetTokenizer()
-    for _type, f_label in map_labels.items():
-        with open("disk/train_data_fake/{}.txt".format(_type)) as f:
-            for line in f:
+    with open("disk/tokens_fake/{}.txt".format(_type), "w") as f:
+        for _type, f_label in map_labels.items():
+            for line in open("disk/train_data_fake/{}.txt".format(_type)):
                 words = tokenizer.tokenize(line.strip())
-                print(words)
-                break
+                f.write(" ".join(words) + "\n")
 
 
 if __name__ == "__main__":
