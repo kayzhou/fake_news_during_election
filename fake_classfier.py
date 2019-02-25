@@ -4,6 +4,7 @@
 
 from my_weapon import *
 import SQLite_handler
+from Trump_Clinton_Classifer.TwClassifier import CustomTweetTokenizer
 
 def get_train_data():
     """
@@ -38,5 +39,26 @@ def get_train_data():
                 f.write(d["text"] + "\n")
             
 
+def get_tokens():
+
+    map_labels = {
+        "0": "fake",
+        "1": "extreme bias (right)",
+        "2": "right",
+        "3": "right leaning",
+        "4": "center",
+        "5": "left leaning",
+        "6": "left",
+        "7": "extreme bias (left)"
+    }
+    tokenizer = CustomTweetTokenizer()
+    for _type, f_label in map_labels.items():
+        with open("disk/train_data_fake/{}.txt".format(_type)) as f:
+            for line in f:
+                words = tokenizer.tokenize(line.strip())
+                print(words)
+                break
+
 if __name__ == "__main__":
-    get_train_data()
+    # get_train_data()
+    get_tokens()
