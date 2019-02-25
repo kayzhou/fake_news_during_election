@@ -98,7 +98,7 @@ class Fake_Classifer(object):
                 y_i = 3
 
             for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
-                if i > 100:
+                if i > 2:
                     break
                 w = line.strip().split()
                 X.append(w)
@@ -107,7 +107,7 @@ class Fake_Classifer(object):
 
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
-        print("spliting data finished!")
+        print("splitting data finished!")
 
         # build one hot embedding
         one_hot = OneHotEncoder()
