@@ -114,6 +114,7 @@ class Fake_Classifer(object):
         print("splitting data finished!")
 
         # build one hot embedding
+        print(X_train)
         v = DictVectorizer(sparse=False)
         X_train = v.transform(X_train)
         X_test = v.transform(X_test)
