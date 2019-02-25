@@ -2,13 +2,18 @@
 # Author: Kay Zhou
 # Date: 2019-02-24 16:42:55
 
-from sklearn.preprocessing import OneHotEncoder
+from itertools import chain
+
+from nltk import ngrams
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 
 import SQLite_handler
 from my_weapon import *
 from myclf import *
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
+from Trump_Clinton_Classifer.TwSentiment import bag_of_words, bag_of_words_and_bigrams
+
 
 class Fake_Classifer(object):
     def __init__(self):
@@ -101,6 +106,7 @@ class Fake_Classifer(object):
                 if i > 2:
                     break
                 w = line.strip().split()
+                print(bag_of_words_and_bigrams(w))
                 X.append(np.array(w))
                 y.append(y_i)
         print("reading data finished!")
