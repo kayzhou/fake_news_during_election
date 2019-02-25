@@ -101,9 +101,7 @@ class Fake_Classifer(object):
             elif f_label in ["extreme bias (left)", "left", "left leaning"]:
                 y_i = 3
 
-            for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
-                if i > 2:
-                    break
+            for _, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
                 w = line.strip().split()
                 X.append(bag_of_words_and_bigrams(w))
                 y.append(y_i)
