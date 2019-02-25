@@ -84,7 +84,6 @@ class Fake_Classifer(object):
 
     def train(self):
         """
-        一共种分类方式
         fake, non-fake
         fake, left, center, right √ 优先
         left, center, right
