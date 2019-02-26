@@ -124,7 +124,8 @@ class Fake_Classifer(object):
         print("building one hot embedding finished!")
 
         # machine learning model
-        list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
+        # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
+        list_classifiers = ['LR']
         classifiers = {
             'NB':naive_bayes_classifier,
             'KNN':knn_classifier,
@@ -142,7 +143,7 @@ class Fake_Classifer(object):
                 clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
                 clf.fit(X_train, y_train)
             if classifier == "LR":
-                clf = LogisticRegression(penalty='l2', multi_class="multinomial")
+                clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="liblinear")
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
