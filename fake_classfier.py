@@ -143,7 +143,7 @@ class Fake_Classifer(object):
                 clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
                 clf.fit(X_train, y_train)
             if classifier == "LR":
-                clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="liblinear")
+                clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="newton-cg")
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
