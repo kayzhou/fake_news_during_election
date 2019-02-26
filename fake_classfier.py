@@ -147,6 +147,7 @@ class Fake_Classifer(object):
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
+            print("fitting finished! Lets evaluate!")
 
             self.evaluate(clf, X_train, y_train, X_test, y_test)
 
