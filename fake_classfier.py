@@ -103,6 +103,8 @@ class Fake_Classifer(object):
 
             for _, line in tqdm(enumerate(open("disk/tokens_fake/{}.txt".format(_type)))):
                 w = line.strip().split()
+                if len(w) == 0 or w[0] == "RT":
+                    continue
                 X.append(bag_of_words_and_bigrams(w))
                 y.append(y_i)
         print("reading data finished!")
