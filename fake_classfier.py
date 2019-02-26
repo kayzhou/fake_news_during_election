@@ -14,6 +14,7 @@ from myclf import *
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 from Trump_Clinton_Classifer.TwSentiment import bag_of_words, bag_of_words_and_bigrams
 
+import gc
 
 class Fake_Classifer(object):
     def __init__(self):
@@ -111,6 +112,8 @@ class Fake_Classifer(object):
 
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        del X, y
+        gc.collect()
         print("splitting data finished!")
 
         # build one hot embedding
@@ -139,7 +142,7 @@ class Fake_Classifer(object):
                 clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
                 clf.fit(X_train, y_train)
             if classifier == "LR":
-                clf = LogisticRegression(penalty='l2')
+                clf = LogisticRegression(penalty='l2', multi_class="multinomial")
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
