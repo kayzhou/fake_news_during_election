@@ -108,24 +108,26 @@ class Fake_Classifer(object):
                     continue
                 X.append(bag_of_words_and_bigrams(w))
                 y.append(y_i)
-        print("reading data finished! count:", len(y))
+
+        print("Reading data finished! count:", len(y))
 
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        
         del X, y
         gc.collect()
-        print("splitting data finished!")
+        print("Splitting data finished!")
 
         # build one hot embedding
         # print(X_train)
         v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
-        print("building one hot embedding finished!")
+        print("Building word embedding finished!")
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
-        list_classifiers = ['LR']
+        list_classifiers = ['NB']
         classifiers = {
             'NB':naive_bayes_classifier,
             'KNN':knn_classifier,
