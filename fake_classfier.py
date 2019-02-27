@@ -102,7 +102,7 @@ class Fake_Classifer(object):
             elif f_label in ["extreme bias (left)", "left", "left leaning"]:
                 y_i = 3
 
-            for i, line in tqdm(enumerate(open("disk/tokens_fake/{}.txt".format(_type)))):
+            for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
                 w = line.strip().split()
                 if len(w) == 0 or w[0] == "RT":
                     continue
