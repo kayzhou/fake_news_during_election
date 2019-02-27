@@ -92,7 +92,9 @@ class Fake_Classifer(object):
         # read data
         X = []
         y = []
+
         for _type, f_label in tqdm(self.MAP_LABELS.items()):
+
             if f_label == "fake":
                 y_i = 0
             elif f_label in ["extreme bias (right)", "right", "right leaning"]:
@@ -104,12 +106,11 @@ class Fake_Classifer(object):
 
             for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
                 w = line.strip().split()
-                if len(w) == 0 or w[0] == "RT":
-                    continue
                 if i > 1000:
                     break
-                X.append(bag_of_words_and_bigrams(w))
-                y.append(y_i)
+                if len(w) > 0 and w[0] != "RT":
+                    X.append(bag_of_words_and_bigrams(w))
+                    y.append(y_i)
 
         print("Reading data finished! count:", len(y))
 
