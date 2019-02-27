@@ -65,23 +65,14 @@ class Fake_Classifer(object):
         """
         text > tokens
         """
-        map_labels = {
-            "0": "fake",
-            "1": "extreme bias (right)",
-            "2": "right",
-            "3": "right leaning",
-            "4": "center",
-            "5": "left leaning",
-            "6": "left",
-            "7": "extreme bias (left)"
-        }
         tokenizer = CustomTweetTokenizer()
 
-        for _type, f_label in map_labels.items():
+        for _type, f_label in self.MAP_LABELS.items():
             with open("disk/tokens_fake/{}.txt".format(_type), "w") as f:
                 for line in open("disk/train_data_fake/{}.txt".format(_type)):
                     words = tokenizer.tokenize(line.strip())
-                    f.write(" ".join(words) + "\n")
+                    if len(words) > 0 and words[0] != "RT":
+                        f.write(" ".join(words) + "\n")
 
     def train(self):
         """
@@ -203,6 +194,6 @@ class Fake_Classifer(object):
 
 if __name__ == "__main__":
     Lebron = Fake_Classifer()
-    # get_train_data()
-    # Lebron.get_tokens()
+    # Lebron.get_train_data()
+    Lebron.get_tokens()
     Lebron.train()
