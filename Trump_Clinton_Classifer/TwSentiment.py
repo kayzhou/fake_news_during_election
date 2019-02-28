@@ -22,9 +22,7 @@ def bag_of_words(words):
     return dict([(word, True) for word in words])
 
 def bag_of_words_and_bigrams(words):
-
     bigrams = ngrams(words, 2)
-
     return bag_of_words(chain(words, bigrams))
 
 def bag_of_words_not_in_set(words, badwords):

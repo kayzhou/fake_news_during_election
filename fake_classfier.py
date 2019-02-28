@@ -87,21 +87,20 @@ class Fake_Classifer(object):
         for _type, f_label in tqdm(self.MAP_LABELS.items()):
 
             if f_label == "fake":
-                y_i = 0
+                y_i = 0 
             elif f_label in ["extreme bias (right)", "right", "right leaning"]:
-                y_i = 1
+                y_i = 1 
             elif f_label == "center":
-                y_i = 2
+                y_i = 2 
             elif f_label in ["extreme bias (left)", "left", "left leaning"]:
-                y_i = 3
+                y_i = 3 
 
             for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
                 w = line.strip().split()
-                if i > 1000:
-                    break
-                if len(w) > 0 and w[0] != "RT":
-                    X.append(bag_of_words_and_bigrams(w))
-                    y.append(y_i)
+                # if len(w) > 0 and w[0] != "RT":
+                X.append(bag_of_words_and_bigrams(w))
+                # print(X[-1])
+                y.append(np.array(y_i))
 
         print("Reading data finished! count:", len(y))
 
@@ -118,10 +117,13 @@ class Fake_Classifer(object):
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
         print("Building word embedding finished!")
+        # print(X_train[0].shape, X_train[1].shape)
+        print(X_train[0])
+        print(X_train[-1])
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
-        list_classifiers = ['NB']
+        list_classifiers = ['NB', 'LR', 'RF']
         classifiers = {
             'NB':naive_bayes_classifier,
             'KNN':knn_classifier,
@@ -139,7 +141,7 @@ class Fake_Classifer(object):
                 clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
                 clf.fit(X_train, y_train)
             if classifier == "LR":
-                clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="newton-cg")
+                clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="sag", max_iter=10e8)
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
@@ -195,5 +197,5 @@ class Fake_Classifer(object):
 if __name__ == "__main__":
     Lebron = Fake_Classifer()
     # Lebron.get_train_data()
-    Lebron.get_tokens()
+    # Lebron.get_tokens()
     Lebron.train()
