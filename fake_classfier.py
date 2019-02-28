@@ -93,10 +93,10 @@ class Fake_Classifer(object):
             elif f_label == "center":
                 y_i = 2 
             elif f_label in ["extreme bias (left)", "left", "left leaning"]:
-                y_i = 3 
+                y_i = 3
 
             for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
-                w = line.strip().split()
+                w = line.strip().split(" ")
                 # if len(w) > 0 and w[0] != "RT":
                 X.append(bag_of_words_and_bigrams(w))
                 # print(X[-1])
@@ -112,14 +112,12 @@ class Fake_Classifer(object):
         print("Splitting data finished!")
 
         # build one hot embedding
-        # print(X_train)
         v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
         print("Building word embedding finished!")
         # print(X_train[0].shape, X_train[1].shape)
-        print(X_train[0])
-        print(X_train[-1])
+        # print(X_train[-1])
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
@@ -182,15 +180,12 @@ class Fake_Classifer(object):
         #     self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
-    def evaluate(self, clf, X, y, X_test, y_test):
+    def evaluate(self, clf, X_train, y_train, X_test, y_test):
         # CV
-        print('accuracy of CV:', cross_val_score(clf, X, y, cv=5).mean())
+        print('accuracy of CV=5:', cross_val_score(clf, X_train, y_test, cv=5).mean())
 
         # 模型评估
-        y_pred = []
-        for _x in X_test:
-            y_hat = clf.predict(_x.reshape(1, -1))
-            y_pred.append(y_hat[0])
+        y_pred = clf.predict(X_test)
         print(classification_report(y_test, y_pred))
 
 
