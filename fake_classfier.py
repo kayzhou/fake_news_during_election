@@ -100,7 +100,7 @@ class Fake_Classifer(object):
                 # if len(w) > 0 and w[0] != "RT":
                 X.append(bag_of_words_and_bigrams(w))
                 # print(X[-1])
-                y.append(np.array(y_i))
+                y.append(y_i)
 
         print("Reading data finished! count:", len(y))
 
@@ -115,9 +115,10 @@ class Fake_Classifer(object):
         v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
+
         print("Building word embedding finished!")
-        # print(X_train[0].shape, X_train[1].shape)
-        # print(X_train[-1])
+        print(X_train[0].shape, X_train[1].shape)
+        print(X_train.shape, X_test.shape)
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
