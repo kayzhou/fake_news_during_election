@@ -183,7 +183,7 @@ class Fake_Classifer(object):
 
     def evaluate(self, clf, X_train, y_train, X_test, y_test):
         # CV
-        print('accuracy of CV=5:', cross_val_score(clf, X_train, y_test, cv=5).mean())
+        print('accuracy of CV=5:', cross_val_score(clf, X_train, y_train, cv=5).mean())
 
         # 模型评估
         y_pred = clf.predict(X_test)
