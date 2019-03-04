@@ -68,7 +68,7 @@ def svm_classifier(train_x, train_y):
 
 
 # SVM Linear Classifier
-def svm_classifier(train_x, train_y):
+def svm_linear_classifier(train_x, train_y):
     from sklearn.svm import LinearSVC
     model = LinearSVC()
     model.fit(train_x, train_y)
