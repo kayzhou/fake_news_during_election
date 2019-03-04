@@ -66,6 +66,15 @@ def svm_classifier(train_x, train_y):
     model.fit(train_x, train_y)
     return model
 
+
+# SVM Linear Classifier
+def svm_classifier(train_x, train_y):
+    from sklearn.svm import LinearSVC
+    model = LinearSVC()
+    model.fit(train_x, train_y)
+    return model
+
+
 # SVM Classifier using cross validation
 def svm_cross_validation(train_x, train_y):
     from sklearn.grid_search import GridSearchCV
