@@ -122,30 +122,30 @@ class Fake_Classifer(object):
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
-        list_classifiers = ['NB', 'LR', 'RF']
+        list_classifiers = ['NB', 'LR', 'SVMLINER', 'GBDT']
         classifiers = {
-            'NB':naive_bayes_classifier,
-            'KNN':knn_classifier,
-            'LR':logistic_regression_classifier,
-            'RF':random_forest_classifier,
-            'DT':decision_tree_classifier,
-            'SVM':svm_classifier,
-            'SVMCV':svm_cross_validation,
-            'GBDT':gradient_boosting_classifier
+            'NB': naive_bayes_classifier,
+            'KNN': knn_classifier,
+            'LR': logistic_regression_classifier,
+            'RF': random_forest_classifier,
+            'DT': decision_tree_classifier,
+            'SVM': svm_classifier,
+            'SVMCV': svm_cross_validation,
+            'GBDT': gradient_boosting_classifier,
+            'SVMLINER': svm_linear_classifier,
         }
 
         for classifier in list_classifiers:
             print('******************* {} ********************'.format(classifier))
             if classifier == "GBDT":
-                clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=5)
+                clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=3)
                 clf.fit(X_train, y_train)
             if classifier == "LR":
                 clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="sag", max_iter=10e8)
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
-            print("fitting finished! Lets evaluate!")
-
+            # print("fitting finished! Lets evaluate!")
             self.evaluate(clf, X_train, y_train, X_test, y_test)
 
 
