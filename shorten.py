@@ -12,10 +12,10 @@ import sqlite3
 from urllib.parse import urlparse
 
 
-# short_url = set(['bit.ly', 'dlvr.it', 'goo.gl', 'j.mp', 'ift.tt', 'nyp.st', 'ln.is', 'trib.al', 'cnn.it', 'youtu.be'])
-
-
 def get_urls():
+    """
+    提取需要分析的URL
+    """
     tweets = pd.read_csv('data/ira-tweets-ele.csv')
     print(len(tweets))
 
@@ -37,6 +37,7 @@ def get_urls():
                 traceback.print_exc(file=sys.stdout)
                 # print(i, e)
 
+
 def task(_ids):
     print("{} task starts ... ".format(os.getpid()), len(_ids))
     unshortener = UnshortenIt(default_timeout=10)
@@ -44,24 +45,17 @@ def task(_ids):
     for d in tqdm(_ids):
         if "error" in d and d["error"]:
             print(d)
+            
             try:
-                if d["url"] == "http://ht.ly/XKLW4":
-                    d["error"] = False
-                    continue
-
-                # print(d["url"])
                 d["error"] = False
-                """
-                if d["url"] == "http://ht.ly/XKLW4":
-                    url = "http://streaming.radio.co/s22cb441d9/listen"
-                else:
-                """
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
                 hostname = urlparse(url).hostname
                 d['hostname'] = hostname
+
             except Exception as e:
                 d['error'] = True
+
         new_ids.append(d)
     write2json(new_ids)
 
@@ -82,7 +76,7 @@ def get_hostname(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("ira-final-urls-last.json", "a") as f:
+    with open("data/ira-final-urls-last.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
@@ -104,9 +98,8 @@ def unshorten_url():
             d['short'] = True
         dict_id_host.append(d)
 
-    task(dict_id_host)
+    # task(dict_id_host)
     
-    '''
     task_cnt = 8
     step = int(len(dict_id_host) / task_cnt)
     pool = multiprocessing.Pool()
@@ -122,7 +115,6 @@ def unshorten_url():
 
     pool.close()
     pool.join()
-    '''
 
 
 def again():
@@ -156,9 +148,7 @@ def again():
 
 
 if __name__ == "__main__":
-    # get_urls()
-    # unshorten_url()
-
-    again()
-    # temp()
+    get_urls()
+    unshorten_url()
+    # again()
 
