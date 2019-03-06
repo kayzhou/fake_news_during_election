@@ -43,18 +43,17 @@ def task(_ids):
     unshortener = UnshortenIt(default_timeout=10)
     new_ids = []
     for d in tqdm(_ids):
-        if "error" in d and d["error"]:
-            print(d)
-            
-            try:
-                d["error"] = False
-                url = unshortener.unshorten(d["url"])
-                d["final_url"] = url
-                hostname = urlparse(url).hostname
-                d['hostname'] = hostname
+        # if "error" in d and d["error"]:
+        #     print(d)
+        try:
+            d["error"] = False
+            url = unshortener.unshorten(d["url"])
+            d["final_url"] = url
+            hostname = urlparse(url).hostname
+            d['hostname'] = hostname
 
-            except Exception as e:
-                d['error'] = True
+        except Exception as e:
+            d['error'] = True
 
         new_ids.append(d)
     write2json(new_ids)
@@ -76,7 +75,7 @@ def get_hostname(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("data/ira-final-urls-last.json", "a") as f:
+    with open("data/ira-urls-last.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
@@ -84,7 +83,7 @@ def write2json(new_ids):
 
 def unshorten_url():
     dict_id_host = []
-    for line in open('data/ira-id-url-hostname.csv'):
+    for line in open('data/ira-id-url-ele.csv'):
         _id, tweetid, url, hostname = line.strip().split('\t')
         d = {
             'id': _id,
@@ -121,7 +120,7 @@ def again():
     dict_id_host = []
     
     # for line in open("ira-urls.json"):
-    for line in open("ira-final-urls---.json"):
+    for line in open("ira-final-urls.json"):
         d = json.loads(line.strip())
         dict_id_host.append(d)
 
@@ -148,7 +147,7 @@ def again():
 
 
 if __name__ == "__main__":
-    get_urls()
+    # get_urls()
     unshorten_url()
     # again()
 
