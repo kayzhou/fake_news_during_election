@@ -2,19 +2,21 @@
 # Author: Kay Zhou
 # Date: 2019-02-24 16:42:55
 
+import gc
 from itertools import chain
 
 from nltk import ngrams
-from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.model_selection import train_test_split
 
 import SQLite_handler
+from joblib import dump, load
 from my_weapon import *
 from myclf import *
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
-from Trump_Clinton_Classifer.TwSentiment import bag_of_words, bag_of_words_and_bigrams
+from Trump_Clinton_Classifer.TwSentiment import (bag_of_words,
+                                                 bag_of_words_and_bigrams)
 
-import gc
 
 class Fake_Classifer(object):
     def __init__(self):
@@ -137,16 +139,17 @@ class Fake_Classifer(object):
 
         for classifier in list_classifiers:
             print('******************* {} ********************'.format(classifier))
-            if classifier == "GBDT":
-                clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=3)
-                clf.fit(X_train, y_train)
             if classifier == "LR":
                 clf = LogisticRegression(penalty='l2', multi_class="multinomial", solver="sag", max_iter=10e8)
+                clf.fit(X_train, y_train)
+            elif classifier == "GBDT":
+                clf = GradientBoostingClassifier(learning_rate=0.1, max_depth=3)
                 clf.fit(X_train, y_train)
             else:
                 clf = classifiers[classifier](X_train, y_train)
             # print("fitting finished! Lets evaluate!")
             self.evaluate(clf, X_train, y_train, X_test, y_test)
+            dump(clf, 'model/{}.joblib'.format(classifier))
 
 
         # original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
