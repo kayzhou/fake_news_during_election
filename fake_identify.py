@@ -7,15 +7,15 @@ from SQLite_handler import find_tweet
 class Who_is_fake(object):
     def __init__(self):
         self.NEW_HOST_1 = {}
-        for k, v in json.load(open("data/sources.json")).items():
-            hostname = k.lower()
-            _type = v["type"]
-            if _type in ["fake", "conspiracy", "hate"]:
-                self.NEW_HOST_1[hostname] = "FAKE"
-            elif _type == "bias":
-                self.NEW_HOST_1[hostname] = "BIAS"
+        # for k, v in json.load(open("data/sources.json")).items():
+        #     hostname = k.lower()
+        #     _type = v["type"]
+        #     if _type in ["fake", "conspiracy", "hate"]:
+        #         self.NEW_HOST_1[hostname] = "FAKE"
+        #     elif _type == "bias":
+        #         self.NEW_HOST_1[hostname] = "BIAS"
 
-        self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
+        # self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
 
         self.HOST = {
                 "thegatewaypundit.com": 0,
