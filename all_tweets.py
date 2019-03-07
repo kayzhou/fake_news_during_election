@@ -42,6 +42,8 @@ class ALL_TWEET(object):
                 if d[8]:
                     hostname = d[8].lower()
                     # print(hostname)
+                    if hostname.startswith("www."):
+                        hostname = hostname[4:]
                     media_type = judge.identify(hostname)
                     if media_type == -1:
                         continue
@@ -58,6 +60,8 @@ class ALL_TWEET(object):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
                 # print(hostname)
+                if hostname.startswith("www."):
+                    hostname = hostname[4:]
                 media_type = judge.identify(hostname)
                 if media_type == -1:
                     continue
@@ -137,7 +141,7 @@ class ALL_TWEET(object):
                 self.tweets[str(d["tweetid"])] = tweet
             else:
                 cnt += 1
-        print("IRA已经存在！", cnt)
+        print("IRA已经存在数量：", cnt)
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
@@ -560,15 +564,16 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        # self.find_all_tweets()
-        # self.find_links()
+        self.find_all_tweets()
+        self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
-        # self.convert_url_timeseries()
+        self.convert_url_timeseries()
+        
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
@@ -577,7 +582,7 @@ class ALL_TWEET(object):
         # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
-        self.for_fake_clique()
+        # self.for_fake_clique()
 
 
 if __name__ == "__main__":
