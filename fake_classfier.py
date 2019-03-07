@@ -124,7 +124,7 @@ class Fake_Classifer(object):
 
         # machine learning model
         # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
-        list_classifiers = ['NB', 'LR', 'SVMLINER', 'GBDT']
+        list_classifiers = ['GBDT']
         classifiers = {
             'NB': naive_bayes_classifier,
             'KNN': knn_classifier,
