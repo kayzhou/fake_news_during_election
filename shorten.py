@@ -106,23 +106,21 @@ def unshorten_url():
 
         dict_id_host.append(d)
 
-    task(dict_id_host)
+    # task(dict_id_host)
     
-    # task_cnt = 8
-    # step = int(len(dict_id_host) / task_cnt)
-    # pool = multiprocessing.Pool()
-    # for i in range(task_cnt + 1):
-    #     if i == task_cnt - 1:
-    #         _ids = dict_id_host[i * step:]
-    #     elif i < task_cnt:
-    #         _ids = dict_id_host[i * step: (i + 1) * step]
-    #     else:
-    #         _ids = []
+    task_cnt = 8
+    step = int(len(dict_id_host) / task_cnt)
+    pool = multiprocessing.Pool()
+    for i in range(task_cnt + 1):
+        if i == task_cnt - 1:
+            _ids = dict_id_host[i * step:]
+        elif i < task_cnt - 1:
+            _ids = dict_id_host[i * step: (i + 1) * step]
         
-    #     pool.apply_async(task, (_ids,))
+        pool.apply_async(task, (_ids,))
 
-    # pool.close()
-    # pool.join()
+    pool.close()
+    pool.join()
 
 
 def again():
