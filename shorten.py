@@ -58,7 +58,7 @@ def task(_ids):
                 d['hostname'] = get_hostname_from_url(url)
         except Exception as e:
             print(e)
-            traceback.print_exc()
+            traceback.print_exc(sys.stdout)
             d['error'] = True
 
         new_ids.append(d)
