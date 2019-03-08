@@ -589,7 +589,7 @@ def build_networks_within_ira():
     end = pendulum.parse("2016-11-09").int_timestamp
 
     for in_name in tqdm(in_files):
-        for line in open(in_name):
+        for line in tqdm(open(in_name)):
             d = json.loads(line)
             dt = pendulum.from_format(d["created_at"], 'ddd MMM DD HH:mm:ss ZZ YYYY').int_timestamp
             if dt > end or dt < start:
