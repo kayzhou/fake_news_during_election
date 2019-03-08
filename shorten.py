@@ -40,7 +40,7 @@ def get_urls():
 
 
 def get_hostname_from_url(url):
-    return ".".join(tldextract.extract(s)[1:])
+    return ".".join(tldextract.extract(url)[1:])
 
 
 def task(_ids):
@@ -57,6 +57,7 @@ def task(_ids):
                 d["final_url"] = url
                 d['hostname'] = get_hostname_from_url(url)
         except Exception as e:
+            print(e)
             d['error'] = True
 
         new_ids.append(d)
