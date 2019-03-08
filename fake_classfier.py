@@ -7,6 +7,7 @@ from itertools import chain
 
 from nltk import ngrams
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import train_test_split
 
 import SQLite_handler
