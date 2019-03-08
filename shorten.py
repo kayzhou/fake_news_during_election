@@ -1,16 +1,23 @@
+# -*- coding: utf-8 -*-
+# Author: Kay Zhou
+# Date: 2019-03-08 17:01:02
+
+import json
+import multiprocessing
 import os
+import sqlite3
+import sys
+import time
+import traceback
+from urllib.parse import urlparse
+
+import networkx as nx
 import pandas as pd
 import requests
-import networkx as nx
-import json
-import sys, traceback
-import multiprocessing
-import time
-from unshortenit import UnshortenIt
 from tqdm import tqdm
-import sqlite3
-from urllib.parse import urlparse
+
 import tldextract
+from unshortenit import UnshortenIt
 
 
 def get_urls():
@@ -148,4 +155,3 @@ if __name__ == "__main__":
     # get_urls()
     unshorten_url()
     # again()
-

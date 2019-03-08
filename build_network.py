@@ -12,9 +12,12 @@ import os
 import sqlite3
 from collections import defaultdict
 
-import graph_tool.all as gt
+from pathlib import Path
+# import graph_tool.all as gt
 
+import pendulum
 from my_weapon import *
+import ujson as json
 from fake_identify import Are_you_IRA
 from SQLite_handler import find_all_uids, find_tweet, get_user_id
 
@@ -570,6 +573,50 @@ def save_network_gt():
     print("finished!")
 
 
+def build_networks_within_ira():
+    ira_tweets = set(pd.read_csv("data/ira-tweets-ele.csv").tweetid)
+    print("loaded ", len(ira_tweets))
+    
+    ira_file = open("disk/ira-mapping-plus.txt", "w")
+    ret_file = open("disk/ira-retweet-network.txt", "w")
+    rep_file = open("disk/ira-reply-network.txt", "w")
+
+    in_files = Path("/media/alex/datums/elections_tweets/archives/trump OR donaldtrump OR realdonaldtrump").glob("*.taj")
+    in_files.extend(Path("/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton").glob("*.taj"))
+    # in_files = ["data/tweets-c3cbeb35-27a6-4dc9-9cc0-9c47e1ad5cf2.taj"]
+
+    start = pendulum.date(2016, 6, 1).int_timestamp
+    end = pendulum.date(2016, 11, 9).int_timestamp
+
+    for in_name in tqdm(in_files):
+        for line in open(in_name):
+            d = json.loads(line)
+            dt = pendulum.parse(d["created_at"]).int_timestamp
+            if dt > end or dt < start:
+                continue
+            tweet_id = int(d["id"])
+            user_id = int(d["user"]["id"])
+
+            if tweet_id in ira_tweets:
+                ret_file.write("{}\t{}\n".format(
+                    tweet_id, user_id))
+
+            if d["retweeted"]:
+                if d["retweeted_status"]["id"] in ira_tweets:
+                    ret_file.write("{}\t{}\t{}\t{}\n".format(
+                        tweet_id, user_id, d["retweeted_status"]["id"], d["retweeted_status"]["user"]["id"]))
+
+            if d["in_reply_to_status_id"]:
+                if d["in_reply_to_status_id"] in ira_tweets:
+                    rep_file.write("{}\t{}\t{}\t{}\n".format(
+                        tweet_id, user_id, d["in_reply_to_status_id"], d["in_reply_to_user_id"]))
+
+    ira_file.close()
+    ret_file.close()
+    rep_file.close()
+
+
+
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
@@ -584,23 +631,23 @@ if __name__ == "__main__":
     # get_mention_network("disk/all-men-links.txt")
 
     # media network~
-    map_labels = {
-        "0": "fake",
-        "1": "extreme bias (right)",
-        "2": "right",
-        "3": "right leaning",
-        "4": "center",
-        "5": "left leaning",
-        "6": "left",
-        "7": "extreme bias (left)"
-    }
+    # map_labels = {
+    #     "0": "fake",
+    #     "1": "extreme bias (right)",
+    #     "2": "right",
+    #     "3": "right leaning",
+    #     "4": "center",
+    #     "5": "left leaning",
+    #     "6": "left",
+    #     "7": "extreme bias (left)"
+    # }
 
-    for _type, f_label in map_labels.items():
-        print(_type, "...")
-        nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-        print("type(n) =", type(nt))
-        _gt = nx2gt(nt)
-        _gt.save("disk/network_{}.gt".format(f_label))
+    # for _type, f_label in map_labels.items():
+    #     print(_type, "...")
+    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+    #     print("type(n) =", type(nt))
+    #     _gt = nx2gt(nt)
+    #     _gt.save("disk/network_{}.gt".format(f_label))
 
     # build IRA network
     """
@@ -621,3 +668,5 @@ if __name__ == "__main__":
     # make_all_network("disk/whole")
     # change_network("disk/whole")
     # save_network_gt()
+
+    build_networks_within_ira()
