@@ -63,7 +63,7 @@ def task(_ids):
         new_ids.append(d)
     write2json(new_ids)
 
-    return new_idss
+    return new_ids
 
 
 def write2json(new_ids):
