@@ -52,11 +52,10 @@ def task(_ids):
         #     print(d)
         try:
             d["error"] = False
-            url = unshortener.unshorten(d["url"])
-            d["final_url"] = url
-            hostname = urlparse(url).hostname
-            d['hostname'] = hostname
-
+            if d["short"]:
+                url = unshortener.unshorten(d["url"])
+                d["final_url"] = url
+                d['hostname'] = get_hostname_from_url(url)
         except Exception as e:
             d['error'] = True
 
@@ -92,37 +91,38 @@ def unshorten_url():
         # _id, tweetid, url, hostname = line.strip().split('\t')
         r = json.loads(line.strip())
         tweetid = str(r["tweetid"])
-        url = r["url"] 
+        url = r["url"]
 
         d = {
             'tweetid': tweetid,
             'url': url,
-            'hostname': None,
+            'hostname': r["hostname"],
             'final_url': url,
-            'short': False
+            'short': False,
         }
 
-        if len(hostname) <= 10:
-            d['short'] = True
+        if d["hostname"] not in ["twitter.com", "youtube.com", "instagram.com", "facebook.com"]:
+            d["short"] = True
+
         dict_id_host.append(d)
 
-    # task(dict_id_host)
+    task(dict_id_host)
     
-    task_cnt = 8
-    step = int(len(dict_id_host) / task_cnt)
-    pool = multiprocessing.Pool()
-    for i in range(task_cnt + 1):
-        if i == task_cnt - 1:
-            _ids = dict_id_host[i * step:]
-        elif i < task_cnt:
-            _ids = dict_id_host[i * step: (i + 1) * step]
-        else:
-            _ids = []
+    # task_cnt = 8
+    # step = int(len(dict_id_host) / task_cnt)
+    # pool = multiprocessing.Pool()
+    # for i in range(task_cnt + 1):
+    #     if i == task_cnt - 1:
+    #         _ids = dict_id_host[i * step:]
+    #     elif i < task_cnt:
+    #         _ids = dict_id_host[i * step: (i + 1) * step]
+    #     else:
+    #         _ids = []
         
-        pool.apply_async(task, (_ids,))
+    #     pool.apply_async(task, (_ids,))
 
-    pool.close()
-    pool.join()
+    # pool.close()
+    # pool.join()
 
 
 def again():
