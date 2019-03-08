@@ -99,7 +99,7 @@ def unshorten_url():
     # task(dict_id_host)
     
     # test
-    dict_id_host = dict_id_host[:80]
+    # dict_id_host = dict_id_host[:80]
 
     task_cnt = 8
     step = int(len(dict_id_host) / task_cnt)
