@@ -593,7 +593,7 @@ def build_networks_within_ira():
             d = json.loads(line)
             # print(d["created_at"], type(d["created_at"]), d)
             print(d["created_at"])
-            dt = pendulum.from_format(d["created_at"], 'MMM DD HH:mm:ss ZZ YYYY').int_timestamp
+            dt = pendulum.from_format(d["created_at"], 'ddd MMM DD HH:mm:ss ZZ YYYY').int_timestamp
             if dt > end or dt < start:
                 continue
             tweet_id = int(d["id"])
