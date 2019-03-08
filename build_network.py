@@ -591,8 +591,8 @@ def build_networks_within_ira():
     for in_name in tqdm(in_files):
         for line in open(in_name):
             d = json.loads(line)
-            print(d["created_at"], type(d["created_at"]), d)
-            dt = pendulum.parse(d["created_at"]).int_timestamp
+            # print(d["created_at"], type(d["created_at"]), d)
+            dt = pendulum.from_format(d["created_at"], 'MMM DD HH:mm:ss ZZ YYYY').int_timestamp
             if dt > end or dt < start:
                 continue
             tweet_id = int(d["id"])
