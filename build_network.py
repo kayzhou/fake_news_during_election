@@ -591,9 +591,7 @@ def build_networks_within_ira():
     for in_name in tqdm(in_files):
         for line in open(in_name):
             d = json.loads(line)
-            if not d:
-                continue
-            # print(d["created_at"], type(d["created_at"]), d)
+            print(d["created_at"], type(d["created_at"]), d)
             dt = pendulum.parse(d["created_at"]).int_timestamp
             if dt > end or dt < start:
                 continue
