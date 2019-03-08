@@ -62,19 +62,7 @@ def task(_ids):
         new_ids.append(d)
     write2json(new_ids)
 
-    return new_ids
-
-
-def get_hostname(_ids):
-    new_ids = []
-    for d in tqdm(_ids):
-        url = d["final_url"]
-        hostname = urlparse(url).hostname
-        d['hostname'] = hostname
-        new_ids.append(d)
-    write2json(new_ids)
-
-    return new_ids
+    return new_idss
 
 
 def write2json(new_ids):
@@ -108,6 +96,9 @@ def unshorten_url():
 
     # task(dict_id_host)
     
+    # test
+    dict_id_host = dict_id_host[:80]
+
     task_cnt = 8
     step = int(len(dict_id_host) / task_cnt)
     pool = multiprocessing.Pool()
