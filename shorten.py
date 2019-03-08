@@ -108,7 +108,7 @@ def unshorten_url():
         if i < task_cnt - 1:
             _ids = dict_id_host[i * step: (i + 1) * step]
         elif i == task_cnt - 1:
-            ids = dict_id_host[i * step:]
+            _ids = dict_id_host[i * step:]
         pool.apply_async(task, (_ids,))
 
     pool.close()
