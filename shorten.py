@@ -10,6 +10,7 @@ from unshortenit import UnshortenIt
 from tqdm import tqdm
 import sqlite3
 from urllib.parse import urlparse
+import tldextract
 
 
 def get_urls():
@@ -36,6 +37,10 @@ def get_urls():
                 # pass
                 traceback.print_exc(file=sys.stdout)
                 # print(i, e)
+
+
+def get_hostname_from_url(url):
+    return ".".join(tldextract.extract(s)[1:])
 
 
 def task(_ids):
@@ -83,16 +88,20 @@ def write2json(new_ids):
 
 def unshorten_url():
     dict_id_host = []
-    for line in open('data/ira-id-url-ele.csv'):
-        _id, tweetid, url, hostname = line.strip().split('\t')
+    for line in open('data/ira-final-url.json'):
+        # _id, tweetid, url, hostname = line.strip().split('\t')
+        r = json.loads(line.strip())
+        tweetid = str(r["tweetid"])
+        url = r["url"] 
+
         d = {
-            'id': _id,
             'tweetid': tweetid,
             'url': url,
-            'hostname': hostname,
+            'hostname': None,
             'final_url': url,
             'short': False
         }
+
         if len(hostname) <= 10:
             d['short'] = True
         dict_id_host.append(d)
