@@ -45,7 +45,7 @@ def get_hostname_from_url(url):
 
 def task(_ids):
     print("{} task starts ... ".format(os.getpid()), len(_ids))
-    unshortener = UnshortenIt(default_timeout=10)
+    unshortener = UnshortenIt(default_timeout=20)
     new_ids = []
     for d in tqdm(_ids):
         # if "error" in d and d["error"]:
@@ -109,7 +109,6 @@ def unshorten_url():
             _ids = dict_id_host[i * step: (i + 1) * step]
         elif i == task_cnt - 1:
             ids = dict_id_host[i * step:]
-
         pool.apply_async(task, (_ids,))
 
     pool.close()
