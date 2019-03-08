@@ -585,8 +585,8 @@ def build_networks_within_ira():
     in_files.extend([f for f in Path("/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton").glob("*.taj")])
     # in_files = ["data/tweets-c3cbeb35-27a6-4dc9-9cc0-9c47e1ad5cf2.taj"]
 
-    start = pendulum.date(2016, 6, 1).int_timestamp
-    end = pendulum.date(2016, 11, 9).int_timestamp
+    start = pendulum.parse("2016-06-01").int_timestamp
+    end = pendulum.parse("2016-11-09").int_timestamp
 
     for in_name in tqdm(in_files):
         for line in open(in_name):
