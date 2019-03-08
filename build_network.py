@@ -581,8 +581,8 @@ def build_networks_within_ira():
     ret_file = open("disk/ira-retweet-network.txt", "w")
     rep_file = open("disk/ira-reply-network.txt", "w")
 
-    in_files = Path("/media/alex/datums/elections_tweets/archives/trump OR donaldtrump OR realdonaldtrump").glob("*.taj")
-    in_files.extend(Path("/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton").glob("*.taj"))
+    in_files = [f for f in Path("/media/alex/datums/elections_tweets/archives/trump OR donaldtrump OR realdonaldtrump").glob("*.taj")]
+    in_files.extend([f for f in Path("/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton").glob("*.taj")])
     # in_files = ["data/tweets-c3cbeb35-27a6-4dc9-9cc0-9c47e1ad5cf2.taj"]
 
     start = pendulum.date(2016, 6, 1).int_timestamp
