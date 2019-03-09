@@ -75,19 +75,25 @@ def task(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("data/ira-urls-last.json", "a") as f:
+    with open("data/ira-urls-last-1.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
 
 
 def unshorten_url():
+
+    tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-urls-last.json")])
+
     dict_id_host = []
     for line in open('data/ira-final-url.json'):
         # _id, tweetid, url, hostname = line.strip().split('\t')
         r = json.loads(line.strip())
         tweetid = str(r["tweetid"])
         url = r["url"]
+
+        if tweetid in tweet_ids_have_dealed:
+            continue
 
         d = {
             'tweetid': tweetid,
