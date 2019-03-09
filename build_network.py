@@ -598,7 +598,7 @@ def build_networks_within_ira():
             user_id = int(d["user"]["id"])
 
             if tweet_id in ira_tweets:
-                ret_file.write("{}\t{}\n".format(
+                ira_file.write("{}\t{}\n".format(
                     tweet_id, user_id))
 
             if d["retweeted"]:
