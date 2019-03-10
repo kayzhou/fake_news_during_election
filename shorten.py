@@ -144,7 +144,7 @@ def deal_with_error():
         if "error" in d and d["error"]:
             print(d["url"])
             try:
-                if d["hostname"] in ["blackmattersus.com", "blackmattersus.com"]:
+                if d["hostname"] in ["blackmattersus.com", "blacktolive.org"]:
                     continue
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
