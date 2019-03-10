@@ -76,7 +76,7 @@ def task(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("data/ira-urls-plus-1.json", "a") as f:
+    with open("data/ira-urls-plus-2.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
@@ -116,8 +116,8 @@ def unshorten_url():
         dict_id_host.append(d)
     print("需要处理：", len(dict_id_host))
 
-    task(dict_id_host)
-    return 0
+    # task(dict_id_host)
+    # return 0
 
     # test
     # dict_id_host = dict_id_host[:80]
@@ -136,38 +136,25 @@ def unshorten_url():
     pool.join()
 
 
-def again():
-    dict_id_host = []
-    
-    # for line in open("ira-urls.json"):
-    for line in open("ira-final-urls.json"):
+def deal_with_error():
+    new_ids = []
+    unshortener = UnshortenIt(default_timeout=20)
+    for line in tqdm(open("data/ira-urls-plus-1.json")):
         d = json.loads(line.strip())
-        dict_id_host.append(d)
-
-    # task(dict_id_host)
-    get_hostname(dict_id_host)
-    return 0
-
-    """
-    task_cnt = 6
-    step = int(len(dict_id_host) / task_cnt)
-    pool = multiprocessing.Pool()
-
-    for i in range(task_cnt):
-        if i == task_cnt - 1:
-            _ids = dict_id_host[i * step:]
-        else:
-            _ids = dict_id_host[i * step: (i + 1) * step]
+        if "error" in d and d["error"]:
+            print(d)
+            url = unshortener.unshorten(d["url"])
+            d["final_url"] = url
+            d['hostname'] = get_hostname_from_url(url)
+            del d["error"]
         
-        pool.apply_async(task, (_ids,))
+        new_ids.append(d)
 
-    pool.close()
-    pool.join()
-    """
+    write2json(new_ids)
 
 
 if __name__ == "__main__":
     remove_duplication()
     # get_urls()
     # unshorten_url()
-    # again()
+    deal_with_error()
