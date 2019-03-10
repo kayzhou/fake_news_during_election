@@ -142,7 +142,7 @@ def deal_with_error():
     for line in tqdm(open("data/ira-urls-plus-1.json")):
         d = json.loads(line.strip())
         if "error" in d and d["error"]:
-            print(d)
+            print(d["url"])
             try:
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
@@ -157,7 +157,8 @@ def deal_with_error():
 
 
 if __name__ == "__main__":
-    remove_duplication()
+    # remove_duplication()
     # get_urls()
     # unshorten_url()
+    
     deal_with_error()
