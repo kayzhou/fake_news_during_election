@@ -144,6 +144,8 @@ def deal_with_error():
         if "error" in d and d["error"]:
             print(d["url"])
             try:
+                if d["hostname"] in ["blackmattersus.com", "blackmattersus.com"]:
+                    continue
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
                 d['hostname'] = get_hostname_from_url(url)
@@ -152,7 +154,6 @@ def deal_with_error():
                 print(e)
         
         new_ids.append(d)
-
     write2json(new_ids)
 
 
@@ -160,5 +161,5 @@ if __name__ == "__main__":
     # remove_duplication()
     # get_urls()
     # unshorten_url()
-    
+
     deal_with_error()
