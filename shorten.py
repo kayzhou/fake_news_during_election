@@ -148,7 +148,7 @@ def deal_with_error():
                 d['hostname'] = get_hostname_from_url(url)
                 del d["error"]
             except Exception as e:
-                print(url)
+                print(d["url"])
         
         new_ids.append(d)
     write2json(new_ids)
