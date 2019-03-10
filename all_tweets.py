@@ -56,7 +56,7 @@ class ALL_TWEET(object):
         cnt = 0
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
-            for line in open("data/ira-final-urls.json"):
+            for line in open("data/data/ira-urls-plus-2.json"):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
                 # print(hostname)
@@ -182,7 +182,8 @@ class ALL_TWEET(object):
                 self.tweets[tweetid]["is_first"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
-            # 原始的不在里面，只可能是IRA-tweets里面发现的。但是我不知道详细的信息，所以这里暂时不需要 ???
+            # 原始的不在里面，只可能是IRA-tweets里面发现的
+            # 但是ira data中original tweets不知道详细信息
             if origin_tweetid not in self.tweets:
                 tweet = {
                     "tweet_id": origin_tweetid,
