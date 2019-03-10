@@ -141,17 +141,14 @@ def deal_with_error():
     unshortener = UnshortenIt(default_timeout=20)
     for line in tqdm(open("data/ira-urls-plus-1.json")):
         d = json.loads(line.strip())
-        if "error" in d and d["error"]:
-            print(d["url"])
+        if "error" in d and d["error"] and d["hostname"] not in ["blackmattersus.com", "blacktolive.org"]:
             try:
-                if d["hostname"] in ["blackmattersus.com", "blacktolive.org"]:
-                    continue
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
                 d['hostname'] = get_hostname_from_url(url)
                 del d["error"]
             except Exception as e:
-                print(e)
+                print(url)
         
         new_ids.append(d)
     write2json(new_ids)
