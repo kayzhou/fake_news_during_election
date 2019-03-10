@@ -60,6 +60,7 @@ def task(_ids):
         try:
             d["error"] = False
             if d["short"]:
+                # print(d)
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
                 d['hostname'] = get_hostname_from_url(url)
@@ -75,26 +76,31 @@ def task(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("data/ira-urls-last-1.json", "a") as f:
+    with open("data/ira-urls-plus-1.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
 
 
-def unshorten_url():
+def remove_duplication():
+    tweets = { json.loads(line.strip())["tweetid"]: json.loads(line.strip()) for line in open("data/ira-final-urls-plus.json") }
+    new_ids = tweets.values()
+    write2json(new_ids)
 
-    tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-urls-last.json")])
+
+def unshorten_url():
+    tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-final-urls-plus.json")])
 
     dict_id_host = []
     for line in open('data/ira-final-url.json'):
         # _id, tweetid, url, hostname = line.strip().split('\t')
         r = json.loads(line.strip())
         tweetid = str(r["tweetid"])
-        url = r["url"]
 
         if tweetid in tweet_ids_have_dealed:
             continue
 
+        url = r["url"]
         d = {
             'tweetid': tweetid,
             'url': url,
@@ -102,14 +108,17 @@ def unshorten_url():
             'final_url': url,
             'short': False,
         }
-
         if d["hostname"] not in ["twitter.com", "youtube.com", "instagram.com", "facebook.com"]:
             d["short"] = True
+        if d["url"] in ["http://listen.radionomy.com/ny2la", "http://ht.ly/XKLW4"]:
+            d["short"] = False
 
         dict_id_host.append(d)
+    print("需要处理：", len(dict_id_host))
 
-    # task(dict_id_host)
-    
+    task(dict_id_host)
+    return 0
+
     # test
     # dict_id_host = dict_id_host[:80]
 
@@ -158,6 +167,7 @@ def again():
 
 
 if __name__ == "__main__":
+    remove_duplication()
     # get_urls()
-    unshorten_url()
+    # unshorten_url()
     # again()
