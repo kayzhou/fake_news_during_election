@@ -143,10 +143,13 @@ def deal_with_error():
         d = json.loads(line.strip())
         if "error" in d and d["error"]:
             print(d)
-            url = unshortener.unshorten(d["url"])
-            d["final_url"] = url
-            d['hostname'] = get_hostname_from_url(url)
-            del d["error"]
+            try:
+                url = unshortener.unshorten(d["url"])
+                d["final_url"] = url
+                d['hostname'] = get_hostname_from_url(url)
+                del d["error"]
+            except Exception as e:
+                print(e)
         
         new_ids.append(d)
 
