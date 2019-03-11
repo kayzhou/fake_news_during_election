@@ -81,7 +81,7 @@ class ALL_TWEET(object):
 
                 json_d = d
                 json_d["media_type"] = label_b
-                json_d["c_mbfc"] = label                         
+                json_d["c_mbfc"] = label              
                 json_d["c_sci_fake"] = label_sci_f                         
                 json_d["c_sci_align"] = label_sci_a
 
@@ -90,7 +90,7 @@ class ALL_TWEET(object):
 
     def find_links(self):
         if not self.tweet_ids:
-            for line in open("disk/all_tweets.json"):
+            for line in open("disk/bingo_tweets.json"):
                 self.tweet_ids.append(json.loads(line.strip())["tweet_id"])
             print(len(self.tweet_ids))
             for line in open("disk/all_IRA_tweets.json"):
@@ -118,7 +118,7 @@ class ALL_TWEET(object):
     def fill_tweets(self):
         print("原始数据处理中 ...")
 
-        for line in tqdm(open("disk/all_tweets.json")):
+        for line in tqdm(open("disk/bingo_tweets.json")):
             d = json.loads(line.strip())
             tweet = {
                 "tweet_id": str(d["tweet_id"]),
@@ -129,8 +129,11 @@ class ALL_TWEET(object):
                 "is_IRA": -1,
                 "URL": d["final_url"].lower(),
                 "hostname": d["final_hostname"].lower(),
-                "media_type": d["media_type"],
-                "retweeted_id": -1
+                "c_alex": d["media_type"],
+                "c_mbfc": d["c_mbfc"],
+                "c_sci_f": d["c_sci_fake"],
+                "c_sci_s": d["c_sci_align"],
+                "retweeted_id": -1,
             }
             if tweet["URL"].endswith("/"):
                 tweet["URL"] = tweet["URL"][:-1]
@@ -150,8 +153,11 @@ class ALL_TWEET(object):
                     "is_IRA": 1,
                     "URL": d["final_url"].lower(),
                     "hostname": d["hostname"].lower(),
-                    "media_type": d["media_type"],
-                    "retweeted_id": -1
+                    "c_alex": d["media_type"],
+                    "c_mbfc": d["c_mbfc"],
+                    "c_sci_f": d["c_sci_fake"],
+                    "c_sci_s": d["c_sci_align"],
+                    "retweeted_id": -1,
                 }
                 if tweet["URL"].endswith("/"):
                     tweet["URL"] = tweet["URL"][:-1]
@@ -164,6 +170,8 @@ class ALL_TWEET(object):
         print("扩展转发处理中 ...")
         tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
         retweets_links = json.load(open("data/all_retweet_network.json"))
+
+        cnt = 0
 
         for tweetid, origin_tweetid in tqdm(retweets_links.items()):
             # tweetid 一定是转发的！
@@ -179,7 +187,10 @@ class ALL_TWEET(object):
                     "is_IRA": -1,
                     "URL": self.tweets[origin_tweetid]["URL"],
                     "hostname": self.tweets[origin_tweetid]["hostname"],
-                    "media_type": self.tweets[origin_tweetid]["media_type"],
+                    "c_alex": self.tweets[origin_tweetid]["c_alex"],
+                    "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
+                    "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
+                    "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
                     "retweeted_id": origin_tweetid
                 }
                 d = {}
@@ -201,7 +212,9 @@ class ALL_TWEET(object):
 
             # 原始的不在里面，只可能是IRA-tweets里面发现的
             # 但是ira data中original tweets不知道详细信息
+
             if origin_tweetid not in self.tweets:
+                cnt += 1
                 tweet = {
                     "tweet_id": origin_tweetid,
                     "user_id": -1,
@@ -211,7 +224,10 @@ class ALL_TWEET(object):
                     "is_IRA": -1,
                     "URL": self.tweets[tweetid]["URL"],
                     "hostname": self.tweets[tweetid]["hostname"],
-                    "media_type": self.tweets[tweetid]["media_type"],
+                    "c_alex": self.tweets[tweetid]["c_alex"],
+                    "c_mbfc": self.tweets[tweetid]["c_mbfc"],
+                    "c_sci_f": self.tweets[tweetid]["c_sci_f"],
+                    "c_sci_s": self.tweets[tweetid]["c_sci_s"],
                     "retweeted_id": 0
                 }
                 d = {}
@@ -231,8 +247,8 @@ class ALL_TWEET(object):
                 self.tweets[origin_tweetid]["retweeted_id"] = 0
 
         print("saving tweets_from_SQL ...")
-        # json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
-        #                                 "w"), indent=2, ensure_ascii=False)
+        json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
+                                        "w"), indent=2, ensure_ascii=False)
 
         # 什么是source？没有转发别人的！其他的全部为源！
         for tweetid in self.tweets.keys():
@@ -243,7 +259,7 @@ class ALL_TWEET(object):
 
 
         # fix URL
-        print("fixing URL ...")
+        print("fixing URL ...") # 转发还包括了引用啊！
         for tweetid in self.tweets.keys():
             ret_id = self.tweets[tweetid]["retweeted_id"]
             if ret_id != 0:
@@ -585,15 +601,14 @@ class ALL_TWEET(object):
     def run(self):
         # 找数据
         self.find_all_tweets()
-        # self.find_links()
+        self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
 
         # 补充is_first
-        # self.convert_url_timeseries()
-        
+        self.convert_url_timeseries()
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
