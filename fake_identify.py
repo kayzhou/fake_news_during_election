@@ -17,6 +17,7 @@ class Who_is_fake(object):
 
         # self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
         self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_dict.json")).items()}
+        self.NEW_HOST_3 = json.load(open("fake_dict_science.json"))
 
         self.HOST = {
                 "thegatewaypundit.com": 0,
@@ -166,6 +167,19 @@ class Who_is_fake(object):
                 bias = "-1"
             # fact = self.NEW_HOST_2[ht][1].lower()
             return bias
+        else:
+            return "-1"
+
+    def identify_v3(self, ht):
+        ht = ht.lower()
+        # if ht in self.NEW_HOST_1:
+        #     labels.append(self.NEW_HOST_1[ht])
+        # else:
+        #     labels.append("GOOD")
+
+        if ht in self.NEW_HOST_3:
+            color = self.NEW_HOST_3[ht]
+            return color
         else:
             return "-1"
 
