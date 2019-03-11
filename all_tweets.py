@@ -197,7 +197,7 @@ class ALL_TWEET(object):
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
-                    tweets_from_SQL[tweetid] = d
+                    # tweets_from_SQL[tweetid] = d
                 self.tweets[tweetid] = tweet
 
             # 原来就存在
@@ -227,14 +227,14 @@ class ALL_TWEET(object):
                     "retweeted_id": 0
                 }
                 d = {}
-                if origin_tweetid in tweets_from_SQL:
-                    d = tweets_from_SQL[origin_tweetid]
-                else:
-                    d = find_tweet(origin_tweetid)
+                # if origin_tweetid in tweets_from_SQL:
+                #     d = tweets_from_SQL[origin_tweetid]
+                # else:
+                d = find_tweet(origin_tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
-                    tweets_from_SQL[origin_tweetid] = d
+                    # tweets_from_SQL[origin_tweetid] = d
 
                 self.tweets[origin_tweetid] = tweet
 
