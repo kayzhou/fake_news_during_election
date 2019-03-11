@@ -156,7 +156,7 @@ class Who_is_fake(object):
 
         if ht in self.NEW_HOST_2:
             bias = self.NEW_HOST_2[ht].lower()
-            if bias in ["fake-news", "conspiracy"]:
+            if bias in ["fake-news", "conspiracy", "satire"]:
                 bias = "fake"
             elif bias == "right-center":
                 bias = "right leaning"
