@@ -18,6 +18,7 @@ class Who_is_fake(object):
         # self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
         self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_dict.json")).items()}
         self.NEW_HOST_3 = json.load(open("data/fake_dict_science.json"))
+        self.NEW_HOST_3 = json.load(open("data/align_dict_science.json"))
 
         self.HOST = {
                 "thegatewaypundit.com": 0,
@@ -170,7 +171,7 @@ class Who_is_fake(object):
         else:
             return "-1"
 
-    def identify_v3(self, ht):
+    def identify_science_fake(self, ht):
         ht = ht.lower()
         # if ht in self.NEW_HOST_1:
         #     labels.append(self.NEW_HOST_1[ht])
@@ -183,6 +184,18 @@ class Who_is_fake(object):
         else:
             return "-1"
 
+    def identify_science_align(self, ht):
+        ht = ht.lower()
+        # if ht in self.NEW_HOST_1:
+        #     labels.append(self.NEW_HOST_1[ht])
+        # else:
+        #     labels.append("GOOD")
+
+        if ht in self.NEW_HOST_3:
+            score = self.NEW_HOST_3[ht]
+            return score
+        else:
+            return -1
 
     def is_fake(self, ht):
         if self.identify(ht)[0] == "FAKE":
