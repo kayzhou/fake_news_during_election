@@ -306,12 +306,14 @@ class ALL_TWEET(object):
         for v in tqdm(sorted_url):
             url = v[0]
             tweet_list = v[1]
-            # 有可能存在2000-01-01 00:00:00
+            # 有可能存在2000-01-01 00:00:00，因为未知具体时间
             sorted_tweets_list = sorted(tweet_list, key=lambda d: d["tweet_id"])
             for i, _tweet in enumerate(sorted_tweets_list):
                 if i == 0:
                     sorted_tweets_list[i]["is_first"] = 1
                     if sorted_tweets_list[0]["is_source"] != 1:
+                        # 时间上第一个居然不是source?
+                        print(sorted_tweets_list)
                         cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
