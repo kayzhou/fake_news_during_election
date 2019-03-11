@@ -30,6 +30,7 @@ class ALL_TWEET(object):
         judge = Who_is_fake()
 
         # all
+        """
         conn = sqlite3.connect(
             "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
         c = conn.cursor()
@@ -52,11 +53,12 @@ class ALL_TWEET(object):
                     f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
                     # self.tweet_ids.append(json_d["tweet_id"])
         conn.close()
+        """
 
         cnt = 0
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
-            for line in open("data/data/ira-urls-plus-2.json"):
+            for line in open("data/ira-urls-plus-2.json"):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
                 # print(hostname)
