@@ -569,12 +569,12 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        self.find_all_tweets()
-        self.find_links()
+        # self.find_all_tweets()
+        # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
 
         # 补充is_first
         self.convert_url_timeseries()
