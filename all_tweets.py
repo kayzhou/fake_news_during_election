@@ -313,7 +313,7 @@ class ALL_TWEET(object):
                     sorted_tweets_list[i]["is_first"] = 1
                     if sorted_tweets_list[0]["is_source"] != 1:
                         # 时间上第一个居然不是source?
-                        print(sorted_tweets_list)
+                        print(url, sorted_tweets_list)
                         cnt += 1
                 else:
                     sorted_tweets_list[i]["is_first"] = 0
@@ -331,7 +331,7 @@ class ALL_TWEET(object):
             self.save_csv()
 
         # saving!
-        self.save_url_ts()
+        # self.save_url_ts()
 
     # -- save -- #
 
