@@ -569,7 +569,7 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        # self.find_all_tweets()
+        self.find_all_tweets()
         # self.find_links()
 
         # self.fill_tweets()
@@ -577,7 +577,7 @@ class ALL_TWEET(object):
         # self.fill_IRA_info()
 
         # 补充is_first
-        self.convert_url_timeseries()
+        # self.convert_url_timeseries()
         
         # 保存，已经放在covert里面
         # self.save_url_ts()

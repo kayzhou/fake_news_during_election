@@ -15,7 +15,8 @@ class Who_is_fake(object):
         #     elif _type == "bias":
         #         self.NEW_HOST_1[hostname] = "BIAS"
 
-        self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
+        # self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
+        self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_dict.json")).items()}
 
         self.HOST = {
                 "thegatewaypundit.com": 0,
@@ -147,9 +148,12 @@ class Who_is_fake(object):
         #     labels.append("GOOD")
 
         if ht in self.NEW_HOST_2:
-            labels.extend(self.NEW_HOST_2[ht])
+            bias = self.NEW_HOST_2[ht][0].lower()
+            fact = self.NEW_HOST_2[ht][1].lower()
+            
+            labels.extend(self.NEW_HOST_2[bias, fact])
         else:
-            labels.extend([-1, -1])
+            labels.extend(["-1", "-1"])
         return labels
 
         # if ht in self.HOST:
