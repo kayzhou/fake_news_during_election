@@ -164,10 +164,6 @@ class Who_is_fake(object):
             labels = ["-1", "-1"]
         return labels
 
-        # if ht in self.HOST:
-        #     return self.HOST[ht]
-        # else:
-        #     return -1
 
     def is_fake(self, ht):
         if self.identify(ht)[0] == "FAKE":
