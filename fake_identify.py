@@ -18,7 +18,7 @@ class Who_is_fake(object):
         # self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_host_label.json")).items()}
         self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_dict.json")).items()}
         self.NEW_HOST_3 = json.load(open("data/fake_dict_science.json"))
-        self.NEW_HOST_3 = json.load(open("data/align_dict_science.json"))
+        self.NEW_HOST_4 = json.load(open("data/align_dict_science.json"))
 
         self.HOST = {
                 "thegatewaypundit.com": 0,
@@ -191,8 +191,8 @@ class Who_is_fake(object):
         # else:
         #     labels.append("GOOD")
 
-        if ht in self.NEW_HOST_3:
-            score = self.NEW_HOST_3[ht]
+        if ht in self.NEW_HOST_4:
+            score = self.NEW_HOST_4[ht]
             return score
         else:
             return -1
