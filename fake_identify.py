@@ -140,6 +140,15 @@ class Who_is_fake(object):
 
     def identify(self, ht):
         ht = ht.lower()
+
+        if ht in self.HOST:
+            return self.HOST[ht]
+        else:
+            return -1
+
+
+    def identify_v2(self, ht):
+        ht = ht.lower()
         labels = []
 
         # if ht in self.NEW_HOST_1:
