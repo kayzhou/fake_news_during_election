@@ -157,7 +157,7 @@ class Who_is_fake(object):
         if ht in self.NEW_HOST_2:
             bias = self.NEW_HOST_2[ht][0].lower()
             fact = self.NEW_HOST_2[ht][1].lower()
-            labels = [bias, fact])
+            labels = [bias, fact]
         else:
             labels = ["-1", "-1"]
         return labels
