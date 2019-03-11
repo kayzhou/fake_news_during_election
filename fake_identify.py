@@ -162,6 +162,8 @@ class Who_is_fake(object):
                 bias = "right leaning"
             elif bias == "leftcenter":
                 bias = "left leaning"
+            elif bias == "pro-science":
+                bias == "-1"
             # fact = self.NEW_HOST_2[ht][1].lower()
             return bias
         else:
