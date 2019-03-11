@@ -600,8 +600,8 @@ class ALL_TWEET(object):
 
     def run(self):
         # 找数据
-        self.find_all_tweets()
-        self.find_links()
+        # self.find_all_tweets()
+        # self.find_links()
 
         self.fill_tweets()
         self.fill_retweets()

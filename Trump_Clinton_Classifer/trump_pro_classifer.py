@@ -160,7 +160,7 @@ def is_discuss_trump_hillary(row):
     else:
         return False
 
-tweets = pd.read_csv('../data/ira_tweets_csv_hashed.csv', low_memory=False)
+tweets = pd.read_csv("../data/ira-tweets-ele.csv")
 
 savedir = '/home/alex/network_workdir/elections/tweet_classification/trump_vs_hillary_june_sep_signi/trained_classifier/'
 filename = 'sklearn_SGDLogReg_' + suffix + '.pickle'
