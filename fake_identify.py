@@ -149,8 +149,6 @@ class Who_is_fake(object):
 
     def identify_v2(self, ht):
         ht = ht.lower()
-        labels = []
-
         # if ht in self.NEW_HOST_1:
         #     labels.append(self.NEW_HOST_1[ht])
         # else:
@@ -159,10 +157,9 @@ class Who_is_fake(object):
         if ht in self.NEW_HOST_2:
             bias = self.NEW_HOST_2[ht][0].lower()
             fact = self.NEW_HOST_2[ht][1].lower()
-            
-            labels.extend(self.NEW_HOST_2[bias, fact])
+            labels = [bias, fact])
         else:
-            labels.extend(["-1", "-1"])
+            labels = ["-1", "-1"]
         return labels
 
         # if ht in self.HOST:
