@@ -38,7 +38,7 @@ class ALL_TWEET(object):
 
     def find_all_tweets(self):
         # newest
-        judge = Who_is_fake()
+        Putin = Who_is_fake()
 
         # all
         # conn = sqlite3.connect(
