@@ -79,11 +79,12 @@ class ALL_TWEET(object):
                 label_sci_f = Putin.identify_science_fake(hostname)
                 label_sci_a = Putin.identify_science_align(hostname)
 
-                json_d = {k: v for k, v in zip(col_names, d)}
+                json_d = d
                 json_d["media_type"] = label_b
                 json_d["c_mbfc"] = label                         
                 json_d["c_sci_fake"] = label_sci_f                         
                 json_d["c_sci_align"] = label_sci_a
+
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
 
         print("count of IRA tweets:", cnt)
