@@ -168,7 +168,7 @@ class ALL_TWEET(object):
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
-        tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
+        # tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
         retweets_links = json.load(open("data/all_retweet_network.json"))
 
         cnt = 0
@@ -193,11 +193,7 @@ class ALL_TWEET(object):
                     "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
                     "retweeted_id": origin_tweetid
                 }
-                d = {}
-                if tweetid in tweets_from_SQL:
-                    d = tweets_from_SQL[tweetid]
-                else:
-                    d = find_tweet(tweetid)
+                d = find_tweet(tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
                     tweet["dt"] = d["datetime_EST"]
@@ -246,9 +242,9 @@ class ALL_TWEET(object):
                 self.tweets[origin_tweetid]["is_source"] = 1
                 self.tweets[origin_tweetid]["retweeted_id"] = 0
 
-        print("saving tweets_from_SQL ...")
-        json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
-                                        "w"), indent=2, ensure_ascii=False)
+        # print("saving tweets_from_SQL ...")
+        # json.dump(tweets_from_SQL, open("disk/tweets_from_SQL.json",
+        #                                 "w"), indent=2, ensure_ascii=False)
 
         # 什么是source？没有转发别人的！其他的全部为源！
         for tweetid in self.tweets.keys():
