@@ -24,38 +24,47 @@ class ALL_TWEET(object):
         self.tweets = {}
         self.tweets_csv = []
         self.url_timeseries = []
+        self.map_labels = {
+            "-1": "-1",
+            "0": "fake",
+            "1": "extreme bias (right)",
+            "2": "right",
+            "3": "right leaning",
+            "4": "center",
+            "5": "left leaning",
+            "6": "left",
+            "7": "extreme bias (left)"
+        }
 
     def find_all_tweets(self):
         # newest
         judge = Who_is_fake()
 
         # all
-        """
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
-        c = conn.cursor()
-        c.execute('''SELECT * FROM urls;''')
-        col_names = [t[0] for t in c.description]
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+        # c = conn.cursor()
+        # c.execute('''SELECT * FROM urls;''')
+        # col_names = [t[0] for t in c.description]
 
-        with open("disk/all_tweets.json", "w") as f:
-            print("start ...")
-            for d in tqdm(c.fetchall()):
-                if d[8]:
-                    hostname = d[8].lower()
-                    # print(hostname)
-                    if hostname.startswith("www."):
-                        hostname = hostname[4:]
-                    media_type = judge.identify(hostname)
-                    if media_type == -1:
-                        continue
-                    json_d = {k: v for k, v in zip(col_names, d)}
-                    json_d["media_type"] = media_type
-                    f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
-                    # self.tweet_ids.append(json_d["tweet_id"])
-        conn.close()
-        """
+        # with open("disk/all_tweets.json", "w") as f:
+        #     print("start ...")
+        #     for d in tqdm(c.fetchall()):
+        #         if d[8]:
+        #             hostname = d[8].lower()
+        #             # print(hostname)
+        #             if hostname.startswith("www."):
+        #                 hostname = hostname[4:]
+        #             media_type = judge.identify(hostname)
+        #             if media_type == -1:
+        #                 continue
+        #             json_d = {k: v for k, v in zip(col_names, d)}
+        #             json_d["media_type"] = media_type
+        #             f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
+        #             # self.tweet_ids.append(json_d["tweet_id"])
+        # conn.close()
 
-        cnt = 0
+
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
             for line in open("data/ira-urls-plus-2.json"):
@@ -64,14 +73,21 @@ class ALL_TWEET(object):
                 # print(hostname)
                 if hostname.startswith("www."):
                     hostname = hostname[4:]
-                media_type = judge.identify(hostname)
-                if media_type == -1:
-                    continue
-                cnt += 1
-                d["media_type"] = media_type
+
+                label_b = self.map_labels[str(Putin.identify(hostname))]
+                label = Putin.identify_v2(hostname)
+                label_sci_f = Putin.identify_science_fake(hostname)
+                label_sci_a = Putin.identify_science_align(hostname)
+
+                json_d = {k: v for k, v in zip(col_names, d)}
+                json_d["media_type"] = label_b
+                json_d["c_mbfc"] = label                         
+                json_d["c_sci_fake"] = label_sci_f                         
+                json_d["c_sci_align"] = label_sci_a
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
 
         print("count of IRA tweets:", cnt)
+
 
     def find_links(self):
         if not self.tweet_ids:
