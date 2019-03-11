@@ -67,7 +67,7 @@ class ALL_TWEET(object):
 
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
-            for line in open("data/ira-urls-plus-2.json"):
+            for line in tqdm(open("data/ira-urls-plus-2.json")):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
                 # print(hostname)
@@ -86,8 +86,6 @@ class ALL_TWEET(object):
                 json_d["c_sci_align"] = label_sci_a
 
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
-
-        print("count of IRA tweets:", cnt)
 
 
     def find_links(self):
