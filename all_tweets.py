@@ -359,7 +359,7 @@ class ALL_TWEET(object):
                 error_cnt += 1
                 tmp_t = tweets[t_id]
                 tmp_t["tweet_id"] = ret_id
-                tweets_id[ret_id] = tmp_t
+                tweets[ret_id] = tmp_t
             else:
                 fuck += 1
 

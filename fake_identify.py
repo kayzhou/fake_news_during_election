@@ -210,6 +210,11 @@ class Are_you_IRA(object):
         # self.IRA_users_before_set = pd.read_csv("data/ira_users_csv_hashed.csv", usecols=["userid"], dtype=str)["userid"]
         self.IRA_user_set = set(json.load(open("data/IRA_user_list.json"))) # all IRA (匿名或非匿名) included
 
+    def uncover(self, uid):
+        if uid in putin._map:
+            uid = str(putin._map[uid])
+        return uid
+
     def fuck(self, ht):
         return ht in self.IRA_user_set
 

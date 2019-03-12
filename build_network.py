@@ -7,6 +7,35 @@ Created on 2018-11-16 09:01:28
 12th week in NY
 """
 
+"""
+------------------------------ TABLE tweet_to_quoted_uid ------------------------------
+count： (2712599,)
+tweet_id		771131463383285761
+quoted_uid		457984599
+author_uid		3192506298
+
+------------------------------ TABLE tweet_to_replied_uid ------------------------------
+count： (10064719,)
+tweet_id		771131465287528449
+replied_uid		1339835893
+author_uid		754080446078676993
+
+------------------------------ TABLE tweet_to_retweeted_uid ------------------------------
+count： (71935828,)
+tweet_id		771131463924199424
+retweeted_uid		1339835893
+author_uid		55956218
+retweet_id		771037992811163648
+
+------------------------------ TABLE tweet_to_mentioned_uid ------------------------------
+count： (40694821,)
+tweet_id		771131463345565696
+mentioned_uid		73657657
+author_uid		2429107224
+
+"""
+
+
 import gc
 import os
 import sqlite3
@@ -573,6 +602,78 @@ def save_network_gt():
     print("finished!")
 
 
+def get_network_with_ira():
+    ira_tweets = pd.read_csv("data/ira-tweets-ele.csv", dtype=str)
+    print("loaded ", len(ira_tweets))
+
+    Putin = Are_you_IRA()
+
+    """
+    Index(['tweetid', 'userid', 'user_display_name', 'user_screen_name',
+       'user_reported_location', 'user_profile_description',
+       'user_profile_url', 'follower_count', 'following_count',
+       'account_creation_date', 'account_language', 'tweet_language',
+       'tweet_text', 'tweet_time', 'tweet_client_name', 'in_reply_to_tweetid',
+       'in_reply_to_userid', 'quoted_tweet_tweetid', 'is_retweet',
+       'retweet_userid', 'retweet_tweetid', 'latitude', 'longitude',
+       'quote_count', 'reply_count', 'like_count', 'retweet_count', 'hashtags',
+       'urls', 'user_mentions', 'poll_choices'],
+      dtype='object')
+    """
+    men_file = open("disk/ira-men.txt", "w")
+    ret_file = open("disk/ira-ret.txt", "w")
+    rep_file = open("disk/ira-rep.txt", "w")
+    quo_file = open("disk/ira-quo.txt", "w")
+
+    rep_ira_tweets = ira_tweets[ira_tweets.in_reply_to_tweetid.notnull()]
+    quo_ira_tweets = ira_tweets[ira_tweets.quoted_tweet_tweetid.notnull()]
+    ret_ira_tweets = ira_tweets[ira_tweets.retweet_tweetid.notnull()]
+    men_ira_tweets = ira_tweets[ira_tweets.user_mentions.notnull()]
+
+    rep_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    for i, row in rep_ira_tweets.iterrows():
+        rep_file.write(",".join([
+            row["tweetid"],
+            Putin.uncover(row["userid"]),
+            row["in_reply_to_tweetid"],
+            Putin.uncover(row["in_reply_to_userid"])
+        ]) + "\n")
+
+    quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    for i, row in quo_ira_tweets.iterrows():
+        quo_file.write(",".join([
+            row["tweetid"],
+            Putin.uncover(row["userid"]),
+            row["quoted_tweet_tweetid"],
+            Putin.uncover(row["quoted_tweet_userid"])
+        ]) + "\n")
+
+    ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    for i, row in ret_ira_tweets.iterrows():
+        ret_file.write(",".join([
+            row["tweetid"],
+            Putin.uncover(row["userid"]),
+            row["retweet_tweetid"],
+            Putin.uncover(row["retweet_userid"])
+        ]) + "\n")
+
+    men_ira_tweets.write("tweet_id,user_id,to_tweet_id,to_user_id\n")
+    for i, row in reply_ira_tweets.iterrows():
+        mentions = row["user_mentions"]
+        us = mentions[1:-1].split(", ")
+        for u in us:
+            men_file.write(",".join([
+                row["tweetid"],
+                Putin.uncover(row["userid"]),
+                Putin.uncover(u)
+            ]) + "\n")
+
+
+
+
+
+
+# abandon
 def build_networks_within_ira():
     ira_tweets = set(pd.read_csv("data/ira-tweets-ele.csv").tweetid)
     print("loaded ", len(ira_tweets))
@@ -669,4 +770,5 @@ if __name__ == "__main__":
     # change_network("disk/whole")
     # save_network_gt()
 
-    build_networks_within_ira()
+    # build_networks_within_ira()
+    get_network_with_ira()
