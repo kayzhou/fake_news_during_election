@@ -336,7 +336,7 @@ class ALL_TWEET(object):
             if t_id not in tweets_id:
                 continue
             tweets[t_id] = {
-                "tweet_id": t_id
+                "tweet_id": t_id,
                 "URL": d["final_url"],
                 "hostname": d["hostname"],
                 "medit_type": d["media_type"],
