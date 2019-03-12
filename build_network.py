@@ -681,7 +681,7 @@ def get_ira_network_with_big_networks():
     Putin = Are_you_IRA()
     def search_IRA(in_name, out_name):
         with open(out_name, "w") as f:
-            for line in open(in_name):
+            for line in tqdm(open(in_name)):
                 w = line.strip().split()
                 if Putin.fuck(w[1]) or Putin.fuck(w[2]):
                     f.write(f)
@@ -789,4 +789,4 @@ if __name__ == "__main__":
 
     # build_networks_within_ira()
     # get_network_with_ira()
-    get_ira_network_with_big_networks
+    get_ira_network_with_big_networks()
