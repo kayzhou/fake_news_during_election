@@ -607,7 +607,7 @@ class ALL_TWEET(object):
         self.fill_IRA_info()
 
         # 补充is_first
-        self.convert_url_timeseries()
+        # self.convert_url_timeseries()
         self.save_csv()
 
         # 保存，已经放在covert里面
