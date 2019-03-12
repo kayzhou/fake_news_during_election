@@ -316,9 +316,10 @@ class ALL_TWEET(object):
         tweets = {}
         for line in tqdm(open("disk/all_tweets.json")):
             d = json.loads(line.strip())
-            if d["tweet_id"] not in tweets_id:
+            t_id = str(d["tweet_id"])
+            if t_id not in tweets_id:
                 continue
-            tweets[d["tweet_id"]] = {
+            tweets[t_id] = {
                 "URL": d["final_url"],
                 "hostname": d["final_hostname"],
                 "c_alex": d["c_alex"],
