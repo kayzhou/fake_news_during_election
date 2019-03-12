@@ -135,8 +135,8 @@ class ALL_TWEET(object):
                 # "c_sci_s": d["c_sci_align"],
                 "retweeted_id": -1,
             }
-            if tweet["URL"].endswith("/"):
-                tweet["URL"] = tweet["URL"][:-1]
+            # if tweet["URL"].endswith("/"):
+            #     tweet["URL"] = tweet["URL"][:-1]
 
             self.tweets[str(d["tweet_id"])] = tweet
 
@@ -159,8 +159,8 @@ class ALL_TWEET(object):
                     # "c_sci_s": d["c_sci_align"],
                     "retweeted_id": -1,
                 }
-                if tweet["URL"].endswith("/"):
-                    tweet["URL"] = tweet["URL"][:-1]
+                # if tweet["URL"].endswith("/"):
+                #     tweet["URL"] = tweet["URL"][:-1]
                 self.tweets[str(d["tweetid"])] = tweet
             else:
                 cnt += 1
