@@ -623,7 +623,7 @@ def get_network_with_ira():
     men_file = open("disk/ira-men.txt", "w")
     ret_file = open("disk/ira-ret.txt", "w")
     rep_file = open("disk/ira-rep.txt", "w")
-    quo_file = open("disk/ira-quo.txt", "w")
+    # quo_file = open("disk/ira-quo.txt", "w")
 
     rep_ira_tweets = ira_tweets[ira_tweets.in_reply_to_tweetid.notnull()]
     quo_ira_tweets = ira_tweets[ira_tweets.quoted_tweet_tweetid.notnull()]
