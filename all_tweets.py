@@ -662,8 +662,7 @@ class ALL_TWEET(object):
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        self.fill_IRA_info()
-
+        self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
