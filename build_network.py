@@ -684,7 +684,7 @@ def get_ira_network_with_big_networks():
             for line in tqdm(open(in_name)):
                 w = line.strip().split()
                 if Putin.fuck(w[1]) or Putin.fuck(w[2]):
-                    f.write(f)
+                    f.write(line)
     search_IRA("disk/all-men-links.txt", "disk/ira-men-links.txt")
     search_IRA("disk/all-ret-links.txt", "disk/ira-ret-links.txt")
     search_IRA("disk/all-rep-links.txt", "disk/ira-rep-links.txt")
