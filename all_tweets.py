@@ -343,7 +343,7 @@ class ALL_TWEET(object):
                 "tweet_id": t_id,
                 "URL": d["final_url"],
                 "hostname": d["hostname"],
-                "medit_type": d["media_type"],
+                "media_type": d["media_type"],
                 "c_mbfc": d["c_mbfc"],
                 "c_sci_f": d["c_sci_fake"],
                 "c_sci_s": d["c_sci_align"],
