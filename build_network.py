@@ -657,7 +657,7 @@ def get_network_with_ira():
             Putin.uncover(row["retweet_userid"])
         ]) + "\n")
 
-    men_ira_tweets.write("tweet_id,user_id,to_tweet_id,to_user_id\n")
+    men_file.write("tweet_id,user_id,to_tweet_id,to_user_id\n")
     for i, row in reply_ira_tweets.iterrows():
         mentions = row["user_mentions"]
         us = mentions[1:-1].split(", ")
