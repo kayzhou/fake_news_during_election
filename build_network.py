@@ -645,7 +645,7 @@ def get_network_with_ira():
             row["tweetid"],
             Putin.uncover(row["userid"]),
             row["quoted_tweet_tweetid"],
-            Putin.uncover(row["retweet_tweet_userid"])
+            Putin.uncover(row["retweet_userid"])
         ]) + "\n")
 
     ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
