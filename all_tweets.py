@@ -348,7 +348,7 @@ class ALL_TWEET(object):
             tweets[t_id] = tmp_t
 
         # save
-        tweets = pd.DataFrame(list(tweets.values))
+        tweets = pd.DataFrame(list(tweets.values()))
         tweets.to_csv("disk/all-tweets-ht.csv", index=None)
 
 
