@@ -12,6 +12,7 @@ import graph_tool.all as gt
 from fake_identify import Are_you_IRA, Who_is_fake
 from my_weapon import *
 from SQLite_handler import find_tweet, find_retweet_network
+import ujson as json
 
 
 class ALL_TWEET(object):
