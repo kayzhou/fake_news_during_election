@@ -309,17 +309,18 @@ class ALL_TWEET(object):
         # data["is_first"] = -1 first目前先不考虑，在做时间序列的时候再考虑。
 
         # 先找到所有source_tweets，填补数据
-        source_tweets = data[data.is_source=="1"]
-        tweets_id = set(source_tweets.tweet_id.tolist())
-        print("source tweets", len(tweets_id))
+        # source_tweets = data[data.is_source=="1"]
+        tweets_id = set(data.tweet_id.tolist())
+        print("tweets", len(tweets_id))
 
         tweets = {}
-        for line in tqdm(open("disk/all_tweets.json")):
+        for line in tqdm(open("disk/bingo_tweets.json")):
             d = json.loads(line.strip())
             t_id = str(d["tweet_id"])
             if t_id not in tweets_id:
                 continue
             tweets[t_id] = {
+                "tweet_id": t_id,
                 "URL": d["final_url"],
                 "hostname": d["final_hostname"],
                 "media_type": d["media_type"],
@@ -331,9 +332,11 @@ class ALL_TWEET(object):
         # IRA
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
-            if d["tweetid"] not in tweets_id:
+            t_id = str(d["tweetid"])
+            if t_id not in tweets_id:
                 continue
-            tweets[d["tweetid"]] = {
+            tweets[t_id] = {
+                "tweet_id": t_id
                 "URL": d["final_url"],
                 "hostname": d["hostname"],
                 "medit_type": d["media_type"],
@@ -343,17 +346,25 @@ class ALL_TWEET(object):
             }
 
         error_cnt = 0
+        fuck = 0
         non_source_tweets = data[data.is_source=="0"]
         for i, row in tqdm(non_source_tweets.iterrows()):
             t_id = row["tweet_id"]
             ret_id = row["retweeted_id"]
             if ret_id in tweets:
                 tmp_t = tweets[ret_id]
+                tmp_t["tweet_id"] = t_id
                 tweets[t_id] = tmp_t
-            else:
+            elif t_id in tweets: 
                 error_cnt += 1
+                tmp_t = tweets[t_id]
+                tmp_t["tweet_id"] = ret_id
+                tweets_id[ret_id] = tmp_t
+            else:
+                fuck += 1
 
-        print("原始文档缺少url信息。", error_cnt)
+        print("原始推特缺少url信息。", error_cnt)
+        print("谁都没有url还玩个P？", fuck)
 
         # save
         tweets = pd.DataFrame(list(tweets.values()))
