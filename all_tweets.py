@@ -347,8 +347,7 @@ class ALL_TWEET(object):
 
         error_cnt = 0
         fuck = 0
-        non_source_tweets = data[data.is_source=="0"]
-        for i, row in tqdm(non_source_tweets.iterrows()):
+        for i, row in tqdm(data.iterrows()):
             t_id = row["tweet_id"]
             ret_id = row["retweeted_id"]
             if ret_id in tweets:
