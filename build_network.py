@@ -639,14 +639,14 @@ def get_network_with_ira():
             Putin.uncover(row["in_reply_to_userid"])
         ]) + "\n")
 
-    # quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
-    # for i, row in quo_ira_tweets.iterrows():
-    #     quo_file.write(",".join([
-    #         row["tweetid"],
-    #         Putin.uncover(row["userid"]),
-    #         row["quoted_tweet_tweetid"],
-    #         Putin.uncover(row["quoted_tweet_userid"])
-    #     ]) + "\n")
+    quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    for i, row in quo_ira_tweets.iterrows():
+        quo_file.write(",".join([
+            row["tweetid"],
+            Putin.uncover(row["userid"]),
+            row["quoted_tweet_tweetid"],
+            Putin.uncover(row["retweet_tweet_userid"])
+        ]) + "\n")
 
     ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
     for i, row in ret_ira_tweets.iterrows():
@@ -658,7 +658,7 @@ def get_network_with_ira():
         ]) + "\n")
 
     men_file.write("tweet_id,user_id,to_tweet_id,to_user_id\n")
-    for i, row in reply_ira_tweets.iterrows():
+    for i, row in men_ira_tweets.iterrows():
         mentions = row["user_mentions"]
         us = mentions[1:-1].split(", ")
         for u in us:
