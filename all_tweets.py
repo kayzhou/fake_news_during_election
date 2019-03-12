@@ -319,6 +319,8 @@ class ALL_TWEET(object):
             t_id = str(d["tweet_id"])
             if t_id not in tweets_id:
                 continue
+            if d["final_url"].endswith("/"):
+                d["final_url"] = d["final_url"][:-1]
             tweets[t_id] = {
                 "tweet_id": t_id,
                 "URL": d["final_url"],
@@ -335,6 +337,8 @@ class ALL_TWEET(object):
             t_id = str(d["tweetid"])
             if t_id not in tweets_id:
                 continue
+            if d["final_url"].endswith("/"):
+                d["final_url"] = d["final_url"][:-1]
             tweets[t_id] = {
                 "tweet_id": t_id,
                 "URL": d["final_url"],
