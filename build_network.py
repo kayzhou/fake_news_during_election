@@ -651,8 +651,9 @@ def get_network_with_ira():
             ]) + "\n")
         except:
             print(row["retweet_userid"])
+            print(row["in_reply_to_userid"])
             cnt += 1
-    print(cnt)
+    print(len(quo_ira_tweets), cnt)
 
     ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
     for i, row in ret_ira_tweets.iterrows():
