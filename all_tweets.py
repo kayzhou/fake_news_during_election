@@ -322,7 +322,7 @@ class ALL_TWEET(object):
             tweets[t_id] = {
                 "URL": d["final_url"],
                 "hostname": d["final_hostname"],
-                "c_alex": d["c_alex"],
+                "media_type": d["media_type"],
                 "c_mbfc": d["c_mbfc"],
                 "c_sci_f": d["c_sci_f"],
                 "c_sci_s": d["c_sci_s"],
@@ -336,7 +336,7 @@ class ALL_TWEET(object):
             tweets[d["tweetid"]] = {
                 "URL": d["final_url"],
                 "hostname": d["hostname"],
-                "c_alex": d["c_alex"],
+                "medit_type": d["media_type"],
                 "c_mbfc": d["c_mbfc"],
                 "c_sci_f": d["c_sci_f"],
                 "c_sci_s": d["c_sci_s"],
