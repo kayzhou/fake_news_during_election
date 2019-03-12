@@ -668,11 +668,6 @@ def get_network_with_ira():
                 Putin.uncover(u)
             ]) + "\n")
 
-
-
-
-
-
 # abandon
 def build_networks_within_ira():
     ira_tweets = set(pd.read_csv("data/ira-tweets-ele.csv").tweetid)

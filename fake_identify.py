@@ -211,8 +211,8 @@ class Are_you_IRA(object):
         self.IRA_user_set = set(json.load(open("data/IRA_user_list.json"))) # all IRA (匿名或非匿名) included
 
     def uncover(self, uid):
-        if uid in putin._map:
-            uid = str(putin._map[uid])
+        if uid in self._map:
+            uid = str(self._map[uid])
         return uid
 
     def fuck(self, ht):
