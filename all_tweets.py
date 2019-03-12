@@ -311,6 +311,7 @@ class ALL_TWEET(object):
         # 先找到所有source_tweets，填补数据
         source_tweets = data[data.is_source=="1"]
         tweets_id = set(source_tweets.tweet_id.tolist())
+        print("source tweets", len(tweets_id))
 
         tweets = {}
         for line in tqdm(open("disk/all_tweets.json")):
