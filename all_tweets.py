@@ -124,15 +124,15 @@ class ALL_TWEET(object):
                 "tweet_id": str(d["tweet_id"]),
                 "user_id": str(d["user_id"]),
                 "dt": d["datetime_EST"],
-                "is_first": -1,
+                # "is_first": -1,
                 "is_source": -1,
                 "is_IRA": -1,
-                "URL": d["final_url"].lower(),
-                "hostname": d["final_hostname"].lower(),
-                "c_alex": d["media_type"],
-                "c_mbfc": d["c_mbfc"],
-                "c_sci_f": d["c_sci_fake"],
-                "c_sci_s": d["c_sci_align"],
+                # "URL": d["final_url"].lower(),
+                # "hostname": d["final_hostname"].lower(),
+                # "c_alex": d["media_type"],
+                # "c_mbfc": d["c_mbfc"],
+                # "c_sci_f": d["c_sci_fake"],
+                # "c_sci_s": d["c_sci_align"],
                 "retweeted_id": -1,
             }
             if tweet["URL"].endswith("/"):
@@ -148,15 +148,15 @@ class ALL_TWEET(object):
                     "tweet_id": str(d["tweetid"]),
                     "user_id": -1,
                     "dt": "2000-01-01 00:00:00",
-                    "is_first": -1,
+                    # "is_first": -1,
                     "is_source": -1,
                     "is_IRA": 1,
-                    "URL": d["final_url"].lower(),
-                    "hostname": d["hostname"].lower(),
-                    "c_alex": d["media_type"],
-                    "c_mbfc": d["c_mbfc"],
-                    "c_sci_f": d["c_sci_fake"],
-                    "c_sci_s": d["c_sci_align"],
+                    # "URL": d["final_url"].lower(),
+                    # "hostname": d["hostname"].lower(),
+                    # "c_alex": d["media_type"],
+                    # "c_mbfc": d["c_mbfc"],
+                    # "c_sci_f": d["c_sci_fake"],
+                    # "c_sci_s": d["c_sci_align"],
                     "retweeted_id": -1,
                 }
                 if tweet["URL"].endswith("/"):
@@ -182,15 +182,15 @@ class ALL_TWEET(object):
                     "tweet_id": tweetid,
                     "user_id": -1,
                     "dt": "2000-01-01 00:00:00",
-                    "is_first": 0,
+                    # "is_first": 0,
                     "is_source": 0,
                     "is_IRA": -1,
-                    "URL": self.tweets[origin_tweetid]["URL"],
-                    "hostname": self.tweets[origin_tweetid]["hostname"],
-                    "c_alex": self.tweets[origin_tweetid]["c_alex"],
-                    "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
-                    "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
-                    "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
+                    # "URL": self.tweets[origin_tweetid]["URL"],
+                    # "hostname": self.tweets[origin_tweetid]["hostname"],
+                    # "c_alex": self.tweets[origin_tweetid]["c_alex"],
+                    # "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
+                    # "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
+                    # "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
                     "retweeted_id": origin_tweetid
                 }
                 d = find_tweet(tweetid)
@@ -203,7 +203,7 @@ class ALL_TWEET(object):
             # 原来就存在
             else:
                 self.tweets[tweetid]["is_source"] = 0
-                self.tweets[tweetid]["is_first"] = 0
+                # self.tweets[tweetid]["is_first"] = 0
                 self.tweets[tweetid]["retweeted_id"] = origin_tweetid
 
             # 原始的不在里面，只可能是IRA-tweets里面发现的
@@ -215,15 +215,15 @@ class ALL_TWEET(object):
                     "tweet_id": origin_tweetid,
                     "user_id": -1,
                     "dt": "2000-01-01 00:00:00",
-                    "is_first": -1,
+                    # "is_first": -1,
                     "is_source": 1,
                     "is_IRA": -1,
-                    "URL": self.tweets[tweetid]["URL"],
-                    "hostname": self.tweets[tweetid]["hostname"],
-                    "c_alex": self.tweets[tweetid]["c_alex"],
-                    "c_mbfc": self.tweets[tweetid]["c_mbfc"],
-                    "c_sci_f": self.tweets[tweetid]["c_sci_f"],
-                    "c_sci_s": self.tweets[tweetid]["c_sci_s"],
+                    # "URL": self.tweets[tweetid]["URL"],
+                    # "hostname": self.tweets[tweetid]["hostname"],
+                    # "c_alex": self.tweets[tweetid]["c_alex"],
+                    # "c_mbfc": self.tweets[tweetid]["c_mbfc"],
+                    # "c_sci_f": self.tweets[tweetid]["c_sci_f"],
+                    # "c_sci_s": self.tweets[tweetid]["c_sci_s"],
                     "retweeted_id": 0
                 }
                 d = {}
@@ -255,12 +255,12 @@ class ALL_TWEET(object):
 
 
         # fix URL
-        print("fixing URL ...") # 转发还包括了引用啊！
-        for tweetid in self.tweets.keys():
-            ret_id = self.tweets[tweetid]["retweeted_id"]
-            if ret_id != 0:
-                self.tweets[tweetid]["URL"] = self.tweets[ret_id]["URL"]
-                self.tweets[tweetid]["media_type"] = self.tweets[ret_id]["media_type"]
+        # print("fixing URL ...") # 转发还包括了引用啊！
+        # for tweetid in self.tweets.keys():
+        #     ret_id = self.tweets[tweetid]["retweeted_id"]
+        #     if ret_id != 0:
+        #         self.tweets[tweetid]["URL"] = self.tweets[ret_id]["URL"]
+        #         self.tweets[tweetid]["media_type"] = self.tweets[ret_id]["media_type"]
 
 
     def fill_IRA_info(self):
@@ -387,7 +387,10 @@ class ALL_TWEET(object):
 
     def save_csv(self):
         print("*.csv文件保存中 ...")
+        if not self.tweets_csv:
+            self.tweets_csv = list(self.tweets.values())
         pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
+
 
     def load_retweet_network(self):
         r_net = json.load(open("data/all_retweet_network.json"))
@@ -605,6 +608,8 @@ class ALL_TWEET(object):
 
         # 补充is_first
         self.convert_url_timeseries()
+        self.save_csv()
+
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
