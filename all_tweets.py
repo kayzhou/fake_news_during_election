@@ -304,7 +304,7 @@ class ALL_TWEET(object):
 
     def fill_other_info(self):
         # tweets数据因分类变化，扩充后需要把之前的数据项补全
-        data = pd.read_csv("data/all_tweets.csv", dtype=str, nrows=100)
+        data = pd.read_csv("data/all-tweets.csv", dtype=str, nrows=100)
 
         # data["is_first"] = -1 first目前先不考虑，在做时间序列的时候再考虑。
 
@@ -349,7 +349,7 @@ class ALL_TWEET(object):
 
         # save
         tweets = pd.DataFrame(list(tweets.values))
-        tweets.to_csv("data/all-tweets-ht.csv", index=None)
+        tweets.to_csv("disk/all-tweets-ht.csv", index=None)
 
 
     def convert_url_timeseries(self):
