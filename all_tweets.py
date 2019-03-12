@@ -324,8 +324,8 @@ class ALL_TWEET(object):
                 "hostname": d["final_hostname"],
                 "media_type": d["media_type"],
                 "c_mbfc": d["c_mbfc"],
-                "c_sci_f": d["c_sci_f"],
-                "c_sci_s": d["c_sci_s"],
+                "c_sci_f": d["c_sci_fake"],
+                "c_sci_s": d["c_sci_align"],
             }
 
         # IRA
@@ -338,8 +338,8 @@ class ALL_TWEET(object):
                 "hostname": d["hostname"],
                 "medit_type": d["media_type"],
                 "c_mbfc": d["c_mbfc"],
-                "c_sci_f": d["c_sci_f"],
-                "c_sci_s": d["c_sci_s"],
+                "c_sci_f": d["c_sci_fake"],
+                "c_sci_s": d["c_sci_align"],
             }
 
         non_source_tweets = data[data.is_source=="0"]
