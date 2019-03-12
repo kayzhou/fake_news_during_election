@@ -639,21 +639,21 @@ def get_network_with_ira():
             Putin.uncover(row["in_reply_to_userid"])
         ]) + "\n")
 
-    cnt = 0
-    quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
-    for i, row in quo_ira_tweets.iterrows():
-        try:
-            quo_file.write(",".join([
-                row["tweetid"],
-                Putin.uncover(row["userid"]),
-                row["quoted_tweet_tweetid"],
-                Putin.uncover(row["retweet_userid"])
-            ]) + "\n")
-        except:
-            print(row["retweet_userid"])
-            print(row["in_reply_to_userid"])
-            cnt += 1
-    print(len(quo_ira_tweets), cnt)
+    # cnt = 0
+    # quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    # for i, row in quo_ira_tweets.iterrows():
+    #     try:
+    #         quo_file.write(",".join([
+    #             row["tweetid"],
+    #             Putin.uncover(row["userid"]),
+    #             row["quoted_tweet_tweetid"],
+    #             Putin.uncover(row["retweet_userid"])
+    #         ]) + "\n")
+    #     except:
+    #         print(row["retweet_userid"])
+    #         print(row["in_reply_to_userid"])
+    #         cnt += 1
+    # print(len(quo_ira_tweets), cnt)
 
     ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
     for i, row in ret_ira_tweets.iterrows():
