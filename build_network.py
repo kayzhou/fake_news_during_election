@@ -675,6 +675,21 @@ def get_network_with_ira():
                 Putin.uncover(u)
             ]) + "\n")
 
+
+
+def get_ira_network_with_big_networks():
+    Putin = Are_you_IRA()
+    def search_IRA(in_name, out_name):
+        with open(out_name, "w") as f:
+            for line in open(in_name):
+                w = line.strip().split()
+                if Putin.fuck(w[1]) or Putin.fuck(w[2]):
+                    f.write(f)
+    search_IRA("disk/all-men-links.txt", "disk/ira-men-links.txt")
+    search_IRA("disk/all-ret-links.txt", "disk/ira-ret-links.txt")
+    search_IRA("disk/all-rep-links.txt", "disk/ira-rep-links.txt")
+
+
 # abandon
 def build_networks_within_ira():
     ira_tweets = set(pd.read_csv("data/ira-tweets-ele.csv").tweetid)
@@ -773,4 +788,5 @@ if __name__ == "__main__":
     # save_network_gt()
 
     # build_networks_within_ira()
-    get_network_with_ira()
+    # get_network_with_ira()
+    get_ira_network_with_big_networks
