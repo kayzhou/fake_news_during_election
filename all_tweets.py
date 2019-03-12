@@ -304,7 +304,7 @@ class ALL_TWEET(object):
 
     def fill_other_info(self):
         # tweets数据因分类变化，扩充后需要把之前的数据项补全
-        data = pd.read_csv("disk/all-tweets.csv", dtype=str, nrows=100)
+        data = pd.read_csv("disk/all-tweets.csv", dtype=str)
 
         # data["is_first"] = -1 first目前先不考虑，在做时间序列的时候再考虑。
 
@@ -342,12 +342,18 @@ class ALL_TWEET(object):
                 "c_sci_s": d["c_sci_align"],
             }
 
+        error_cnt = 0
         non_source_tweets = data[data.is_source=="0"]
         for i, row in tqdm(non_source_tweets.iterrows()):
             t_id = row["tweet_id"]
             ret_id = row["retweeted_id"]
-            tmp_t = tweets[ret_id]
-            tweets[t_id] = tmp_t
+            if ret_id in tweets:
+                tmp_t = tweets[ret_id]
+                tweets[t_id] = tmp_t
+            else:
+                error_cnt += 1
+
+        print("原始文档缺少url信息。", error_cnt)
 
         # save
         tweets = pd.DataFrame(list(tweets.values()))
