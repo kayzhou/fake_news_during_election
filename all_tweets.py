@@ -467,7 +467,6 @@ class ALL_TWEET(object):
             self.tweets_csv = list(self.tweets.values())
         pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
-
     def load_retweet_network(self):
         r_net = json.load(open("data/all_retweet_network.json"))
         self.retweet_network = r_net
@@ -476,7 +475,7 @@ class ALL_TWEET(object):
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
         self.tweets_csv = all_tweets.astype(
-            {"is_IRA": int, "is_first": int, "is_source": int, "dt": datetime})
+            {"is_IRA": int, "is_source": int, "dt": datetime})
         print("finished!")
         return self.tweets_csv
 
