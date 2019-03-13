@@ -539,6 +539,5 @@ if __name__ == "__main__":
     uids = [u for u in Putin.IRA_user_set if len(u) != 64]
     data = find_tweets_by_users(uids)
     with open("IRA-tweets-id.txt", "w") as f:
-        for d in data:
-            f.write(str(d) + "\n")
+        json.dump(data, f, indent=4)
     
