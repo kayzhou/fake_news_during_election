@@ -676,7 +676,6 @@ def get_network_with_ira():
             ]) + "\n")
 
 
-
 def get_ira_network_with_big_networks():
     Putin = Are_you_IRA()
     def search_IRA(in_name, out_name):
@@ -688,6 +687,102 @@ def get_ira_network_with_big_networks():
     search_IRA("disk/all-men-links.txt", "disk/ira-men-links.txt")
     search_IRA("disk/all-ret-links.txt", "disk/ira-ret-links.txt")
     search_IRA("disk/all-rep-links.txt", "disk/ira-rep-links.txt")
+
+
+def merge_two_groups_link_to_graph():
+    from collections import Counter
+    men_tweets = {}
+    rep_tweets = {}
+    ret_tweets = {}
+
+    G = nx.DiGraph()
+    men_rec = set()
+    men_graph = Counter()
+    for line in open("disk/ira-men-links.txt"):
+        w = line.strip().split()
+        t_id = w[0]
+        n1 = w[2]
+        n2 = w[1]
+        if t_id + "-" + n2 in men_rec:
+            continue
+        men_graph[(n1, n2)] += 1
+
+    for i, line in enumerate(open("disk/ira-men.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[1]
+        n2 = w[2]
+        if t_id + "-" + n2 in men_rec:
+            continue
+        men_graph[(n1, n2)] += 1
+    
+    for e in men_graph:
+        w = men_graph[e]
+        G.add_edge(*e, weight=w)
+
+    nx.write_pajek(G, "disk/ira-men.pajek")
+
+
+    G = nx.DiGraph()
+    rep_rec = set()
+    rep_graph = Counter()
+    for line in open("disk/ira-rep-links.txt"):
+        w = line.strip().split()
+        t_id = w[0]
+        n1 = w[1]
+        n2 = w[2]
+        if t_id in rep_rec:
+            continue
+        rep_graph[(n1, n2)] += 1
+
+    for i, line in enumerate(open("disk/ira-rep.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[3]
+        n2 = w[1]
+        if t_id in rep_rec:
+            continue
+        rep_graph[(n1, n2)] += 1
+    
+    for e in rep_graph:
+        w = rep_graph[e]
+        G.add_edge(*e, weight=w)
+        
+    nx.write_pajek(G, "disk/ira-rep.pajek")
+
+
+    G = nx.DiGraph()
+    ret_rec = set()
+    ret_graph = Counter()
+    for line in open("disk/ira-ret-links.txt"):
+        w = line.strip().split()
+        t_id = w[0]
+        n1 = w[1]
+        n2 = w[2]
+        if t_id in ret_rec:
+            continue
+        ret_graph[(n1, n2)] += 1
+
+    for i, line in enumerate(open("disk/irt-rep.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[3]
+        n2 = w[1]
+        if t_id in ret_rec:
+            continue
+        ret_graph[(n1, n2)] += 1
+    
+    for e in ret_graph:
+        w = ret_graph[e]
+        G.add_edge(*e, weight=w)
+        
+    nx.write_pajek(G, "disk/ira-ret.pajek")
 
 
 # abandon
@@ -789,4 +884,5 @@ if __name__ == "__main__":
 
     # build_networks_within_ira()
     # get_network_with_ira()
-    get_ira_network_with_big_networks()
+    # get_ira_network_with_big_networks()
+    merge_two_groups_link_to_graph()
