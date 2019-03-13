@@ -707,22 +707,22 @@ def merge_two_groups_link_to_graph():
             continue
         men_graph[(n1, n2)] += 1
 
-    for i, line in enumerate(open("disk/ira-men.txt")):
-        if i == 0:
-            continue
-        w = line.strip().split(",")
-        t_id = w[0]
-        n1 = w[1]
-        n2 = w[2]
-        if t_id + "-" + n2 in men_rec:
-            continue
-        men_graph[(n1, n2)] += 1
+    # for i, line in enumerate(open("disk/ira-men.txt")):
+    #     if i == 0:
+    #         continue
+    #     w = line.strip().split(",")
+    #     t_id = w[0]
+    #     n1 = w[1]
+    #     n2 = w[2]
+    #     if t_id + "-" + n2 in men_rec:
+    #         continue
+    #     men_graph[(n1, n2)] += 1
     
     for e in men_graph:
         w = men_graph[e]
         G.add_edge(*e, weight=w)
 
-    nx.write_gpickle(G, "disk/ira-men.gp")
+    nx.write_gpickle(G, "disk/ira-men-SQL.gp")
 
 
     G = nx.DiGraph()
@@ -737,22 +737,22 @@ def merge_two_groups_link_to_graph():
             continue
         rep_graph[(n1, n2)] += 1
 
-    for i, line in enumerate(open("disk/ira-rep.txt")):
-        if i == 0:
-            continue
-        w = line.strip().split(",")
-        t_id = w[0]
-        n1 = w[3]
-        n2 = w[1]
-        if t_id in rep_rec:
-            continue
-        rep_graph[(n1, n2)] += 1
+    # for i, line in enumerate(open("disk/ira-rep.txt")):
+    #     if i == 0:
+    #         continue
+    #     w = line.strip().split(",")
+    #     t_id = w[0]
+    #     n1 = w[3]
+    #     n2 = w[1]
+    #     if t_id in rep_rec:
+    #         continue
+    #     rep_graph[(n1, n2)] += 1
     
     for e in rep_graph:
         w = rep_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_gpickle(G, "disk/ira-rep.gp")
+    nx.write_gpickle(G, "disk/ira-rep-SQL.gp")
 
 
     G = nx.DiGraph()
@@ -767,22 +767,22 @@ def merge_two_groups_link_to_graph():
             continue
         ret_graph[(n1, n2)] += 1
 
-    for i, line in enumerate(open("disk/ira-ret.txt")):
-        if i == 0:
-            continue
-        w = line.strip().split(",")
-        t_id = w[0]
-        n1 = w[3]
-        n2 = w[1]
-        if t_id in ret_rec:
-            continue
-        ret_graph[(n1, n2)] += 1
+    # for i, line in enumerate(open("disk/ira-ret.txt")):
+    #     if i == 0:
+    #         continue
+    #     w = line.strip().split(",")
+    #     t_id = w[0]
+    #     n1 = w[3]
+    #     n2 = w[1]
+    #     if t_id in ret_rec:
+    #         continue
+    #     ret_graph[(n1, n2)] += 1
     
     for e in ret_graph:
         w = ret_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_gpickle(G, "disk/ira-ret.gp")
+    nx.write_gpickle(G, "disk/ira-ret-SQL.gp")
 
 
 # abandon
