@@ -129,11 +129,11 @@ class ALL_TWEET(object):
                 "is_source": -1,
                 "is_IRA": -1,
                 # "URL": d["final_url"].lower(),
-                # "hostname": d["final_hostname"].lower(),
-                # "c_alex": d["media_type"],
-                # "c_mbfc": d["c_mbfc"],
-                # "c_sci_f": d["c_sci_fake"],
-                # "c_sci_s": d["c_sci_align"],
+                "hostname": d["final_hostname"].lower(),
+                "c_alex": d["media_type"],
+                "c_mbfc": d["c_mbfc"],
+                "c_sci_f": d["c_sci_fake"],
+                "c_sci_s": d["c_sci_align"],
                 "retweeted_id": -1,
             }
             # if tweet["URL"].endswith("/"):
@@ -153,11 +153,11 @@ class ALL_TWEET(object):
                     "is_source": -1,
                     "is_IRA": 1,
                     # "URL": d["final_url"].lower(),
-                    # "hostname": d["hostname"].lower(),
-                    # "c_alex": d["media_type"],
-                    # "c_mbfc": d["c_mbfc"],
-                    # "c_sci_f": d["c_sci_fake"],
-                    # "c_sci_s": d["c_sci_align"],
+                    "hostname": d["hostname"].lower(),
+                    "c_alex": d["media_type"],
+                    "c_mbfc": d["c_mbfc"],
+                    "c_sci_f": d["c_sci_fake"],
+                    "c_sci_s": d["c_sci_align"],
                     "retweeted_id": -1,
                 }
                 # if tweet["URL"].endswith("/"):
@@ -188,10 +188,10 @@ class ALL_TWEET(object):
                     "is_IRA": -1,
                     # "URL": self.tweets[origin_tweetid]["URL"],
                     # "hostname": self.tweets[origin_tweetid]["hostname"],
-                    # "c_alex": self.tweets[origin_tweetid]["c_alex"],
-                    # "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
-                    # "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
-                    # "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
+                    "c_alex": self.tweets[origin_tweetid]["c_alex"],
+                    "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
+                    "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
+                    "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
                     "retweeted_id": origin_tweetid
                 }
                 d = find_tweet(tweetid)
@@ -210,6 +210,7 @@ class ALL_TWEET(object):
             # 原始的不在里面，只可能是IRA-tweets里面发现的
             # 但是ira data中original tweets不知道详细信息
 
+            # 用被转发的结果来定义原始的结果可能会存在问题
             if origin_tweetid not in self.tweets:
                 cnt += 1
                 tweet = {
@@ -221,10 +222,10 @@ class ALL_TWEET(object):
                     "is_IRA": -1,
                     # "URL": self.tweets[tweetid]["URL"],
                     # "hostname": self.tweets[tweetid]["hostname"],
-                    # "c_alex": self.tweets[tweetid]["c_alex"],
-                    # "c_mbfc": self.tweets[tweetid]["c_mbfc"],
-                    # "c_sci_f": self.tweets[tweetid]["c_sci_f"],
-                    # "c_sci_s": self.tweets[tweetid]["c_sci_s"],
+                    "c_alex": self.tweets[tweetid]["c_alex"],
+                    "c_mbfc": self.tweets[tweetid]["c_mbfc"],
+                    "c_sci_f": self.tweets[tweetid]["c_sci_f"],
+                    "c_sci_s": self.tweets[tweetid]["c_sci_s"],
                     "retweeted_id": 0
                 }
                 d = {}
@@ -276,8 +277,7 @@ class ALL_TWEET(object):
 
             if tweetid in self.tweets:
                 uid = row["userid"]
-                if uid in putin._map:
-                    uid = str(putin._map[uid])
+                uid = putin.uncover(uid)
 
                 self.tweets[tweetid]["is_IRA"] = 1
 
@@ -291,13 +291,16 @@ class ALL_TWEET(object):
             if retweet_id in self.tweets:
                 if self.tweets[retweet_id]["user_id"] == -1:
                     r_uid = row["retweet_userid"]
-                    if r_uid in putin._map:
-                        r_uid = str(putin._map[r_uid])
+                    r_uid = putin.uncover(r_uid)
                     self.tweets[retweet_id]["user_id"] = r_uid
 
         for tweetid in self.tweets.keys():
             if self.tweets[tweetid]["is_IRA"] == -1:
-                self.tweets[tweetid]["is_IRA"] = 0
+                if putin.fuck(self.tweets[tweetid]["user_id"]):
+                    self.tweets[tweetid]["is_IRA"] = 1
+                    cnt += 1
+                else:
+                    self.tweets[tweetid]["is_IRA"] = 0
 
         print("Count of IRA tweets:", cnt)
 
@@ -677,15 +680,16 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
+        self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        self.fill_other_info()
+        # self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
