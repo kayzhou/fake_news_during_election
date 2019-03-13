@@ -722,7 +722,7 @@ def merge_two_groups_link_to_graph():
         w = men_graph[e]
         G.add_edge(*e, weight=w)
 
-    nx.write_pajek(G, "disk/ira-men.pajek")
+    nx.write_gpickle(G, "disk/ira-men.gp")
 
 
     G = nx.DiGraph()
@@ -752,7 +752,7 @@ def merge_two_groups_link_to_graph():
         w = rep_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_pajek(G, "disk/ira-rep.pajek")
+    nx.write_gpickle(G, "disk/ira-rep.gp")
 
 
     G = nx.DiGraph()
@@ -782,7 +782,7 @@ def merge_two_groups_link_to_graph():
         w = ret_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_pajek(G, "disk/ira-ret.pajek")
+    nx.write_gpickle(G, "disk/ira-ret.gp")
 
 
 # abandon
