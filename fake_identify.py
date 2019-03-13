@@ -2,7 +2,7 @@ import json
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-from SQLite_handler import find_tweet
+# from SQLite_handler import find_tweet
 
 class Who_is_fake(object):
     def __init__(self):
