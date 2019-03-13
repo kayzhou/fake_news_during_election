@@ -767,7 +767,7 @@ def merge_two_groups_link_to_graph():
             continue
         ret_graph[(n1, n2)] += 1
 
-    for i, line in enumerate(open("disk/irt-rep.txt")):
+    for i, line in enumerate(open("disk/ira-ret.txt")):
         if i == 0:
             continue
         w = line.strip().split(",")
