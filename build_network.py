@@ -623,7 +623,7 @@ def get_network_with_ira():
     men_file = open("disk/ira-men.txt", "w")
     ret_file = open("disk/ira-ret.txt", "w")
     rep_file = open("disk/ira-rep.txt", "w")
-    # quo_file = open("disk/ira-quo.txt", "w")
+    quo_file = open("disk/ira-quo.txt", "w")
 
     rep_ira_tweets = ira_tweets[ira_tweets.in_reply_to_tweetid.notnull()]
     quo_ira_tweets = ira_tweets[ira_tweets.quoted_tweet_tweetid.notnull()]
@@ -639,21 +639,21 @@ def get_network_with_ira():
             Putin.uncover(row["in_reply_to_userid"])
         ]) + "\n")
 
-    # cnt = 0
-    # quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
-    # for i, row in quo_ira_tweets.iterrows():
-    #     try:
-    #         quo_file.write(",".join([
-    #             row["tweetid"],
-    #             Putin.uncover(row["userid"]),
-    #             row["quoted_tweet_tweetid"],
-    #             Putin.uncover(row["retweet_userid"])
-    #         ]) + "\n")
-    #     except:
-    #         print(row["retweet_userid"])
-    #         print(row["in_reply_to_userid"])
-    #         cnt += 1
-    # print(len(quo_ira_tweets), cnt)
+    cnt = 0
+    quo_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
+    for i, row in quo_ira_tweets.iterrows():
+        try:
+            quo_file.write(",".join([
+                row["tweetid"],
+                Putin.uncover(row["userid"]),
+                row["quoted_tweet_tweetid"],
+                Putin.uncover(row["retweet_userid"])
+            ]) + "\n")
+        except:
+            print(row["retweet_userid"])
+            print(row["in_reply_to_userid"])
+            cnt += 1
+    print(len(quo_ira_tweets), cnt)
 
     ret_file.write("tweet_id,user_id,o_tweet_id,o_user_id\n")
     for i, row in ret_ira_tweets.iterrows():
@@ -687,6 +687,7 @@ def get_ira_network_with_big_networks():
     search_IRA("disk/all-men-links.txt", "disk/ira-men-links.txt")
     search_IRA("disk/all-ret-links.txt", "disk/ira-ret-links.txt")
     search_IRA("disk/all-rep-links.txt", "disk/ira-rep-links.txt")
+    search_IRA("disk/all-quo-links.txt", "disk/ira-quo-links.txt")
 
 
 def merge_two_groups_link_to_graph():
@@ -707,22 +708,22 @@ def merge_two_groups_link_to_graph():
             continue
         men_graph[(n1, n2)] += 1
 
-    # for i, line in enumerate(open("disk/ira-men.txt")):
-    #     if i == 0:
-    #         continue
-    #     w = line.strip().split(",")
-    #     t_id = w[0]
-    #     n1 = w[1]
-    #     n2 = w[2]
-    #     if t_id + "-" + n2 in men_rec:
-    #         continue
-    #     men_graph[(n1, n2)] += 1
+    for i, line in enumerate(open("disk/ira-men.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[1]
+        n2 = w[2]
+        if t_id + "-" + n2 in men_rec:
+            continue
+        men_graph[(n1, n2)] += 1
     
     for e in men_graph:
         w = men_graph[e]
         G.add_edge(*e, weight=w)
 
-    nx.write_gpickle(G, "disk/ira-men-SQL.gp")
+    nx.write_gpickle(G, "disk/ira-men.gp")
 
 
     G = nx.DiGraph()
@@ -737,22 +738,22 @@ def merge_two_groups_link_to_graph():
             continue
         rep_graph[(n1, n2)] += 1
 
-    # for i, line in enumerate(open("disk/ira-rep.txt")):
-    #     if i == 0:
-    #         continue
-    #     w = line.strip().split(",")
-    #     t_id = w[0]
-    #     n1 = w[3]
-    #     n2 = w[1]
-    #     if t_id in rep_rec:
-    #         continue
-    #     rep_graph[(n1, n2)] += 1
+    for i, line in enumerate(open("disk/ira-rep.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[3]
+        n2 = w[1]
+        if t_id in rep_rec:
+            continue
+        rep_graph[(n1, n2)] += 1
     
     for e in rep_graph:
         w = rep_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_gpickle(G, "disk/ira-rep-SQL.gp")
+    nx.write_gpickle(G, "disk/ira-rep.gp")
 
 
     G = nx.DiGraph()
@@ -767,22 +768,51 @@ def merge_two_groups_link_to_graph():
             continue
         ret_graph[(n1, n2)] += 1
 
-    # for i, line in enumerate(open("disk/ira-ret.txt")):
-    #     if i == 0:
-    #         continue
-    #     w = line.strip().split(",")
-    #     t_id = w[0]
-    #     n1 = w[3]
-    #     n2 = w[1]
-    #     if t_id in ret_rec:
-    #         continue
-    #     ret_graph[(n1, n2)] += 1
+    for i, line in enumerate(open("disk/ira-ret.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[3]
+        n2 = w[1]
+        if t_id in ret_rec:
+            continue
+        ret_graph[(n1, n2)] += 1
     
     for e in ret_graph:
         w = ret_graph[e]
         G.add_edge(*e, weight=w)
         
-    nx.write_gpickle(G, "disk/ira-ret-SQL.gp")
+    nx.write_gpickle(G, "disk/ira-ret.gp")
+
+    G = nx.DiGraph()
+    quo_rec = set()
+    quo_graph = Counter()
+    for line in open("disk/ira-quo-links.txt"):
+        w = line.strip().split()
+        t_id = w[0]
+        n1 = w[1]
+        n2 = w[2]
+        if t_id in quo_rec:
+            continue
+        quo_graph[(n1, n2)] += 1
+
+    for i, line in enumerate(open("disk/ira-quo.txt")):
+        if i == 0:
+            continue
+        w = line.strip().split(",")
+        t_id = w[0]
+        n1 = w[3]
+        n2 = w[1]
+        if t_id in quo_rec:
+            continue
+        quo_graph[(n1, n2)] += 1
+    
+    for e in quo_graph:
+        w = quo_graph[e]
+        G.add_edge(*e, weight=w)
+        
+    nx.write_gpickle(G, "disk/ira-quo.gp")
 
 
 # abandon
@@ -883,6 +913,6 @@ if __name__ == "__main__":
     # save_network_gt()
 
     # build_networks_within_ira()
-    # get_network_with_ira()
-    # get_ira_network_with_big_networks()
+    get_network_with_ira()
+    get_ira_network_with_big_networks()
     merge_two_groups_link_to_graph()
