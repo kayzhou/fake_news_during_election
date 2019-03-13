@@ -203,6 +203,7 @@ class Who_is_fake(object):
         else:
             return False
 
+
 class Are_you_IRA(object):
 
     def __init__(self):
