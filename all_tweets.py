@@ -187,13 +187,19 @@ class ALL_TWEET(object):
                     "is_source": 0,
                     "is_IRA": -1,
                     # "URL": self.tweets[origin_tweetid]["URL"],
-                    # "hostname": self.tweets[origin_tweetid]["hostname"],
+                    "hostname": self.tweets[origin_tweetid]["hostname"],
                     "c_alex": self.tweets[origin_tweetid]["c_alex"],
                     "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
                     "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
                     "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
                     "retweeted_id": origin_tweetid
                 }
+                # d = {}
+                # if tweetid in tweets_from_SQL:
+                #     d = tweets_from_SQL[tweetid]
+                # else:
+                #     d = find_tweet(stweetid)
+
                 d = find_tweet(tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
@@ -221,17 +227,18 @@ class ALL_TWEET(object):
                     "is_source": 1,
                     "is_IRA": -1,
                     # "URL": self.tweets[tweetid]["URL"],
-                    # "hostname": self.tweets[tweetid]["hostname"],
+                    "hostname": self.tweets[tweetid]["hostname"],
                     "c_alex": self.tweets[tweetid]["c_alex"],
                     "c_mbfc": self.tweets[tweetid]["c_mbfc"],
                     "c_sci_f": self.tweets[tweetid]["c_sci_f"],
                     "c_sci_s": self.tweets[tweetid]["c_sci_s"],
                     "retweeted_id": 0
                 }
-                d = {}
+                # d = {}
                 # if origin_tweetid in tweets_from_SQL:
                 #     d = tweets_from_SQL[origin_tweetid]
                 # else:
+                #     d = find_tweet(origin_tweetid)
                 d = find_tweet(origin_tweetid)
                 if d:
                     tweet["user_id"] = str(d["user_id"])
