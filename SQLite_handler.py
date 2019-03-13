@@ -10,6 +10,7 @@ from tqdm import tqdm
 import pendulum
 import json
 from collections import defaultdict
+from fake_identify import Are_you_IRA
 
 DB1_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite"
 DB2_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite"
@@ -531,5 +532,13 @@ def update_user(tweet_id, user_id, info_json):
 if __name__ == "__main__":
     # get_hashtag_tweet_user()
     # create_db()
-    print(find_tweet("742417158429233152"))
-    opinion("742417158429233152")
+    # print(find_tweet("742417158429233152"))
+    # opinion("742417158429233152")
+    
+    Putin = Are_you_IRA()
+    uids = [u for u in Putin.IRA_user_set if len(u) != 64]
+    data = find_tweets_by_users(uids)
+    with open("IRA-tweets-id.txt", "w") as f:
+        for d in data:
+            f.write(str(d) + "\n")
+    
