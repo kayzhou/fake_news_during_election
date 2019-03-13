@@ -200,7 +200,7 @@ def find_tweets_by_users(uids):
     c1 = conn1.cursor()
     c2 = conn2.cursor()
 
-    for _id in uids:
+    for _id in tqdm(uids):
         c1.execute('''SELECT tweet_id FROM retweeted_status WHERE user_id={}'''.format(_id))
         for d in c1.fetchall():
             dict_uids_tweetids[_id].append(str(d[0]) + "-retweet")
