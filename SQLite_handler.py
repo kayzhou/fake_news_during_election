@@ -204,14 +204,14 @@ def find_tweets_by_users(uids):
         c1.execute('''SELECT tweet_id FROM retweeted_status WHERE user_id={}'''.format(_id))
         for d in c1.fetchall():
             dict_uids_tweetids[_id].append(str(d[0]) + "-retweet")
-        c1.execute('''SELECT tweet_id FROM tweet_id WHERE user_id={}'''.format(_id))
+        c1.execute('''SELECT tweet_id FROM tweet WHERE user_id={}'''.format(_id))
         for d in c1.fetchall():
             dict_uids_tweetids[_id].append(str(d[0]))
 
         c2.execute('''SELECT tweet_id FROM retweeted_status WHERE user_id={}'''.format(_id))
         for d in c1.fetchall():
             dict_uids_tweetids[_id].append(str(d[0]) + "-retweet")
-        c2.execute('''SELECT tweet_id FROM tweet_id WHERE user_id={}'''.format(_id))
+        c2.execute('''SELECT tweet_id FROM tweet WHERE user_id={}'''.format(_id))
         for d in c2.fetchall():
             dict_uids_tweetids[_id].append(str(d[0]))
     conn2.close()
