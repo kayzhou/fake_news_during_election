@@ -490,44 +490,56 @@ class ALL_TWEET(object):
         return self.tweets_csv
 
     def make_users(self):
-        self.load_all_tweets()
-        all_tweets = self.tweets_csv
+        # self.load_all_tweets()
+        # all_tweets = self.tweets_csv
+
+        print("loading all tweets_csv ...")
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
+        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+
         users = None
-        map_labels = {
-            "0": "fake",
-            "1": "extreme bias (right)",
-            "2": "right",
-            "3": "right leaning",
-            "4": "center",
-            "5": "left leaning",
-            "6": "left",
-            "7": "extreme bias (left)"
-        }
+        # map_labels = {
+        #     "0": "fake",
+        #     "1": "extreme bias (right)",
+        #     "2": "right",
+        #     "3": "right leaning",
+        #     "4": "center",
+        #     "5": "left leaning",
+        #     "6": "left",
+        #     "7": "extreme bias (left)"
+        # }
 
-        for _type, f_label in map_labels.items():
+        mbfc_labels = [
+            "fake",
+            "right",
+            "right leaning",
+            "center",
+            "left leaning",
+            "left",     
+        ]
+
+        for _type in mbfc_labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["media_type"] == _type]
-
-            user_count = pd.value_counts(tweets["user_id"]).rename(f_label)
+            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
+            user_count = pd.value_counts(tweets["user_id"]).rename(_type)
             user_sources_count = tweets["is_source"].groupby(
-                tweets["user_id"]).sum().rename(f_label + "_source")
-            user_first_count = tweets["is_first"].groupby(
-                tweets["user_id"]).sum().rename(f_label + "_first")
-
+                tweets["user_id"]).sum().rename(_type + "_source")
+            # user_first_count = tweets["is_first"].groupby(
+            #     tweets["user_id"]).sum().rename(f_label + "_first")
             if users is None:
                 users = pd.concat(
-                    [user_count, user_first_count, user_sources_count], axis=1, sort=False)
+                    [user_count, user_sources_count], axis=1, sort=False)
             else:
                 users = pd.concat(
-                    [users, user_count, user_first_count, user_sources_count], axis=1, sort=False)
+                    [users, user_count, user_sources_count], axis=1, sort=False)
 
-        for _type, f_label in map_labels.items():
-            users[f_label + "_source_rate"] = users[f_label +
-                                                    "_source"] / users[f_label]
-            users[f_label + "_first_rate"] = users[f_label +
-                                                   "_first"] / users[f_label]
-            users[f_label + "_first_source_rate"] = users[f_label +
-                                                          "_first"] / users[f_label + "_source"]
+        for _type in mbfc_labels:
+            users[f_label + "_source_rate"] = users[_type +
+                                                    "_source"] / users[_type]
+            # users[f_label + "_first_rate"] = users[f_label +
+            #                                        "_first"] / users[f_label]
+            # users[f_label + "_first_source_rate"] = users[f_label +
+            #                                               "_first"] / users[f_label + "_source"]
 
         IRA_tweets = all_tweets[all_tweets["is_IRA"] == 1]
         IRA_u = IRA_tweets["is_IRA"].groupby(
@@ -538,7 +550,7 @@ class ALL_TWEET(object):
         # save data
 
         users["user_id"] = users.index
-        users.to_csv("data/all-users.csv", index=False)
+        users.to_csv("data/all-users-mbfc.csv", index=False)
 
     # abandon
     def save_network_gt(self, _tweets, dict_tweetid_userid, node_map, out_name):
@@ -565,12 +577,21 @@ class ALL_TWEET(object):
 
     def make_graph_for_CI(self):
 
-        self.load_all_tweets()
-        all_tweets = self.tweets_csv
-        print("loaded all tweets!")
+        print("loading all tweets_csv ...")
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
+        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
 
         self.load_retweet_network()
         print("loaded retweet network!")
+
+        mbfc_labels = [
+            "fake",
+            "right",
+            "right leaning",
+            "center",
+            "left leaning",
+            "left",     
+        ]
 
         print("making dict_tweetid_userid ...")
         dict_tweetid_userid = {}
@@ -599,22 +620,12 @@ class ALL_TWEET(object):
             nx.write_gpickle(g, out_name)
             # print("finished!")
 
-        map_labels = {
-            "0": "fake",
-            "1": "extreme bias (right)",
-            "2": "right",
-            "3": "right leaning",
-            "4": "center",
-            "5": "left leaning",
-            "6": "left",
-            "7": "extreme bias (left)"
-        }
-
-        for _type, f_label in map_labels.items():
+        for _type in mbfc_labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["media_type"] == _type]
+            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "data/network/network_{}.gpickle".format(f_label))
+                            "data/network/network_{}_mbfc.gpickle".format(_type))
+
 
     def load_all_users(self):
         print("Loading all users ...")
@@ -687,10 +698,10 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
-        self.save_csv()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
+        # self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()
@@ -702,8 +713,8 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
-        # self.make_graph_for_CI()
+        self.make_users()
+        self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
         # self.for_fake_clique()
