@@ -42,7 +42,7 @@ import sqlite3
 from collections import defaultdict
 
 from pathlib import Path
-# import graph_tool.all as gt
+import graph_tool.all as gt
 
 import pendulum
 from my_weapon import *
