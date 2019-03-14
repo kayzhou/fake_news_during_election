@@ -534,7 +534,7 @@ class ALL_TWEET(object):
                     [users, user_count, user_sources_count], axis=1, sort=False)
 
         for _type in mbfc_labels:
-            users[f_label + "_source_rate"] = users[_type +
+            users[_type + "_source_rate"] = users[_type +
                                                     "_source"] / users[_type]
             # users[f_label + "_first_rate"] = users[f_label +
             #                                        "_first"] / users[f_label]
