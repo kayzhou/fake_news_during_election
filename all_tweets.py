@@ -629,27 +629,39 @@ class ALL_TWEET(object):
 
     def load_all_users(self):
         print("Loading all users ...")
-        map_labels = {
-            "0": "fake",
-            "1": "extreme bias (right)",
-            "2": "right",
-            "3": "right leaning",
-            "4": "center",
-            "5": "left leaning",
-            "6": "left",
-            "7": "extreme bias (left)"
-        }
+        # map_labels = {
+        #     "0": "fake",
+        #     "1": "extreme bias (right)",
+        #     "2": "right",
+        #     "3": "right leaning",
+        #     "4": "center",
+        #     "5": "left leaning",
+        #     "6": "left",
+        #     "7": "extreme bias (left)"
+        # }
 
-        users = pd.read_csv("data/all-users.csv", index_col="user_id", dtype={"user_id": str})
+        users = pd.read_csv("data/all-users-mbfc.csv", index_col="user_id", dtype={"user_id": str})
 
         # change the type
-        f_labels = [map_labels[k] for k in map_labels]
+        # f_labels = [map_labels[k] for k in map_labels]
         users = users.astype({"is_IRA": int})
 
-        for label in f_labels:
+        mbfc_labels = [
+            "fake",
+            "right",
+            "right leaning",
+            "center",
+            "left leaning",
+            "left",     
+        ]
+
+        for label in mbfc_labels:
             users = users.astype({label: int, label + "_source": int, label + "_first": int, 
                                 label + "_source_rate": float, label + "_first_rate": float,
                                 label + "_first_source_rate": float,})
+
+            users = users.astype({label: int, label + "_source": int, label + "_source_rate": float})
+
         print("Finished!")
         
         return users
