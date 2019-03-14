@@ -892,6 +892,20 @@ if __name__ == "__main__":
     #     _gt = nx2gt(nt)
     #     _gt.save("disk/network_{}.gt".format(f_label))
 
+    save_dir = '/home/alex/kayzhou/election/data/network'
+    for in_name in os.listdir(save_dir):
+        if in_name.endswith(".gpickle"):
+            nt = nx.read_gpickle(os.path.join(save_dir, in_name))
+            _gt = nx2gt(nt)
+            _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
+    # for _type, f_label in map_labels.items():
+    #     print(_type, "...")
+    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
+    #     print("type(n) =", type(nt))
+    #     _gt = nx2gt(nt)
+    #     _gt.save("disk/network_{}.gt".format(f_label))
+
+
     # build IRA network
     """
     putin = Are_you_IRA()
@@ -912,7 +926,8 @@ if __name__ == "__main__":
     # change_network("disk/whole")
     # save_network_gt()
 
+    # 构建用户和IRA的交互
     # build_networks_within_ira()
-    get_network_with_ira()
-    get_ira_network_with_big_networks()
-    merge_two_groups_link_to_graph()
+    # get_network_with_ira()
+    # get_ira_network_with_big_networks()
+    # merge_two_groups_link_to_graph()

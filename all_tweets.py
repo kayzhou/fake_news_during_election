@@ -552,29 +552,6 @@ class ALL_TWEET(object):
         users["user_id"] = users.index
         users.to_csv("data/all-users-mbfc.csv", index=False)
 
-    # abandon
-    def save_network_gt(self, _tweets, dict_tweetid_userid, node_map, out_name):
-        g = gt.Graph()
-
-        print("add nodes from ...")
-        vlist = g.add_vertex(len(node_map))
-
-        print("add edge from ...")
-        for n2, n1 in tqdm(self.retweet_network.items()):
-            if n1 in _tweets:
-                try:
-                    u1 = dict_tweetid_userid[n1]
-                    u1 = node_map[u1]
-                    u2 = dict_tweetid_userid[n2]
-                    u2 = node_map[u2]
-                    g.add_edge(g.vertex(u1), g.vertex(u2))
-                except:
-                    print(n2, ">", n1)
-
-        print("saving the graph ...", out_name)
-        g.save(out_name)
-        print("finished!")
-
     def make_graph_for_CI(self):
 
         print("loading all tweets_csv ...")
