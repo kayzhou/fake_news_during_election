@@ -11,6 +11,7 @@ from gensim.models import LdaModel
 from gensim.corpora import Dictionary
 from gensim.test.utils import datapath
 from tqdm import tqdm
+import numpy as np
 
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
@@ -21,39 +22,52 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
                                  normalize_urls=True,
                                  keep_allupper=False)
 
-conn = sqlite3.connect(
-    "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
-c = conn.cursor()
-c.execute('''SELECT text FROM tweet''')
-f = open("disk/all_texts.txt", "w")
+# conn = sqlite3.connect(
+#     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
+# c = conn.cursor()
+# c.execute('''SELECT text FROM tweet''')
 
-for d in tqdm(c.fetchall()):
-    words = tokenizer.tokenize(d[0])
-    if words[0] == "rt":
-        continue
-    f.write(" ".join(words) + "\n") 
+texts = []
+for line in open("data/ira-left-text.txt"):
+    words = tokenizer.tokenize(line.strip())
+    # if words[0] == "RT":
+    #     continue
+    texts.append(words) 
 
 print("loaded!")
-conn.close()
+# conn.close()
 
-# dictionary = Dictionary(texts)
-# corpus = [dictionary.doc2bow(t) for t in texts]
-# lda = LdaModel(corpus, num_topics=10)
+dictionary = Dictionary(texts)
+corpus = [dictionary.doc2bow(t) for t in texts]
+lda = LdaModel(corpus, num_topics=10)
 
-conn = sqlite3.connect(
-    "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
-c = conn.cursor()
-c.execute('''SELECT text FROM tweet''')
+x = lda.show_topics(num_topics=10, num_words=20,formatted=False)
+topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
 
-for d in tqdm(c.fetchall()):
-    words = tokenizer.tokenize(d[0])
-    if words[0] == "rt":
-        continue
-    f.write(" ".join(words) + "\n") 
+dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
+#Below Code Prints Topics and Words
+for topic, words in topics_words:
+    print(str(topic)+ "::" + str([dictionary.id2token[int(w)] for w in words]))
+print()
 
-# texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
-print("loaded!")
-conn.close()
+#Below Code Prints Only Words 
+# for topic, words in topics_words:
+#     print(" ".join(words))
+
+# conn = sqlite3.connect(
+#     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite")
+# c = conn.cursor()
+# c.execute('''SELECT text FROM tweet''')
+
+# for d in tqdm(c.fetchall()):
+#     words = tokenizer.tokenize(d[0])
+#     if words[0] == "rt":
+#         continue
+#     f.write(" ".join(words) + "\n") 
+
+# # texts = [tokenizer.tokenize(d[0]) for d in c.fetchall()]
+# print("loaded!")
+# conn.close()
 
 # dictionary = Dictionary(texts)
 # corpus = [dictionary.doc2bow(t) for t in texts]
