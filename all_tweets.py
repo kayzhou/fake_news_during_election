@@ -604,7 +604,8 @@ class ALL_TWEET(object):
                         u2 = dict_tweetid_userid[n2]
                         g.add_edge(u1, u2)
                     except:
-                        print(n2, ">", n1)
+                        pass
+                        # print(n2, ">", n1)
 
             print("saving the graph ...", out_name)
             nx.write_gpickle(g, out_name)
@@ -614,7 +615,7 @@ class ALL_TWEET(object):
             print(_type, "...")
             tweets = all_tweets[all_tweets["c_alex"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "data/network/network_{}_nc.gpickle".format(_type))
+                            "disk/network/{}_nc.gpickle".format(_type))
 
 
     def load_all_users(self):
