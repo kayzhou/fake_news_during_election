@@ -26,8 +26,8 @@ def add_CI_to_graph(graph_file):
     print('pid ' + str(os.getpid()) + ' loading graph ' + graph_file)
     graph = gt.load_graph(graph_file)
 
-    for direction in ['out', 'both', 'in']:
-        # for direction in ['out', 'undir', 'in', 'both']:
+    # for direction in ['out', 'both', 'in']:
+    for direction in ['out', 'undir', 'in', 'both']:
         print('pid ' + str(os.getpid()) + ' -- ' + direction)
         t0 = time.time()
         CIranks, CImap = CIcython.compute_graph_CI(graph, rad=2,
@@ -39,9 +39,9 @@ def add_CI_to_graph(graph_file):
         print('pid ' + str(os.getpid()) + ' saving CIranks ' +
               direction + '_' + graph_file)
 
-        CI_file_name = '/home/alex/kayzhou/election/data/CI_rst/CI_{}_{}.rst'.format(
-            direction, os.path.split(graph_file)[1][:-3])
-        np.save(CI_file_name, np.array([CIranks, CImap]))
+        # CI_file_name = 'data/CI_rst/CI_{}_{}.rst'.format(
+        #     direction, os.path.split(graph_file)[1][:-3])
+        # np.save(CI_file_name, np.array([CIranks, CImap]))
 
         graph.vp['CI_' +
                  direction] = graph.new_vertex_property('int64_t', vals=0)
@@ -59,17 +59,7 @@ def add_CI_to_graph(graph_file):
 
 if __name__ == "__main__":
 
-    # save_dir = '/home/alex/kayzhou/election/disk'
-    # for in_name in os.listdir(save_dir):
-    #     if in_name.endswith(".gt") and in_name.startswith("whole"):
-    #         if in_name == "whole-all.gt":
-    #             continue
-    #         add_CI_to_graph(os.path.join(save_dir, in_name))
-
-        # if in_name.endswith(".gt") and in_name.startswith("whole"):
-            # add_CI_to_graph(os.path.join(save_dir, in_name))
-
-    save_dir = '/home/alex/kayzhou/election/data/network'
+    save_dir = 'disk/network'
     for in_name in os.listdir(save_dir):
         if in_name.endswith("nc.gt"):
             add_CI_to_graph(os.path.join(save_dir, in_name))
