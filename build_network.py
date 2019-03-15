@@ -42,7 +42,7 @@ import sqlite3
 from collections import defaultdict
 
 from pathlib import Path
-import graph_tool.all as gt
+# import graph_tool.all as gt
 
 import pendulum
 from my_weapon import *
@@ -859,6 +859,49 @@ def build_networks_within_ira():
     rep_file.close()
 
 
+def get_user_name_info():
+
+    in_files = [f for f in Path("/media/alex/datums/elections_tweets/archives/trump OR donaldtrump OR realdonaldtrump").glob("*.taj")]
+    in_files.extend([f for f in Path("/media/alex/datums/elections_tweets/archives/hillary OR clinton OR hillaryclinton").glob("*.taj")])
+    # in_files = ["data/tweets-c611a16c-48a8-4d0a-8872-2caf11cc38ff.taj"]
+
+    start = pendulum.parse("2016-06-01").int_timestamp
+    end = pendulum.parse("2016-11-09").int_timestamp
+
+    def update_user(d):
+        user_id = int(d["id"])
+        name = d["screen_name"]
+        followers_count = d["followers_count"]
+        friends_count = d["friends_count"]
+
+        if user_id in user_data:
+            if followers_count > user_data[user_id][1]:
+                user_data[user_id][1] = followers_count
+            if friends_count > user_data[user_id][2]:
+                user_data[user_id][2] = friends_count
+        else:
+            user_data[user_id] = [name, followers_count, friends_count]
+
+
+    user_data = {}
+    for in_name in tqdm(in_files):
+        for line in open(in_name):
+            d = json.loads(line)
+            # dt = pendulum.from_format(d["created_at"], 'ddd MMM DD HH:mm:ss ZZ YYYY').int_timestamp
+            # if dt > end or dt < start:
+            #     continue
+            # tweet_id = int(d["id"])
+            update_user(d["user"])
+
+            if "retweeted_status" in d:
+                update_user(d["retweeted_status"]["user"])
+
+
+    with open("disk/user_info.json", "w") as f:
+        for k, v in user_data.items():
+            f.write("{},{},{},{}\n".format(k, v[0], v[1], v[2]))
+
+
 
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
@@ -892,18 +935,14 @@ if __name__ == "__main__":
     #     _gt = nx2gt(nt)
     #     _gt.save("disk/network_{}.gt".format(f_label))
 
-    save_dir = '/home/alex/kayzhou/election/data/network'
-    for in_name in os.listdir(save_dir):
-        if in_name.endswith(".gpickle"):
-            nt = nx.read_gpickle(os.path.join(save_dir, in_name))
-            _gt = nx2gt(nt)
-            _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
-    # for _type, f_label in map_labels.items():
-    #     print(_type, "...")
-    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-    #     print("type(n) =", type(nt))
-    #     _gt = nx2gt(nt)
-    #     _gt.save("disk/network_{}.gt".format(f_label))
+    # save_dir = '/home/alex/kayzhou/election/data/network'
+    # for in_name in os.listdir(save_dir):
+    #     if in_name.endswith(".gpickle"):
+    #         nt = nx.read_gpickle(os.path.join(save_dir, in_name))
+    #         _gt = nx2gt(nt)
+    #         _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
+
+    get_user_name_info()
 
 
     # build IRA network
