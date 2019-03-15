@@ -495,7 +495,8 @@ class ALL_TWEET(object):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
-        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        all_tweets.to_csv("disk/all-tweets-nc.csv")
 
         users = None
         # map_labels = {
@@ -509,18 +510,29 @@ class ALL_TWEET(object):
         #     "7": "extreme bias (left)"
         # }
 
-        mbfc_labels = [
+        labels = [
             "fake",
+            "extreme bias (right)",
             "right",
             "right leaning",
             "center",
             "left leaning",
-            "left",     
+            "left",
+            "extreme bias (left)"
         ]
 
-        for _type in mbfc_labels:
+        # mbfc_labels = [
+        #     "fake",
+        #     "right",
+        #     "right leaning",
+        #     "center",
+        #     "left leaning",
+        #     "left",     
+        # ]
+
+        for _type in _labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
+            tweets = all_tweets[all_tweets["c_alex"] == _type]
             user_count = pd.value_counts(tweets["user_id"]).rename(_type)
             user_sources_count = tweets["is_source"].groupby(
                 tweets["user_id"]).sum().rename(_type + "_source")
@@ -548,26 +560,28 @@ class ALL_TWEET(object):
 
         users.fillna(0, inplace=True)
         # save data
-
         users["user_id"] = users.index
-        users.to_csv("data/all-users-mbfc.csv", index=False)
+        users.to_csv("data/all-users-nc.csv", index=False)
 
     def make_graph_for_CI(self):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
-        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
 
         self.load_retweet_network()
         print("loaded retweet network!")
 
-        mbfc_labels = [
+        labels = [
             "fake",
+            "extreme bias (right)",
             "right",
             "right leaning",
             "center",
             "left leaning",
-            "left",     
+            "left",
+            "extreme bias (left)"
         ]
 
         print("making dict_tweetid_userid ...")
@@ -597,11 +611,11 @@ class ALL_TWEET(object):
             nx.write_gpickle(g, out_name)
             # print("finished!")
 
-        for _type in mbfc_labels:
+        for _type in labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
+            tweets = all_tweets[all_tweets["c_alex"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "data/network/network_{}_mbfc.gpickle".format(_type))
+                            "data/network/network_{}_nc.gpickle".format(_type))
 
 
     def load_all_users(self):
