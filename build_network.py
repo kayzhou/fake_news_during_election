@@ -42,7 +42,10 @@ import sqlite3
 from collections import defaultdict
 
 from pathlib import Path
-# import graph_tool.all as gt
+try:
+    import graph_tool.all as gt
+except:
+    print("import graph_tool error.")
 
 import pendulum
 from my_weapon import *
