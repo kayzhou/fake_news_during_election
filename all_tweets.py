@@ -566,21 +566,32 @@ class ALL_TWEET(object):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
-        # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
-        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
 
         self.load_retweet_network()
         print("loaded retweet network!")
 
+        # labels = [
+        #     "fake",
+        #     "extreme bias (right)",
+        #     "right",
+        #     "right leaning",
+        #     "center",
+        #     "left leaning",
+        #     "left",
+        #     "extreme bias (left)"
+        # ]
+
         labels = [
             "fake",
-            "extreme bias (right)",
+            # "extreme bias (right)",
             "right",
             "right leaning",
             "center",
             "left leaning",
             "left",
-            "extreme bias (left)"
+            # "extreme bias (left)"
         ]
 
         print("making dict_tweetid_userid ...")
@@ -598,7 +609,7 @@ class ALL_TWEET(object):
 
             print("add edge from ...")
             for n2, n1 in tqdm(self.retweet_network.items()):
-                if n1 in _tweets:
+                if n1 in _tweets and n1 in dict_tweetid_userid and n2 in dict_tweetid_userid:
                     try:
                         u1 = dict_tweetid_userid[n1]
                         u2 = dict_tweetid_userid[n2]
@@ -613,9 +624,10 @@ class ALL_TWEET(object):
 
         for _type in labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["c_alex"] == _type]
+            # tweets = all_tweets[all_tweets["c_alex"] == _type]
+            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
             save_network_nx(set(tweets.tweet_id),
-                            "disk/network/{}_nc.gpickle".format(_type))
+                            "disk/network/{}_fc.gpickle".format(_type))
 
 
     def load_all_users(self):

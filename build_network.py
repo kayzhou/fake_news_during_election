@@ -902,7 +902,6 @@ def get_user_name_info():
             f.write("{},{},{},{}\n".format(k, v[0], v[1], v[2]))
 
 
-
 if __name__ == "__main__":
     # Lebron = analyze_IRA_in_network()
     # Lebron.run()
