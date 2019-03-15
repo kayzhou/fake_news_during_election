@@ -716,7 +716,7 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
