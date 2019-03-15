@@ -530,7 +530,7 @@ class ALL_TWEET(object):
         #     "left",     
         # ]
 
-        for _type in _labels:
+        for _type in labels:
             print(_type, "...")
             tweets = all_tweets[all_tweets["c_alex"] == _type]
             user_count = pd.value_counts(tweets["user_id"]).rename(_type)
