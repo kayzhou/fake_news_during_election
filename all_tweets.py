@@ -545,9 +545,8 @@ class ALL_TWEET(object):
                 users = pd.concat(
                     [users, user_count, user_sources_count], axis=1, sort=False)
 
-        for _type in mbfc_labels:
-            users[_type + "_source_rate"] = users[_type +
-                                                    "_source"] / users[_type]
+        for _type in labels:
+            users[_type + "_source_rate"] = users[_type + "_source"] / users[_type]
             # users[f_label + "_first_rate"] = users[f_label +
             #                                        "_first"] / users[f_label]
             # users[f_label + "_first_source_rate"] = users[f_label +
