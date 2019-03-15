@@ -915,34 +915,15 @@ if __name__ == "__main__":
     # print("men")
     # get_mention_network("disk/all-men-links.txt")
 
-    # media network~
-    # map_labels = {
-    #     "0": "fake",
-    #     "1": "extreme bias (right)",
-    #     "2": "right",
-    #     "3": "right leaning",
-    #     "4": "center",
-    #     "5": "left leaning",
-    #     "6": "left",
-    #     "7": "extreme bias (left)"
-    # }
+    save_dir = 'disk/network'
+    for in_name in os.listdir(save_dir):
+        if in_name.endswith(".gpickle"):
+            nt = nx.read_gpickle(os.path.join(save_dir, in_name))
+            _gt = nx2gt(nt)
+            _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
 
-    # for _type, f_label in map_labels.items():
-    #     print(_type, "...")
-    #     nt = nx.read_gpickle("disk/network_{}.gpickle".format(f_label))
-    #     print("type(n) =", type(nt))
-    #     _gt = nx2gt(nt)
-    #     _gt.save("disk/network_{}.gt".format(f_label))
-
-    # save_dir = '/home/alex/kayzhou/election/data/network'
-    # for in_name in os.listdir(save_dir):
-    #     if in_name.endswith(".gpickle"):
-    #         nt = nx.read_gpickle(os.path.join(save_dir, in_name))
-    #         _gt = nx2gt(nt)
-    #         _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
-
-    get_user_name_info()
-
+    # 获取用户的详细信息；
+    # get_user_name_info()
 
     # build IRA network
     """
