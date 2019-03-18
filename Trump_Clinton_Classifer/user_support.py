@@ -44,4 +44,4 @@ for d in c.fetchall():
 
 with open("../disk/user_support.txt", "w") as f:
     for uid, v in userdata.items():
-        f.write("{},{},{},{}\n".format(uid, v["num_pro_hill"], v["num_tweets"], v["sum_pro_hill"]))
+        f.write("{},{},{},{:.2f}\n".format(uid, v["num_pro_hill"], v["num_tweets"], v["sum_pro_hill"]))
