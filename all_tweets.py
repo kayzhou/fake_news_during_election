@@ -597,7 +597,7 @@ class ALL_TWEET(object):
             "Black",
             "Red",
             "Orange",
-            "fake",
+            "Fake",
         ]
 
         print("making dict_tweetid_userid ...")
