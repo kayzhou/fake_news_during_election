@@ -26,22 +26,22 @@ def update_user(_d):
 
 conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_class_proba_final_htgs_db.sqlite")
 c = conn.cursor()
-c.execute('''SELECT * FROM class_proba limit 100;''')
+c.execute('''SELECT * FROM class_proba;''')
 for d in c.fetchall():
     update_user(d)
-c.execute('''SELECT * FROM retweet_class_proba limit 100;''')
+c.execute('''SELECT * FROM retweet_class_proba;''')
 for d in c.fetchall():
     update_user(d)
 
 conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_june_sep_db.sqlite")
 c = conn.cursor()
-c.execute('''SELECT * FROM class_proba limit 100;''')
+c.execute('''SELECT * FROM class_proba;''')
 for d in c.fetchall():
     update_user(d)
-c.execute('''SELECT * FROM retweet_class_proba limit 100;''')
+c.execute('''SELECT * FROM retweet_class_proba;''')
 for d in c.fetchall():
     update_user(d)
 
 with open("../disk/user_support.txt", "w") as f:
     for uid, v in userdata.items():
-        f.write("{},{},{},{:.2f}\n".format(uid, v["num_pro_hill"], v["num_tweets"], v["sum_pro_hill"]))
+        f.write("{},{},{},{:.6f}\n".format(uid, v["num_pro_hill"], v["num_tweets"], v["sum_pro_hill"]))
