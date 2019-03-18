@@ -3,7 +3,8 @@
 # Date: 2019-03-18 15:59:33
 
 import sqlite3
-import json
+# import json
+from tqdm import tqdm
 
 set_tweet_id = set()
 userdata = {}
@@ -27,19 +28,19 @@ def update_user(_d):
 conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_class_proba_final_htgs_db.sqlite")
 c = conn.cursor()
 c.execute('''SELECT * FROM class_proba;''')
-for d in c.fetchall():
+for d in tqdm(c.fetchall()):
     update_user(d)
 c.execute('''SELECT * FROM retweet_class_proba;''')
-for d in c.fetchall():
+for d in tqdm(c.fetchall()):
     update_user(d)
 
 conn = sqlite3.connect("/home/alex/network_workdir/elections/databases/complete_trump_vs_hillary_sep-nov_class_proba_final_htgs_june_sep_db.sqlite")
 c = conn.cursor()
 c.execute('''SELECT * FROM class_proba;''')
-for d in c.fetchall():
+for d in tqdm(c.fetchall()):
     update_user(d)
 c.execute('''SELECT * FROM retweet_class_proba;''')
-for d in c.fetchall():
+for d in tqdm(c.fetchall()):
     update_user(d)
 
 with open("../disk/user_support.txt", "w") as f:
