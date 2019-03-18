@@ -566,7 +566,8 @@ class ALL_TWEET(object):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["user_id", "tweet_id", "c_sci_f"])
-        all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
+        all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
         # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
 
         self.load_retweet_network()
@@ -633,7 +634,7 @@ class ALL_TWEET(object):
             # tweets = all_tweets[all_tweets["c_mbfc"] == _type]
             
             if _type == "Fake":
-                tweets = all_tweets[all_tweets["c_sci_f"] != "-1"]
+                tweets = all_tweets
             else:
                 tweets = all_tweets[all_tweets["c_sci_f"] == _type]
 
