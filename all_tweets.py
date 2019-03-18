@@ -565,7 +565,7 @@ class ALL_TWEET(object):
     def make_graph_for_CI(self):
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["user_id", "tweet_id", "c_sci_f"])
         all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
         # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
 
