@@ -583,15 +583,20 @@ class ALL_TWEET(object):
         #     "extreme bias (left)"
         # ]
 
+        # labels = [
+        #     "fake",
+        #     "right",
+        #     "right leaning",
+        #     "center",
+        #     "left leaning",
+        #     "left",
+        # ]
+
         labels = [
+            "Black",
+            "Red",
+            "Orange",
             "fake",
-            # "extreme bias (right)",
-            "right",
-            "right leaning",
-            "center",
-            "left leaning",
-            "left",
-            # "extreme bias (left)"
         ]
 
         print("making dict_tweetid_userid ...")
@@ -625,9 +630,15 @@ class ALL_TWEET(object):
         for _type in labels:
             print(_type, "...")
             # tweets = all_tweets[all_tweets["c_alex"] == _type]
-            tweets = all_tweets[all_tweets["c_mbfc"] == _type]
+            # tweets = all_tweets[all_tweets["c_mbfc"] == _type]
+            
+            if _type == "Fake":
+                tweets = all_tweets[all_tweets["c_sci_f"] != "-1"]
+            else:
+                tweets = all_tweets[all_tweets["c_sci_f"] == _type]
+
             save_network_nx(set(tweets.tweet_id),
-                            "disk/network/{}_fc.gpickle".format(_type))
+                            "disk/network/{}_sf.gpickle".format(_type.lower()))
 
 
     def load_all_users(self):
