@@ -315,6 +315,8 @@ class ALL_TWEET(object):
     def fill_other_info(self):
         # tweets数据因分类变化，扩充后需要把之前的数据项补全
         data = pd.read_csv("disk/all-tweets.csv", dtype=str)
+        len_URL_id = 0
+        dict_URL_id = {}
 
         # data["is_first"] = -1 first目前先不考虑，在做时间序列的时候再考虑。
 
@@ -331,14 +333,17 @@ class ALL_TWEET(object):
                 continue
             if d["final_url"].endswith("/"):
                 d["final_url"] = d["final_url"][:-1]
+
+            if d["final_url"] not in dict_URL_id:
+                dict_URL_id[d["final_url"]] = len_URL_id
+                len_URL_id += 1
+
+            url_id = dict_URL_id[d["final_url"]]
+
             tweets[t_id] = {
                 "tweet_id": t_id,
-                "URL": d["final_url"],
-                "hostname": d["final_hostname"],
-                "media_type": d["media_type"],
-                "c_mbfc": d["c_mbfc"],
-                "c_sci_f": d["c_sci_fake"],
-                "c_sci_s": d["c_sci_align"],
+                "URL_id": url_id,
+                "hostname": d["final_hostname"]
             }
 
         # IRA
@@ -349,19 +354,22 @@ class ALL_TWEET(object):
                 continue
             if d["final_url"].endswith("/"):
                 d["final_url"] = d["final_url"][:-1]
+
+            if d["final_url"] not in dict_URL_id:
+                dict_URL_id[d["final_url"]] = len_URL_id
+                len_URL_id += 1
+
+            url_id = dict_URL_id[d["final_url"]]
+
             tweets[t_id] = {
                 "tweet_id": t_id,
-                "URL": d["final_url"],
-                "hostname": d["hostname"],
-                "media_type": d["media_type"],
-                "c_mbfc": d["c_mbfc"],
-                "c_sci_f": d["c_sci_fake"],
-                "c_sci_s": d["c_sci_align"],
+                "URL_id": url_id,
+                "hostname": d["final_hostname"]
             }
 
         error_cnt = 0
         fuck = 0
-        non_source_tweets = data[data.is_source=="0"]
+        non_source_tweets = data[data["is_source"]=="0"]
         for i, row in tqdm(non_source_tweets.iterrows()):
             t_id = row["tweet_id"]
             ret_id = row["retweeted_id"]
@@ -377,8 +385,8 @@ class ALL_TWEET(object):
             else:
                 fuck += 1
 
-        print("原始推特缺少url信息。", error_cnt)
-        print("谁都没有url还玩个P？", fuck)
+        print("原始推特缺少url信息：", error_cnt)
+        print("谁都没有url还玩个P：", fuck)
 
         # save
         tweets = pd.DataFrame(list(tweets.values()))
@@ -734,14 +742,14 @@ class ALL_TWEET(object):
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        # self.fill_other_info()
+        self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
 
         # self.make_users()
-        self.make_graph_for_CI()
+        # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
         # self.for_fake_clique()
