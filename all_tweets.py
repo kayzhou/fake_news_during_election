@@ -395,6 +395,7 @@ class ALL_TWEET(object):
         print("谁都没有url还玩个P：", fuck)
 
         # save
+        json.dump(dict_URL_id, open("disk/dict_URL_id.json", "w"), indent=1)
         tweets = pd.DataFrame(list(tweets.values()))
         print("saving ...")
         tweets.to_csv("disk/all-tweets-ht.csv", index=None)
@@ -544,11 +545,11 @@ class ALL_TWEET(object):
         #     "left",     
         # ]
 
-        labels = [
-            "Black",
-            "Red",
-            "Orange",
-        ]
+        # labels = [
+        #     "Black",
+        #     "Red",
+        #     "Orange",
+        # ]
 
         for _type in labels:
             print(_type, "...")
@@ -755,13 +756,13 @@ class ALL_TWEET(object):
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        # self.fill_other_info()
+        self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
