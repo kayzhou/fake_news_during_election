@@ -61,5 +61,5 @@ if __name__ == "__main__":
 
     save_dir = 'disk/network'
     for in_name in os.listdir(save_dir):
-        if in_name.endswith("nc.gt"):
+        if in_name.endswith("sf.gt"):
             add_CI_to_graph(os.path.join(save_dir, in_name))
