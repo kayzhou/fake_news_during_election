@@ -508,7 +508,7 @@ class ALL_TWEET(object):
         # all_tweets = self.tweets_csv
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int})
         all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
         all_tweets.to_csv("disk/all-tweets-sf.csv")
 
