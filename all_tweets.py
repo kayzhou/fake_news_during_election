@@ -331,6 +331,9 @@ class ALL_TWEET(object):
             t_id = str(d["tweet_id"])
             if t_id not in tweets_id:
                 continue
+            
+            d["final_url"] = d["final_url"].lower()
+
             if d["final_url"].endswith("/"):
                 d["final_url"] = d["final_url"][:-1]
 
@@ -343,7 +346,7 @@ class ALL_TWEET(object):
             tweets[t_id] = {
                 "tweet_id": t_id,
                 "URL_id": url_id,
-                "hostname": d["final_hostname"]
+                "hostname": d["final_hostname"].lower()
             }
 
         # IRA
@@ -352,6 +355,9 @@ class ALL_TWEET(object):
             t_id = str(d["tweetid"])
             if t_id not in tweets_id:
                 continue
+
+            d["final_url"] = d["final_url"].lower()
+
             if d["final_url"].endswith("/"):
                 d["final_url"] = d["final_url"][:-1]
 
@@ -364,7 +370,7 @@ class ALL_TWEET(object):
             tweets[t_id] = {
                 "tweet_id": t_id,
                 "URL_id": url_id,
-                "hostname": d["final_hostname"]
+                "hostname": d["hostname"].lower()
             }
 
         error_cnt = 0
@@ -503,8 +509,8 @@ class ALL_TWEET(object):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "dt": datetime})
-        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
-        all_tweets.to_csv("disk/all-tweets-nc.csv")
+        all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
+        all_tweets.to_csv("disk/all-tweets-sf.csv")
 
         users = None
         # map_labels = {
@@ -518,16 +524,16 @@ class ALL_TWEET(object):
         #     "7": "extreme bias (left)"
         # }
 
-        labels = [
-            "fake",
-            "extreme bias (right)",
-            "right",
-            "right leaning",
-            "center",
-            "left leaning",
-            "left",
-            "extreme bias (left)"
-        ]
+        # labels = [
+        #     "fake",
+        #     "extreme bias (right)",
+        #     "right",
+        #     "right leaning",
+        #     "center",
+        #     "left leaning",
+        #     "left",
+        #     "extreme bias (left)"
+        # ]
 
         # mbfc_labels = [
         #     "fake",
@@ -538,9 +544,16 @@ class ALL_TWEET(object):
         #     "left",     
         # ]
 
+        labels = [
+            "Black",
+            "Red",
+            "Orange",
+        ]
+
         for _type in labels:
             print(_type, "...")
-            tweets = all_tweets[all_tweets["c_alex"] == _type]
+            # tweets = all_tweets[all_tweets["c_alex"] == _type]
+            tweets = all_tweets[all_tweets["c_sci_f"] == _type]
             user_count = pd.value_counts(tweets["user_id"]).rename(_type)
             user_sources_count = tweets["is_source"].groupby(
                 tweets["user_id"]).sum().rename(_type + "_source")
@@ -568,7 +581,7 @@ class ALL_TWEET(object):
         users.fillna(0, inplace=True)
         # save data
         users["user_id"] = users.index
-        users.to_csv("data/all-users-nc.csv", index=False)
+        users.to_csv("data/all-users-sf.csv", index=False)
 
     def make_graph_for_CI(self):
 
@@ -742,13 +755,13 @@ class ALL_TWEET(object):
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        self.fill_other_info()
+        # self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
+        self.make_users()
         # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验

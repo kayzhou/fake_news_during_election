@@ -20,7 +20,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 import CIcython
 
-
 #%% add CI values to graph
 def add_CI_to_graph(graph_file):
     print('pid ' + str(os.getpid()) + ' loading graph ' + graph_file)
