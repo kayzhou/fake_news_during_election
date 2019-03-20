@@ -2,12 +2,6 @@ from my_weapon import *
 from collections import defaultdict, Counter
 from IPython.display import display
 from tqdm import tqdm_notebook as tqdm
-import matplotlib
-matplotlib.rcParams["font.size"] = 14
-sns.set(style="darkgrid", font_scale=1.5)
-ira_c = sns.color_palette("coolwarm", 8)[7]
-all_c = sns.color_palette("coolwarm", 8)[0]
-
 labels = [
     "fake",
     "extreme bias (right)",
