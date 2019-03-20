@@ -2,6 +2,7 @@ from my_weapon import *
 from collections import defaultdict, Counter
 from IPython.display import display
 from tqdm import tqdm_notebook as tqdm
+
 labels = [
     "fake",
     "extreme bias (right)",
@@ -12,6 +13,39 @@ labels = [
     "left",
     "extreme bias (left)"
 ]
+
+# 方向 both undir out in
+
+import graph_tool.all as gt
+
+def build_CI_rank(graph_file):
+    rst = {}
+    g = gt.load_graph(graph_file)
+    user_CI = {g.vp.id[v]: g.vp.CI_out[v] for v in g.vertices()}
+    rst["out_CI"] = user_CI
+    st_user_CI = sorted(user_CI.items(), key=lambda d: d[1], reverse=True)
+    rank = {d[0]: i for i, d in enumerate(st_user_CI)}
+    rst["out_id"] = st_user_CI
+    rst["out_rank"] = rank
+    
+#     user_CI = {g.vp.id[v]: g.vp.CI_undir[v] for v in g.vertices()}
+#     rst["undir_CI"] = user_CI
+#     st_user_CI = sorted(user_CI.items(), key=lambda d: d[1], reverse=True)
+#     rst["undir_id"] = st_user_CI
+    
+#     user_CI = {g.vp.id[v]: g.vp.CI_both[v] for v in g.vertices()}
+#     rst["both_CI"] = user_CI
+#     st_user_CI = sorted(user_CI.items(), key=lambda d: d[1], reverse=True)
+#     rst["both_id"] = st_user_CI
+
+    user_CI = {g.vp.id[v]: g.vp.CI_in[v] for v in g.vertices()}
+    rst["in_CI"] = user_CI
+    st_user_CI = sorted(user_CI.items(), key=lambda d: d[1], reverse=True)
+    rank = {d[0]: i for i, d in enumerate(st_user_CI)}
+    rst["in_id"] = st_user_CI
+    rst["in_rank"] = rank
+    
+    return rst
 
 # all_users = pd.read_csv("data/all-users-mbfc.csv", index_col="user_id", dtype={"user_id": str})
 users = pd.read_csv("data/all-users-nc.csv", index_col="user_id",
