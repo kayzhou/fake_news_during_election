@@ -90,7 +90,7 @@ for label in labels:
         
         print("IRA sum", np.log10(IRA_CI_sum))
         for i, d in enumerate(rst[dire + "_id"]):
-            dlog = np.log10(d[1])
+            dlog = np.log10(float(d[1]))
             if dlog > IRA_CI_sum:
                 print(i, d[0], dlog)
         
