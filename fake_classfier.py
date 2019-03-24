@@ -37,7 +37,7 @@ class Fake_Classifer(object):
         获取训练文本
         """
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["tweet_id", "media_type"])
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["tweet_id", "c_alex"])
         print("finished!")
 
         labels = [
