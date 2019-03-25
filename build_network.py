@@ -920,7 +920,7 @@ if __name__ == "__main__":
 
     save_dir = 'disk/network'
     for in_name in os.listdir(save_dir):
-        if in_name.endswith("sf.gpickle"):
+        if in_name.endswith("v2.gpickle"):
             nt = nx.read_gpickle(os.path.join(save_dir, in_name))
             _gt = nx2gt(nt)
             _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
