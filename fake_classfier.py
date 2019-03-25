@@ -145,14 +145,14 @@ class Fake_Classifer(object):
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
         
-        gc.collect()
         print("Splitting data finished!")
 
         # build one hot embedding
         v = DictVectorizer(dtype=np.int8, sparse=True, sort=False)
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
-
+        
+        dump(v, 'model/20190325-DictVectorizer.joblib')
         print("Building word embedding finished!")
         print(X_train[0].shape, X_train[1].shape)
         print(X_train.shape, X_test.shape)
@@ -184,7 +184,7 @@ class Fake_Classifer(object):
                 clf = classifiers[classifier](X_train, y_train)
             # print("fitting finished! Lets evaluate!")
             self.evaluate(clf, X_train, y_train, X_test, y_test)
-            dump(clf, 'model/{}.joblib'.format(classifier))
+            dump(clf, 'model/20190325-{}.joblib'.format(classifier))
 
 
         # original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
