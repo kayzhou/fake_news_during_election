@@ -303,8 +303,17 @@ class Are_you_IRA(object):
 if __name__ == "__main__":
     # who = Who_is_fake()
     # print(who.identify("baidu.com"))
-    putin = Are_you_IRA()
-    putin.find_IRA_retweets()
-    putin.find_IRA_tweets()
+    # putin = Are_you_IRA()
+    # putin.find_IRA_retweets()
+    # putin.find_IRA_tweets()
     # putin.cal_IRA_map()
     # print(putin._map)
+
+    tmp = []
+    who = Who_is_fake()
+    for k in who.NEW_HOST_3:
+        if k in who.HOST:
+            print(k, who.HOST[k])
+            tmp.append(who.HOST[k])
+    tmp = pd.Series(tmp)
+    print(tmp.value_counts())

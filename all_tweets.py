@@ -121,7 +121,7 @@ class ALL_TWEET(object):
 
         for line in tqdm(open("disk/bingo_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1":
+            if d["c_sci_fake"] != "-1" and d["c_alex"] == "-1":
                 d["media_type"] = "fake"
 
             tweet = {
@@ -147,7 +147,7 @@ class ALL_TWEET(object):
         cnt = 0
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1":
+            if d["c_sci_fake"] != "-1" and d["c_alex"] == "-1":
                 d["media_type"] = "fake"
             if str(d["tweetid"]) not in self.tweets:
                 tweet = {
@@ -515,8 +515,8 @@ class ALL_TWEET(object):
 
         print("loading all tweets_csv ...")
         all_tweets = pd.read_csv("disk/all-tweets-v2.csv", dtype=str).astype({"is_IRA": int, "is_source": int})
-        all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
-        all_tweets.to_csv("disk/all-tweets-sf.csv")
+        # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        # all_tweets.to_csv("disk/all-tweets-sf.csv")
 
         users = None
         # map_labels = {
@@ -767,8 +767,8 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
-        # self.make_graph_for_CI()
+        self.make_users()
+        self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
         # self.for_fake_clique()
