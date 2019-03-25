@@ -595,7 +595,8 @@ class ALL_TWEET(object):
         all_tweets = pd.read_csv("disk/all-tweets-v2.csv", dtype=str, usecols=["user_id", "tweet_id", "c_alex"])
         # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
         # all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
-        # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        print(len(all_tweets))
 
         self.load_retweet_network()
         print("loaded retweet network!")
