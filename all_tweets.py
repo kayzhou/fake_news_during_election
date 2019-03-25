@@ -121,7 +121,7 @@ class ALL_TWEET(object):
 
         for line in tqdm(open("disk/bingo_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1" and d["c_alex"] == "-1":
+            if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
                 d["media_type"] = "fake"
 
             tweet = {
@@ -147,7 +147,7 @@ class ALL_TWEET(object):
         cnt = 0
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1" and d["c_alex"] == "-1":
+            if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
                 d["media_type"] = "fake"
             if str(d["tweetid"]) not in self.tweets:
                 tweet = {
