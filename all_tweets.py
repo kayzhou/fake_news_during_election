@@ -753,10 +753,10 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
-        self.save_csv()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
+        # self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()
@@ -768,7 +768,7 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
