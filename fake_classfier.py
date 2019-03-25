@@ -4,6 +4,7 @@
 
 import gc
 from itertools import chain
+from random import sample
 
 from nltk import ngrams
 from sklearn.feature_extraction import DictVectorizer
@@ -99,30 +100,51 @@ class Fake_Classifer(object):
         X = []
         y = []
 
-        for _type, f_label in tqdm(self.MAP_LABELS.items()):
+        labels = [
+            "fake",
+            "extreme bias (right)",
+            "right",
+            "right leaning",
+            "center",
+            "left leaning",
+            "left",
+            "extreme bias (left)"
+        ]
 
-            if f_label == "fake":
-                y_i = 0 
-            elif f_label in ["extreme bias (right)", "right", "right leaning"]:
+        w_of_categories = [[], [], [], []]
+
+        for label in labels:
+            print(label, "...")
+
+            if label == "fake":
+                y_i = 0
+            elif label in ["extreme bias (right)", "right", "right leaning"]:
                 y_i = 1 
-            elif f_label == "center":
+            elif label == "center":
                 y_i = 2 
-            elif f_label in ["extreme bias (left)", "left", "left leaning"]:
+            elif label in ["extreme bias (left)", "left", "left leaning"]:
                 y_i = 3
 
-            for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(_type))):
+            for i, line in enumerate(open("disk/tokens_fake/{}.txt".format(label))):
                 w = line.strip().split(" ")
-                # if len(w) > 0 and w[0] != "RT":
+                if len(w) > 0 and w[0] != "RT":
+                    w_of_categories[y_i].append(w)
+                    # X.append(bag_of_words_and_bigrams(w))
+                    # # print(X[-1])
+                    # y.append(y_i)
+
+        for i in range(len(w_of_categories)):
+            print("len of category:", len(w_of_categories[i]))
+            w_of_categories[i] = sample(w_of_categories[i], 1000000)
+            for w in w_of_categories[i]:
                 X.append(bag_of_words_and_bigrams(w))
-                # print(X[-1])
-                y.append(y_i)
+                y.append(i)
 
         print("Reading data finished! count:", len(y))
 
         # split train and test data
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
         
-        del X, y
         gc.collect()
         print("Splitting data finished!")
 
@@ -136,8 +158,8 @@ class Fake_Classifer(object):
         print(X_train.shape, X_test.shape)
 
         # machine learning model
-        # list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
-        list_classifiers = ['GBDT']
+        list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
+        # list_classifiers = ['GBDT']
         classifiers = {
             'NB': naive_bayes_classifier,
             'KNN': knn_classifier,
@@ -208,6 +230,6 @@ class Fake_Classifer(object):
 
 if __name__ == "__main__":
     Lebron = Fake_Classifer()
-    Lebron.get_train_data()
-    Lebron.get_tokens()
-    # Lebron.train()
+    # Lebron.get_train_data()
+    # Lebron.get_tokens()
+    Lebron.train()
