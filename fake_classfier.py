@@ -158,7 +158,7 @@ class Fake_Classifer(object):
         print(X_train.shape, X_test.shape)
 
         # machine learning model
-        list_classifiers = ['LR', 'GBDT', 'NB', 'RF']
+        list_classifiers = ['LR', 'NB', 'RF', 'SVMLINER', 'DT', 'GBDT']
         # list_classifiers = ['GBDT']
         classifiers = {
             'NB': naive_bayes_classifier,
