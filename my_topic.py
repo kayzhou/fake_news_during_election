@@ -71,9 +71,21 @@ dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
 
 
+import scipy
+
+def average_distance(v_tops):
+    _sum = 0
+    _cnt = 0
+    for i in range(len(v_tops)):
+        for j in range(i+1, len(v_tops)):
+            _sum += scipy.spatial.distance.cosine(v_tops[i], v_tops[j])
+            _cnt += 1
+    return _sum / _cnt
+
 for n in range(3, 10):
     lda = LdaModel(corpus, num_topics=n)
-    print(lda.get_topics())
+    v_topics = lda.get_topics()
+    print("average distance:", average_distance(v_topics))
     # show
     x = lda.show_topics(num_topics=n, num_words=16, formatted=False)
     topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
