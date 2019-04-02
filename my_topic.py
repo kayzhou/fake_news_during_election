@@ -40,7 +40,7 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 # print("loaded!")
 # conn.close()
 
-texts = pd.read("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
+texts = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
 print(len(texts))
 
 dictionary = Dictionary(texts)
