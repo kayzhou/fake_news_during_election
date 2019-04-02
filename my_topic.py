@@ -28,6 +28,9 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 #     "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite")
 # c = conn.cursor()
 # c.execute('''SELECT text FROM tweet''')
+# print("loaded!")
+# conn.close()
+
 
 # texts = []
 # for line in open("data/ira-tweets-ele.csv"):
@@ -37,10 +40,15 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 #     #     continue
 #     texts.append(words) 
 
-# print("loaded!")
-# conn.close()
 
-texts = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
+
+texts = []
+data = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
+for d in data:
+    words = tokenizer.tokenize(d["tweet_text"])
+    # if words[0] == "RT":
+    #     continue
+    texts.append(words)  
 print(len(texts))
 
 dictionary = Dictionary(texts)
