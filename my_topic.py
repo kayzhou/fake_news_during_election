@@ -25,6 +25,10 @@ stopWords.add("rt")
 stopWords.add("…")
 stopWords.add("...")
 stopWords.add("URL")
+stopWords.add("“")
+stopWords.add("”")
+stopWords.add("‘")
+stopWords.add("’")
 
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
@@ -65,16 +69,35 @@ print(len(texts))
 
 dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
-lda = LdaModel(corpus, num_topics=8)
 
-x = lda.show_topics(num_topics=8, num_words=16, formatted=False)
-topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
 
-dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
-# Below Code Prints Topics and Words
-for topic, words in topics_words:
-    print(str(topic)+ "::" + str([dictionary.id2token[int(w)] for w in words]))
-print()
+for n in range(3, 10):
+    lda = LdaModel(corpus, num_topics=n)
+    print(lda.get_topics())
+    # show
+    x = lda.show_topics(num_topics=n, num_words=16, formatted=False)
+    topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
+
+    dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
+    # Below Code Prints Topics and Words
+    for topic, words in topics_words:
+        print(str(topic), "::", str([dictionary.id2token[int(w)] for w in words]))
+    print()
+
+
+"""
+Topics:
+
+0::['', 'get', 'day', '#tofeelbetteri', 'game', 'like', "can't", 'people', '#myolympicsportwouldbe', 'stop', 'time', 'enough', 'morning', 'trying', "i'd", 'little']
+1::['#news', 'police', 'man', '#world', 'u', 'says', '#sports', 'killed', '#topnews', 'new', 'shot', 'shooting', 'woman', 'state', 'n', 'city']
+2::['“', '”', 'new', '’', '#foke', 'foke', 'via', 'debate', 'video', 'live', 'watch', 'us', 'report', 'black', 'california', 'speech']
+3::["he's", '@talibkweli', 'listen', 'us', '#betteralternativetodebates', 'country', 'help', 'win', '#trumpsfavoriteheadline', 'name', 'times', 'read', 'people', 'supporters', '#sometimesitsokto', '#pjnet']
+4::['@danageezus', 'get', 'money', 'people', 'school', '@chrixmorgan', 'use', 'go', '#mustbebanned', '#ihatepokemongobecause', '#thingsmoretrustedthanhillary', '#obamaswishlist', '#toavoidworki', 'work', '#reasonstogetdivorced', '#wheniwasyoung']
+5::['😂', 'thanks', 'lives', 'matter', '#obamanextjob', 'black', 'yes', '2', 'wrong', 'hashtag', 'us', 'part', 'children', '🔥', 'charged', 'https']
+6::["i'm", 'people', 'like', 'know', 'would', 'black', 'think', 'one', 'really', 'white', '@midnight', 'good', 'never', 'love', "that's", 'want']
+7::['trump', '’', 'hillary', 'clinton', 'https', '‘', 'vote', 'donald', 'obama', '#politics', 'media', '@realdonaldtrump', 'via', 'campaign', 'president', 'america']
+
+"""
 
 # Below Code Prints Only Words 
 # for topic, words in topics_words:
