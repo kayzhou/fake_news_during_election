@@ -17,6 +17,11 @@ from tqdm import tqdm
 from nltk.corpus import stopwords
 stopWords = set(stopwords.words('english'))
 
+import string
+for w in string.punctuation:
+    stopWords.add(w)
+
+stopWords.add("rt")
 
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
