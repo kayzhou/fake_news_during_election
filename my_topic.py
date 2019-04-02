@@ -45,7 +45,7 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 texts = []
 data = pd.read_csv("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
 for d in data:
-    words = tokenizer.tokenize(d["tweet_text"])
+    words = tokenizer.tokenize(d)
     # if words[0] == "RT":
     #     continue
     texts.append(words)  
