@@ -22,6 +22,9 @@ for w in string.punctuation:
     stopWords.add(w)
 
 stopWords.add("rt")
+stopWords.add("…")
+stopWords.add("...")
+stopWords.add("URL")
 
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
