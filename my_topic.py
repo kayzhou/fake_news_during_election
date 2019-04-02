@@ -5,13 +5,14 @@ Created on 2019-01-27 17:55:17
 @author: https://kayzhou.github.io/
 """
 
+import json
 import sqlite3
 
-from gensim.models import LdaModel
+import numpy as np
 from gensim.corpora import Dictionary
+from gensim.models import LdaModel
 from gensim.test.utils import datapath
 from tqdm import tqdm
-import numpy as np
 
 from Trump_Clinton_Classifer.TwProcess import CustomTweetTokenizer
 
