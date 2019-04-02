@@ -28,14 +28,16 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 # c.execute('''SELECT text FROM tweet''')
 
 texts = []
-for line in open("data/ira-left-text.txt"):
-    words = tokenizer.tokenize(line.strip())
+for line in open("data/ira-tweets-ele.csv"):
+    d = json.loads(line.strip())
+    words = tokenizer.tokenize(d["tweet_text"])
     # if words[0] == "RT":
     #     continue
     texts.append(words) 
 
-print("loaded!")
+# print("loaded!")
 # conn.close()
+
 
 dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]

@@ -10,6 +10,7 @@ from nltk import ngrams
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 import SQLite_handler
 from joblib import dump, load

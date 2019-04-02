@@ -13,6 +13,8 @@ import time
 
 import graph_tool.all as gt
 import numpy as np
+from joblib import Parallel, delayed
+from functools import partial
 
 PACKAGE_PARENT = '.'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
