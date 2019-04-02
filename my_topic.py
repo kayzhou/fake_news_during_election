@@ -9,6 +9,7 @@ import json
 import sqlite3
 
 import numpy as np
+import pandas as pd
 from gensim.corpora import Dictionary
 from gensim.models import LdaModel
 from gensim.test.utils import datapath
@@ -28,17 +29,19 @@ tokenizer = CustomTweetTokenizer(preserve_case=False,
 # c = conn.cursor()
 # c.execute('''SELECT text FROM tweet''')
 
-texts = []
-for line in open("data/ira-tweets-ele.csv"):
-    d = json.loads(line.strip())
-    words = tokenizer.tokenize(d["tweet_text"])
-    # if words[0] == "RT":
-    #     continue
-    texts.append(words) 
+# texts = []
+# for line in open("data/ira-tweets-ele.csv"):
+#     d = json.loads(line.strip())
+#     words = tokenizer.tokenize(d["tweet_text"])
+#     # if words[0] == "RT":
+#     #     continue
+#     texts.append(words) 
 
 # print("loaded!")
 # conn.close()
 
+texts = pd.read("data/ira-tweets-ele.csv", usecols=["tweet_text"])["tweet_text"]
+print(len(texts))
 
 dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
