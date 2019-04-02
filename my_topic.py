@@ -64,7 +64,7 @@ dictionary = Dictionary(texts)
 corpus = [dictionary.doc2bow(t) for t in texts]
 lda = LdaModel(corpus, num_topics=8)
 
-x = lda.show_topics(num_topics=8, num_words=20, formatted=False)
+x = lda.show_topics(num_topics=8, num_words=16, formatted=False)
 topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
 
 dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
