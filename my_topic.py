@@ -73,6 +73,7 @@ corpus = [dictionary.doc2bow(t) for t in texts]
 
 import scipy
 
+
 def average_distance(v_tops):
     _sum = 0
     _cnt = 0
@@ -82,19 +83,20 @@ def average_distance(v_tops):
             _cnt += 1
     return _sum / _cnt
 
-for n in range(3, 10):
-    lda = LdaModel(corpus, num_topics=n)
-    v_topics = lda.get_topics()
-    print("average distance:", average_distance(v_topics))
-    # show
-    x = lda.show_topics(num_topics=n, num_words=16, formatted=False)
-    topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
 
-    dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
-    # Below Code Prints Topics and Words
-    for topic, words in topics_words:
-        print(str(topic), "::", str([dictionary.id2token[int(w)] for w in words]))
-    print()
+with open ("data/IRA_topics.txt", "w") as f:
+    for n in range(3, 20):
+        lda = LdaModel(corpus, num_topics=n)
+        v_topics = lda.get_topics()
+        f.write("average distance: {}\n".format(average_distance(v_topics)))
+        # show
+        x = lda.show_topics(num_topics=n, num_words=16, formatted=False)
+        topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
+
+        dictionary.id2token = {v: k for k, v in dictionary.token2id.items()}
+        # Below Code Prints Topics and Words
+        for topic, words in topics_words:
+            f.write(str(topic) + " :: " + str([dictionary.id2token[int(w)] for w in words]) + "\n")
 
 
 """
