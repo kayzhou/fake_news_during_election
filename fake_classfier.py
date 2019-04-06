@@ -153,13 +153,13 @@ class Fake_Classifer(object):
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
         
-        dump(v, 'model/20190325-DictVectorizer.joblib')
+        dump(v, 'model/20190401-DictVectorizer.joblib')
         print("Building word embedding finished!")
         print(X_train[0].shape, X_train[1].shape)
         print(X_train.shape, X_test.shape)
 
         # machine learning model
-        list_classifiers = ['LR', 'NB', 'RF', 'SVMLINER', 'DT', 'GBDT']
+        list_classifiers = ['LR', 'NB', 'SVC']
         # list_classifiers = ['GBDT']
         classifiers = {
             'NB': naive_bayes_classifier,
@@ -170,7 +170,7 @@ class Fake_Classifer(object):
             'SVM': svm_classifier,
             'SVMCV': svm_cross_validation,
             'GBDT': gradient_boosting_classifier,
-            'SVMLINER': svm_linear_classifier,
+            'SVC': svm_linear_classifier,
         }
 
         for classifier in list_classifiers:
@@ -185,7 +185,7 @@ class Fake_Classifer(object):
                 clf = classifiers[classifier](X_train, y_train)
             # print("fitting finished! Lets evaluate!")
             self.evaluate(clf, X_train, y_train, X_test, y_test)
-            dump(clf, 'model/20190325-{}.joblib'.format(classifier))
+            dump(clf, 'model/20190401-{}.joblib'.format(classifier))
 
 
         # original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
