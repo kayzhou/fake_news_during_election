@@ -65,7 +65,6 @@ class ALL_TWEET(object):
         #             # self.tweet_ids.append(json_d["tweet_id"])
         # conn.close()
 
-
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
             for line in tqdm(open("data/ira-urls-plus-2.json")):
@@ -123,6 +122,8 @@ class ALL_TWEET(object):
             d = json.loads(line.strip())
             if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
                 d["media_type"] = "fake"
+            if d["media_type"] == "-1":
+                continue
 
             tweet = {
                 "tweet_id": str(d["tweet_id"]),
@@ -149,6 +150,8 @@ class ALL_TWEET(object):
             d = json.loads(line.strip())
             if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
                 d["media_type"] = "fake"
+            if d["media_type"] == "-1":
+                continue
             if str(d["tweetid"]) not in self.tweets:
                 tweet = {
                     "tweet_id": str(d["tweetid"]),
@@ -572,8 +575,8 @@ class ALL_TWEET(object):
                 users = pd.concat(
                     [users, user_count, user_sources_count], axis=1, sort=False)
 
-        for _type in labels:
-            users[_type + "_source_rate"] = users[_type + "_source"] / users[_type]
+        # for _type in labels:
+            # users[_type + "_source_rate"] = users[_type + "_source"] / users[_type]
             # users[f_label + "_first_rate"] = users[f_label +
             #                                        "_first"] / users[f_label]
             # users[f_label + "_first_source_rate"] = users[f_label +
@@ -753,10 +756,10 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
-        # self.save_csv()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
+        self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()
@@ -768,8 +771,8 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
-        self.make_graph_for_CI()
+        self.make_users()
+        # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
         # self.for_fake_clique()
