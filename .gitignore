@@ -118,3 +118,5 @@ model/
 *.json
 train_data/
 .idea
+Infomap/
+python-louvain/
