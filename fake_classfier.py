@@ -188,38 +188,6 @@ class Fake_Classifer(object):
             dump(clf, 'model/20190401-{}.joblib'.format(classifier))
 
 
-        # original_params = {'n_estimators': 1000, 'max_leaf_nodes': 4, 'max_depth': 3, 'random_state': 23,
-        #                 'min_samples_split': 5}
-
-        # for GDBT
-        # for i, setting in enumerate([{'learning_rate': 1.0, 'subsample': 1.0},
-        #                 {'learning_rate': 0.1, 'subsample': 1.0},
-        #                 {'learning_rate': 1.0, 'subsample': 0.5},
-        #                 {'learning_rate': 0.1, 'subsample': 0.5},
-        #                 {'learning_rate': 0.1, 'max_features': 2}]):
-        #     print('******************* {} ********************'.format(i))
-        #     params = dict(original_params)
-        #     params.update(setting)
-
-        #     clf = GradientBoostingClassifier(**params)
-        #     clf.fit(X_train, y_train)
-        #     self.evaluate(clf, X_train, y_train, X_test, y_test)
-
-
-        # original_params = {}
-
-        # LinearSVC
-        # for i, setting in enumerate([{'C':0.125}, {'C': 0.25}, {'C':0.5}, {'C':1.0}, {'C':2.0}, {'C': 4.0}, {'C':8.0}]):
-        #     print('******************* {} ********************'.format(i))
-        #     print(setting)
-        #     params = dict(original_params)
-        #     params.update(setting)
-
-        #     clf = LinearSVC(**params)
-        #     clf.fit(X_train, y_train)
-        #     self.evaluate(clf, X_train, y_train, X_test, y_test)
-
-
     def evaluate(self, clf, X_train, y_train, X_test, y_test):
         # CV
         print('accuracy of CV=10:', cross_val_score(clf, X_train, y_train, cv=5).mean())
@@ -227,6 +195,34 @@ class Fake_Classifer(object):
         # 模型评估
         y_pred = clf.predict(X_test)
         print(classification_report(y_test, y_pred))
+
+
+    def predict(self):
+        tokenizer = CustomTweetTokenizer()
+        v = load('model/20190401-DictVectorizer.joblib')
+        clf = load('model/20190401-LR.joblib')
+        ele_tweets = pd.read_csv('data/ira-tweets-ele.csv', dtype=str)
+
+        X = []
+        uids = []
+        batch_size = 1000
+
+        with open("data/ira_predicted_tweets.txt", "w") as f:
+            for i, row in ele_tweets.iterrows():
+                uids.append(row["userid"])
+                text = d["tweet_text"].replace("\n", " ").replace("\t", " ")
+                words = bag_of_words_and_bigrams(tokenizer.tokenize(text))
+                y = clf.predict(words)
+                X.append(words)
+
+                if len(X) >= batch_size:
+                    # print(X)
+                    X = v.transform(X)
+                    y = clf.predict_proba(X)
+                    for i in range(len(y)):
+                        f.write("{},{},{}\n".format(uids[i], y[i]))
+                    X = []
+                    uids = []
 
 
 if __name__ == "__main__":
