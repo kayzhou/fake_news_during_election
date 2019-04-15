@@ -25,6 +25,8 @@ stopWords.add("rt")
 stopWords.add("…")
 stopWords.add("...")
 stopWords.add("URL")
+stopWords.add("http")
+stopWords.add("https")
 stopWords.add("“")
 stopWords.add("”")
 stopWords.add("‘")
@@ -88,7 +90,9 @@ with open ("data/IRA_topics.txt", "w") as f:
     for n in range(3, 20):
         lda = LdaModel(corpus, num_topics=n)
         v_topics = lda.get_topics()
+
         f.write("average distance: {}\n".format(average_distance(v_topics)))
+
         # show
         x = lda.show_topics(num_topics=n, num_words=16, formatted=False)
         topics_words = [(tp[0], [wd[0] for wd in tp[1]]) for tp in x]
