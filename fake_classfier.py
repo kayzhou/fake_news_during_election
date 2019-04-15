@@ -210,7 +210,7 @@ class Fake_Classifer(object):
         with open("data/ira_predicted_tweets.txt", "w") as f:
             for i, row in ele_tweets.iterrows():
                 uids.append(row["userid"])
-                text = d["tweet_text"].replace("\n", " ").replace("\t", " ")
+                text = row["tweet_text"].replace("\n", " ").replace("\t", " ")
                 words = bag_of_words_and_bigrams(tokenizer.tokenize(text))
                 y = clf.predict(words)
                 X.append(words)
