@@ -229,4 +229,5 @@ if __name__ == "__main__":
     Lebron = Fake_Classifer()
     # Lebron.get_train_data()
     # Lebron.get_tokens()
-    Lebron.train()
+    # Lebron.train()
+    Lebron.predict()
