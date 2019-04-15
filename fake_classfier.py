@@ -153,13 +153,14 @@ class Fake_Classifer(object):
         X_train = v.fit_transform(X_train)
         X_test = v.transform(X_test)
         
-        dump(v, 'model/20190401-DictVectorizer.joblib')
+        dump(v, 'model/20190415-DictVectorizer.joblib')
         print("Building word embedding finished!")
         print(X_train[0].shape, X_train[1].shape)
         print(X_train.shape, X_test.shape)
 
         # machine learning model
-        list_classifiers = ['LR', 'NB', 'SVC']
+        list_classifiers = ['LR']
+        # list_classifiers = ['LR', 'NB', 'SVC']
         # list_classifiers = ['GBDT']
         classifiers = {
             'NB': naive_bayes_classifier,
@@ -185,7 +186,7 @@ class Fake_Classifer(object):
                 clf = classifiers[classifier](X_train, y_train)
             # print("fitting finished! Lets evaluate!")
             self.evaluate(clf, X_train, y_train, X_test, y_test)
-            dump(clf, 'model/20190401-{}.joblib'.format(classifier))
+            dump(clf, 'model/20190415-{}.joblib'.format(classifier))
 
 
     def evaluate(self, clf, X_train, y_train, X_test, y_test):
@@ -229,5 +230,5 @@ if __name__ == "__main__":
     Lebron = Fake_Classifer()
     # Lebron.get_train_data()
     # Lebron.get_tokens()
-    # Lebron.train()
+    Lebron.train()
     Lebron.predict()
