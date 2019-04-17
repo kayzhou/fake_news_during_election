@@ -200,8 +200,8 @@ class Fake_Classifer(object):
 
     def predict(self):
         tokenizer = CustomTweetTokenizer()
-        v = load('model/20190401-DictVectorizer.joblib')
-        clf = load('model/20190401-LR.joblib')
+        v = load('model/20190415-DictVectorizer.joblib')
+        clf = load('model/20190415-LR.joblib')
         ele_tweets = pd.read_csv('data/ira-tweets-ele.csv', dtype=str)
 
         X = []
@@ -213,15 +213,14 @@ class Fake_Classifer(object):
                 uids.append(row["userid"])
                 text = row["tweet_text"].replace("\n", " ").replace("\t", " ")
                 words = bag_of_words_and_bigrams(tokenizer.tokenize(text))
-                y = clf.predict(words)
                 X.append(words)
 
                 if len(X) >= batch_size:
                     # print(X)
                     X = v.transform(X)
-                    y = clf.predict_proba(X)
+                    y = clf.predict(X)
                     for i in range(len(y)):
-                        f.write("{},{},{}\n".format(uids[i], y[i]))
+                        f.write("{},{}\n".format(uids[i], y[i]))
                     X = []
                     uids = []
 
@@ -230,5 +229,5 @@ if __name__ == "__main__":
     Lebron = Fake_Classifer()
     # Lebron.get_train_data()
     # Lebron.get_tokens()
-    Lebron.train()
+    # Lebron.train()
     Lebron.predict()
