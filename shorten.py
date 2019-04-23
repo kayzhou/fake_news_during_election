@@ -51,7 +51,7 @@ def get_hostname_from_url(url):
 
 
 def task(_ids):
-    print("{} task starts ... ".format(os.getpid()), len(_ids))
+    print(f"{os.getpid()} task starts ... ", len(_ids))
     unshortener = UnshortenIt(default_timeout=20)
     new_ids = []
     for d in tqdm(_ids):
@@ -89,6 +89,9 @@ def remove_duplication():
 
 
 def unshorten_url():
+    """
+    main
+    """
     # tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-final-urls-plus.json")])
     ignore = set(["twitter.com", "youtube.com", "instagram.com", "facebook.com", "kron4.com"])
 
@@ -160,6 +163,6 @@ def deal_with_error():
 if __name__ == "__main__":
     # remove_duplication()
     # get_urls()
-    # unshorten_url()
+    unshorten_url()
 
-    deal_with_error()
+    # deal_with_error()
