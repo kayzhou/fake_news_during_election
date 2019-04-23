@@ -76,7 +76,7 @@ def task(_ids):
 
 def write2json(new_ids):
     print("writing ... ...")
-    with open("data/ira-urls-plus-2.json", "a") as f:
+    with open("data/ira-urls-plus-20190423.json", "a") as f:
         for d in new_ids:
             f.write(json.dumps(d, ensure_ascii=False) + "\n")
     print("finished!")
@@ -89,31 +89,34 @@ def remove_duplication():
 
 
 def unshorten_url():
-    tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-final-urls-plus.json")])
+    # tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-final-urls-plus.json")])
+    ignore = set(["twitter.com", "youtube.com", "instagram.com", "facebook.com", "kron4.com"])
 
     dict_id_host = []
-    for line in open('data/ira-final-url.json'):
+    # for line in open('data/ira-final-url.json'):
+    for line in open("data/IRA-en-urls.json"):
         # _id, tweetid, url, hostname = line.strip().split('\t')
         r = json.loads(line.strip())
         tweetid = str(r["tweetid"])
 
-        if tweetid in tweet_ids_have_dealed:
-            continue
+        # if tweetid in tweet_ids_have_dealed:
+        #     continue
 
-        url = r["url"]
+        url = r["urls"]
         d = {
             'tweetid': tweetid,
             'url': url,
-            'hostname': r["hostname"],
+            'hostname': get_hostname_from_url(url),
             'final_url': url,
             'short': False,
         }
-        if d["hostname"] not in ["twitter.com", "youtube.com", "instagram.com", "facebook.com"]:
+        if d["hostname"] not in ignore:
             d["short"] = True
         if d["url"] in ["http://listen.radionomy.com/ny2la", "http://ht.ly/XKLW4"]:
             d["short"] = False
 
         dict_id_host.append(d)
+
     print("需要处理：", len(dict_id_host))
 
     # task(dict_id_host)
