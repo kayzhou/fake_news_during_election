@@ -92,7 +92,7 @@ def unshorten_url():
     """
     main
     """
-    # tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-final-urls-plus.json")])
+    tweet_ids_have_dealed = set([json.loads(line.strip())["tweetid"] for line in open("data/ira-urls-plus-20190423.json")])
     ignore = set(["twitter.com", "youtube.com", "instagram.com", "facebook.com", "kron4.com"])
 
     dict_id_host = []
@@ -102,8 +102,8 @@ def unshorten_url():
         r = json.loads(line.strip())
         tweetid = str(r["tweetid"])
 
-        # if tweetid in tweet_ids_have_dealed:
-        #     continue
+        if tweetid in tweet_ids_have_dealed:
+            continue
 
         url = r["urls"]
         d = {
