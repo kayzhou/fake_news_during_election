@@ -322,7 +322,8 @@ class ALL_TWEET(object):
 
     def fill_other_info(self):
         # tweets数据因分类变化，扩充后需要把之前的数据项补全
-        data = pd.read_csv("disk/all-tweets.csv", dtype=str)
+        data = pd.read_csv("disk/all-tweets-v2.csv", dtype=str)
+        data = data[data.c_alex != "-1"]
         len_URL_id = 0
         dict_URL_id = {}
 
@@ -330,6 +331,7 @@ class ALL_TWEET(object):
 
         # 先找到所有source_tweets，填补数据
         # source_tweets = data[data.is_source=="1"]
+
         tweets_id = set(data.tweet_id.tolist())
         print("tweets", len(tweets_id))
 
@@ -403,10 +405,10 @@ class ALL_TWEET(object):
         print("谁都没有url还玩个P：", fuck)
 
         # save
-        json.dump(dict_URL_id, open("disk/dict_URL_id.json", "w"), indent=1)
+        json.dump(dict_URL_id, open("disk/all-dict_URL_id.json", "w"), indent=1)
         tweets = pd.DataFrame(list(tweets.values()))
         print("saving ...")
-        tweets.to_csv("disk/all-tweets-ht.csv", index=None)
+        tweets.to_csv("disk/all-tweets-url.csv", index=None)
 
 
     def convert_url_timeseries(self):
@@ -756,22 +758,22 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        self.fill_tweets()
-        self.fill_retweets()
-        self.fill_IRA_info()
-        self.save_csv()
+        # self.fill_tweets()
+        # self.fill_retweets()
+        # self.fill_IRA_info()
+        # self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        # self.fill_other_info()
+        self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
 
-        self.make_users()
+        # self.make_users()
         # self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
