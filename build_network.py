@@ -687,6 +687,7 @@ def get_ira_network_with_big_networks():
                 w = line.strip().split()
                 if Putin.fuck(w[1]) or Putin.fuck(w[2]):
                     f.write(line)
+
     search_IRA("disk/all-men-links.txt", "disk/ira-men-links.txt")
     search_IRA("disk/all-ret-links.txt", "disk/ira-ret-links.txt")
     search_IRA("disk/all-rep-links.txt", "disk/ira-rep-links.txt")
@@ -920,7 +921,7 @@ if __name__ == "__main__":
 
     save_dir = 'disk/network'
     for in_name in os.listdir(save_dir):
-        if in_name.endswith("v2.gpickle"):
+        if in_name.endswith("fake_extreme_v2.gpickle"):
             nt = nx.read_gpickle(os.path.join(save_dir, in_name))
             _gt = nx2gt(nt)
             _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
@@ -950,6 +951,6 @@ if __name__ == "__main__":
 
     # 构建用户和IRA的交互
     # build_networks_within_ira()
-    # get_network_with_ira()
-    # get_ira_network_with_big_networks()
-    # merge_two_groups_link_to_graph()
+    get_network_with_ira()
+    get_ira_network_with_big_networks()
+    merge_two_groups_link_to_graph()

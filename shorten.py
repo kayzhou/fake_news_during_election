@@ -60,7 +60,7 @@ def task(_ids):
         try:
             d["error"] = False
             if d["short"]:
-                # print(d)
+                print(d)
                 url = unshortener.unshorten(d["url"])
                 d["final_url"] = url
                 d['hostname'] = get_hostname_from_url(url)
@@ -115,19 +115,22 @@ def unshorten_url():
         }
         if d["hostname"] not in ignore:
             d["short"] = True
-        if d["url"] in ["http://listen.radionomy.com/ny2la", "http://ht.ly/XKLW4"]:
+        if d["url"] in ["http://listen.radionomy.com/ny2la", "http://ht.ly/XKLW4",
+            "http://streaming.radionomy.com/catorwebradio", ""]:
             d["short"] = False
 
         dict_id_host.append(d)
 
     print("需要处理：", len(dict_id_host))
 
-    # task(dict_id_host)
-    # return 0
+    print(dict_id_host)
+    task(dict_id_host)
+    return 0
 
     # test
     # dict_id_host = dict_id_host[:80]
 
+    """
     task_cnt = 8
     step = int(len(dict_id_host) / task_cnt)
     pool = multiprocessing.Pool()
@@ -140,6 +143,7 @@ def unshorten_url():
 
     pool.close()
     pool.join()
+    """
 
 
 def deal_with_error():

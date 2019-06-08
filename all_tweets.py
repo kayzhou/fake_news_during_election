@@ -42,31 +42,31 @@ class ALL_TWEET(object):
         Putin = Who_is_fake()
 
         # all
-        # conn = sqlite3.connect(
-        #     "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
-        # c = conn.cursor()
-        # c.execute('''SELECT * FROM urls;''')
-        # col_names = [t[0] for t in c.description]
+        conn = sqlite3.connect(
+            "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+        c = conn.cursor()
+        c.execute('''SELECT * FROM urls;''')
+        col_names = [t[0] for t in c.description]
 
-        # with open("disk/all_tweets.json", "w") as f:
-        #     print("start ...")
-        #     for d in tqdm(c.fetchall()):
-        #         if d[8]:
-        #             hostname = d[8].lower()
-        #             # print(hostname)
-        #             if hostname.startswith("www."):
-        #                 hostname = hostname[4:]
-        #             media_type = judge.identify(hostname)
-        #             if media_type == -1:
-        #                 continue
-        #             json_d = {k: v for k, v in zip(col_names, d)}
-        #             json_d["media_type"] = media_type
-        #             f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
-        #             # self.tweet_ids.append(json_d["tweet_id"])
-        # conn.close()
+        with open("disk/all_tweets_v3.json", "w") as f:
+            print("start ...")
+            for d in tqdm(c.fetchall()):
+                if d[8]:
+                    hostname = d[8].lower()
+                    # print(hostname)
+                    if hostname.startswith("www."):
+                        hostname = hostname[4:]
+                        media_type = self.map_labels[str(Putin.identify(hostname))]
+                    if media_type == -1:
+                        continue
+                    json_d = {k: v for k, v in zip(col_names, d)}
+                    json_d["media_type"] = media_type
+                    f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
+                    # self.tweet_ids.append(json_d["tweet_id"])
+        conn.close()
 
         # IRA
-        with open("disk/all_IRA_tweets.json", "w") as f:
+        with open("disk/all_IRA_tweets_v3.json", "w") as f:
             for line in tqdm(open("data/ira-urls-plus-2.json")):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
@@ -75,15 +75,15 @@ class ALL_TWEET(object):
                     hostname = hostname[4:]
 
                 label_b = self.map_labels[str(Putin.identify(hostname))]
-                label = Putin.identify_v2(hostname)
-                label_sci_f = Putin.identify_science_fake(hostname)
-                label_sci_a = Putin.identify_science_align(hostname)
+                # label = Putin.identify_v2(hostname)
+                # label_sci_f = Putin.identify_science_fake(hostname)
+                # label_sci_a = Putin.identify_science_align(hostname)
 
                 json_d = d
                 json_d["media_type"] = label_b
-                json_d["c_mbfc"] = label              
-                json_d["c_sci_fake"] = label_sci_f                         
-                json_d["c_sci_align"] = label_sci_a
+                # json_d["c_mbfc"] = label              
+                # json_d["c_sci_fake"] = label_sci_f                         
+                # json_d["c_sci_align"] = label_sci_a
 
                 f.write(json.dumps(d, ensure_ascii=False) + '\n')
 
@@ -661,6 +661,10 @@ class ALL_TWEET(object):
             nx.write_gpickle(g, out_name)
             # print("finished!")
 
+        tweets = all_tweets[(all_tweets["c_alex"] == "fake") | (all_tweets["c_alex"] == "extreme bias (right)")]
+        save_network_nx(set(tweets.tweet_id), "disk/network/fake+extreme right_v2.gpickle")
+
+        """
         for _type in labels:
             print(_type, "...")
             tweets = all_tweets[all_tweets["c_alex"] == _type]
@@ -673,7 +677,7 @@ class ALL_TWEET(object):
 
             save_network_nx(set(tweets.tweet_id),
                             "disk/network/{}_v2.gpickle".format(_type.lower()))
-
+        """
 
     def load_all_users(self):
         print("Loading all users ...")
@@ -767,14 +771,14 @@ class ALL_TWEET(object):
         # self.convert_url_timeseries()
         # self.save_csv()
 
-        self.fill_other_info()
+        # self.fill_other_info()
 
         # 保存，已经放在covert里面
         # self.save_url_ts()
         # self.save_csv()
 
         # self.make_users()
-        # self.make_graph_for_CI()
+        self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
         # self.for_fake_clique()
