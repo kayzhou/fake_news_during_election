@@ -1,27 +1,34 @@
-#-*- coding: utf-8 -*-
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    compute_CI_retweet_networks.py                     :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
+#    Updated: 2019/06/07 20:27:48 by Kay Zhou         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-"""
-Created on 2019-01-03 14:54:11
-@author: https://kayzhou.github.io/
-"""
 
 import json
 import os
 # import pickle
 import sys
 import time
+from functools import partial
 from pathlib import Path
 
 import graph_tool.all as gt
 import numpy as np
 from joblib import Parallel, delayed
-from functools import partial
+
+import CIcython
 
 PACKAGE_PARENT = '.'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
-import CIcython
 
 #%% add CI values to graph
 def add_CI_to_graph(graph_file):

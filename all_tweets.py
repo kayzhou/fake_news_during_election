@@ -1,9 +1,15 @@
-# -*- coding: utf-8 -*-
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    all_tweets.py                                      :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/06/07 20:25:08 by Kay Zhou          #+#    #+#              #
+#    Updated: 2019/06/07 20:25:12 by Kay Zhou         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-"""
-Created on 2018-12-01 17:02:07
-@author: https://kayzhou.github.io/
-"""
 import sqlite3
 from collections import defaultdict
 from datetime import datetime
