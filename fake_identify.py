@@ -19,8 +19,10 @@ class Who_is_fake(object):
         self.NEW_HOST_2 = {k.lower(): v for k, v in json.load(open("data/mbfc_dict.json")).items()}
         self.NEW_HOST_3 = json.load(open("data/fake_dict_science.json"))
         self.NEW_HOST_4 = json.load(open("data/align_dict_science.json"))
-
+        
         self.HOST = {
+                "libertywritersnews.com": 0,
+                "blackmattersus.com": 0,
                 "thegatewaypundit.com": 0,
                 "truthfeed.com": 0,
                 "infowars.com": 0,
@@ -37,6 +39,8 @@ class Who_is_fake(object):
                 "thefederalistpapers.org": 0,
                 "redflagnews.com": 0,
                 "thetruthdivision.com": 0,
+
+                "westernjournal.com": 1,
                 "breitbart.com": 1,
                 "dailycaller.com": 1,
                 "americanthinker.com": 1,
@@ -54,6 +58,7 @@ class Who_is_fake(object):
                 "100percentfedup.com": 1,
                 "pjmedia.com": 1,
                 "weaselzippers.us": 1,
+
                 "foxnews.com": 2,
                 "dailymail.co.uk": 2,
                 "washingtonexaminer.com": 2,
@@ -74,6 +79,7 @@ class Who_is_fake(object):
                 "hotair.com": 2,
                 "conservativereview.com": 2,
                 "weeklystandard.com": 2,
+
                 "wsj.com": 3,
                 "washingtontimes.com": 3,
                 "rt.com": 3,
@@ -81,6 +87,7 @@ class Who_is_fake(object):
                 "telegraph.co.uk": 3,
                 "forbes.com": 3,
                 "fortune.com": 3,
+
                 "cnn.com": 4,
                 "thehill.com": 4,
                 "politico.com": 4,
@@ -94,6 +101,7 @@ class Who_is_fake(object):
                 "bbc.com": 4,
                 "ibtimes.com": 4,
                 "bbc.co.uk": 4,
+
                 "nytimes.com": 5,
                 "washingtonpost.com": 5,
                 "nbcnews.com": 5,
@@ -113,6 +121,8 @@ class Who_is_fake(object):
                 "independent.co.uk": 5,
                 "cnb.cx": 5,
                 "hollywoodreporter.com": 5,
+                "medium.com": 5,
+
                 "huffingtonpost.com": 6,
                 "thedailybeast.com": 6,
                 "dailykos.com": 6,
@@ -131,13 +141,25 @@ class Who_is_fake(object):
                 "theintercept.com": 6,
                 "thenation.com": 6,
                 "people.com": 6,
+
                 "dailynewsbin.com": 7,
                 "bipartisanreport.com": 7,
                 "bluenationreview.com": 7,
                 "crooksandliars.com": 7,
                 "occupydemocrats.com": 7,
                 "shareblue.com": 7,
-                "usuncut.com": 7
+                "usuncut.com": 7,
+
+                "ksnt.com": 8,
+                "kron4.com": 8,
+                "cbslocal.com": 8,
+                "ksn.com": 8,
+                "nola.com": 8,
+                "nj.com": 8,
+                "kmbc.com": 8,
+                "nbc12.com": 8,
+                "memphisdailynews.com": 8,
+                "abc7ny.com": 8,
             }
 
     def identify(self, ht):

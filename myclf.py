@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:54 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/07 20:26:00 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/07 20:42:16 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -100,4 +100,3 @@ def svm_cross_validation(train_x, train_y):
         print(para, val)
     model = SVC(kernel='rbf', C=best_parameters['C'], gamma=best_parameters['gamma'], probability=True)
     model.fit(train_x, train_y)
-gg

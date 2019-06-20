@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/07 20:27:48 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/19 21:56:16 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,4 +71,22 @@ if __name__ == "__main__":
     #     if in_name.endswith("ALL.gt"):
     #         add_CI_to_graph(os.path.join(save_dir, in_name))
 
-    add_CI_to_graph('disk/network/fake_extreme_v2.gt')
+
+
+    name_labels = [
+        "fake",
+        "extreme bias (right)",
+        "right",
+        "right leaning",
+        "center",
+        "left leaning",
+        "left",
+        "extreme bias (left)",
+        "local",
+    ]
+
+    save_dir = 'disk/network'
+    for in_name in name_labels:
+        add_CI_to_graph(os.path.join(save_dir, in_name + ".gt"))
+
+

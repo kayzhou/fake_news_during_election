@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:29 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/07 20:25:32 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/19 22:04:12 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -922,12 +922,24 @@ if __name__ == "__main__":
     # print("men")
     # get_mention_network("disk/all-men-links.txt")
 
+    name_labels = [
+        "fake",
+        "extreme bias (right)",
+        "right",
+        "right leaning",
+        "center",
+        "left leaning",
+        "left",
+        "extreme bias (left)",
+        "local",
+    ]
+
     save_dir = 'disk/network'
-    for in_name in os.listdir(save_dir):
-        if in_name.endswith("fake_extreme_v2.gpickle"):
-            nt = nx.read_gpickle(os.path.join(save_dir, in_name))
-            _gt = nx2gt(nt)
-            _gt.save(os.path.join(save_dir, in_name[:-8] + ".gt"))
+    for in_name in name_labels:
+        print(in_name)
+        nt = nx.read_gpickle(os.path.join(save_dir, in_name + ".gpickle"))
+        _gt = nx2gt(nt)
+        _gt.save(os.path.join(save_dir, in_name + ".gt"))
 
     # 获取用户的详细信息；
     # get_user_name_info()
@@ -954,6 +966,6 @@ if __name__ == "__main__":
 
     # 构建用户和IRA的交互
     # build_networks_within_ira()
-    get_network_with_ira()
-    get_ira_network_with_big_networks()
-    merge_two_groups_link_to_graph()
+    # get_network_with_ira()
+    # get_ira_network_with_big_networks()
+    # merge_two_groups_link_to_graph()

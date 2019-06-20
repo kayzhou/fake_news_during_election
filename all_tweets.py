@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:08 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/07 20:25:12 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/19 19:52:05 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,6 @@ class ALL_TWEET(object):
         self.tweets_csv = []
         self.url_timeseries = []
         self.map_labels = {
-            "-1": "-1",
             "0": "fake",
             "1": "extreme bias (right)",
             "2": "right",
@@ -40,10 +39,12 @@ class ALL_TWEET(object):
             "4": "center",
             "5": "left leaning",
             "6": "left",
-            "7": "extreme bias (left)"
+            "7": "extreme bias (left)",
+            "8": "local"
         }
 
     def find_all_tweets(self):
+
         # newest
         Putin = Who_is_fake()
 
@@ -54,7 +55,7 @@ class ALL_TWEET(object):
         c.execute('''SELECT * FROM urls;''')
         col_names = [t[0] for t in c.description]
 
-        with open("disk/all_tweets_v3.json", "w") as f:
+        with open("disk/bingo_tweets.json", "w") as f:
             print("start ...")
             for d in tqdm(c.fetchall()):
                 if d[8]:
@@ -62,7 +63,7 @@ class ALL_TWEET(object):
                     # print(hostname)
                     if hostname.startswith("www."):
                         hostname = hostname[4:]
-                        media_type = self.map_labels[str(Putin.identify(hostname))]
+                    media_type = Putin.identify(hostname)
                     if media_type == -1:
                         continue
                     json_d = {k: v for k, v in zip(col_names, d)}
@@ -72,7 +73,7 @@ class ALL_TWEET(object):
         conn.close()
 
         # IRA
-        with open("disk/all_IRA_tweets_v3.json", "w") as f:
+        with open("disk/all_IRA_tweets.json", "w") as f:
             for line in tqdm(open("data/ira-urls-plus-2.json")):
                 d = json.loads(line.strip())
                 hostname = d["hostname"].lower()
@@ -80,7 +81,9 @@ class ALL_TWEET(object):
                 if hostname.startswith("www."):
                     hostname = hostname[4:]
 
-                label_b = self.map_labels[str(Putin.identify(hostname))]
+                label_b = Putin.identify(hostname)
+                if label_b == -1:
+                    continue
                 # label = Putin.identify_v2(hostname)
                 # label_sci_f = Putin.identify_science_fake(hostname)
                 # label_sci_a = Putin.identify_science_align(hostname)
@@ -95,20 +98,19 @@ class ALL_TWEET(object):
 
 
     def find_links(self):
-        if not self.tweet_ids:
-            for line in open("disk/bingo_tweets.json"):
-                self.tweet_ids.append(json.loads(line.strip())["tweet_id"])
-            print(len(self.tweet_ids))
-            for line in open("disk/all_IRA_tweets.json"):
-                self.tweet_ids.append(json.loads(line.strip())["tweetid"])
-            print(len(self.tweet_ids))
+        for line in open("disk/bingo_tweets.json"):
+            self.tweet_ids.append(json.loads(line.strip())["tweet_id"])
+        print(len(self.tweet_ids))
+        for line in open("disk/all_IRA_tweets.json"):
+            self.tweet_ids.append(json.loads(line.strip())["tweetid"])
+        print(len(self.tweet_ids))
 
         tweets_ids = set(self.tweet_ids)
         print("目前所有tweets的量", len(tweets_ids))
         retweet_link = find_retweet_network(tweets_ids)
 
         # IRA
-        data_ira = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+        data_ira = pd.read_csv("disk/ira_tweets_csv_hashed.csv",
                                usecols=["tweetid", "retweet_tweetid"], dtype=str)
         data_ira = data_ira.dropna()
         for _, row in data_ira.iterrows():
@@ -121,16 +123,12 @@ class ALL_TWEET(object):
         json.dump(retweet_link, open("data/all_retweet_network.json",
                                      "w"), ensure_ascii=False, indent=2)
 
+
     def fill_tweets(self):
-        print("原始数据处理中 ...")
+        print("原始数据倒入内存中 ...")
 
         for line in tqdm(open("disk/bingo_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
-                d["media_type"] = "fake"
-            if d["media_type"] == "-1":
-                continue
-
             tweet = {
                 "tweet_id": str(d["tweet_id"]),
                 "user_id": str(d["user_id"]),
@@ -151,12 +149,10 @@ class ALL_TWEET(object):
 
             self.tweets[str(d["tweet_id"])] = tweet
 
-        cnt = 0
+
         for line in tqdm(open("disk/all_IRA_tweets.json")):
             d = json.loads(line.strip())
-            if d["c_sci_fake"] != "-1" and d["media_type"] == "-1":
-                d["media_type"] = "fake"
-            if d["media_type"] == "-1":
+            if d["media_type"] == -1:
                 continue
             if str(d["tweetid"]) not in self.tweets:
                 tweet = {
@@ -177,49 +173,50 @@ class ALL_TWEET(object):
                 # if tweet["URL"].endswith("/"):
                 #     tweet["URL"] = tweet["URL"][:-1]
                 self.tweets[str(d["tweetid"])] = tweet
-            else:
-                cnt += 1
-        print("IRA已经存在数量：", cnt)
+        
+        print(len(self.tweets))
+
 
     def fill_retweets(self):
         print("扩展转发处理中 ...")
         # tweets_from_SQL = json.load(open("disk/tweets_from_SQL.json"))
         retweets_links = json.load(open("data/all_retweet_network.json"))
 
-        cnt = 0
-
         for tweetid, origin_tweetid in tqdm(retweets_links.items()):
             # tweetid 一定是转发的！
 
             # 新扩展进来的
             if tweetid not in self.tweets:
-                tweet = {
-                    "tweet_id": tweetid,
-                    "user_id": -1,
-                    "dt": "2000-01-01 00:00:00",
-                    # "is_first": 0,
-                    "is_source": 0,
-                    "is_IRA": -1,
-                    # "URL": self.tweets[origin_tweetid]["URL"],
-                    # "hostname": self.tweets[origin_tweetid]["hostname"],
-                    "c_alex": self.tweets[origin_tweetid]["c_alex"],
-                    # "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
-                    # "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
-                    # "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
-                    "retweeted_id": origin_tweetid
-                }
-                # d = {}
-                # if tweetid in tweets_from_SQL:
-                #     d = tweets_from_SQL[tweetid]
-                # else:
-                #     d = find_tweet(stweetid)
+                try:
+                    tweet = {
+                        "tweet_id": tweetid,
+                        "user_id": -1,
+                        "dt": "2000-01-01 00:00:00",
+                        # "is_first": 0,
+                        "is_source": 0,
+                        "is_IRA": -1,
+                        # "URL": self.tweets[origin_tweetid]["URL"],
+                        # "hostname": self.tweets[origin_tweetid]["hostname"],
+                        "c_alex": self.tweets[origin_tweetid]["c_alex"],
+                        # "c_mbfc": self.tweets[origin_tweetid]["c_mbfc"],
+                        # "c_sci_f": self.tweets[origin_tweetid]["c_sci_f"],
+                        # "c_sci_s": self.tweets[origin_tweetid]["c_sci_s"],
+                        "retweeted_id": origin_tweetid
+                    }
+                    # d = {}
+                    # if tweetid in tweets_from_SQL:
+                    #     d = tweets_from_SQL[tweetid]
+                    # else:
+                    #     d = find_tweet(stweetid)
 
-                d = find_tweet(tweetid)
-                if d:
-                    tweet["user_id"] = str(d["user_id"])
-                    tweet["dt"] = d["datetime_EST"]
-                    # tweets_from_SQL[tweetid] = d
-                self.tweets[tweetid] = tweet
+                    d = find_tweet(tweetid)
+                    if d:
+                        tweet["user_id"] = str(d["user_id"])
+                        tweet["dt"] = d["datetime_EST"]
+                        # tweets_from_SQL[tweetid] = d
+                    self.tweets[tweetid] = tweet
+                except KeyError as e:
+                    print(e)
 
             # 原来就存在
             else:
@@ -232,34 +229,36 @@ class ALL_TWEET(object):
 
             # 用被转发的结果来定义原始的结果可能会存在问题
             if origin_tweetid not in self.tweets:
-                cnt += 1
-                tweet = {
-                    "tweet_id": origin_tweetid,
-                    "user_id": -1,
-                    "dt": "2000-01-01 00:00:00",
-                    # "is_first": -1,
-                    "is_source": 1,
-                    "is_IRA": -1,
-                    # "URL": self.tweets[tweetid]["URL"],
-                    # "hostname": self.tweets[tweetid]["hostname"],
-                    "c_alex": self.tweets[tweetid]["c_alex"],
-                    # "c_mbfc": self.tweets[tweetid]["c_mbfc"],
-                    # "c_sci_f": self.tweets[tweetid]["c_sci_f"],
-                    # "c_sci_s": self.tweets[tweetid]["c_sci_s"],
-                    "retweeted_id": 0
-                }
-                # d = {}
-                # if origin_tweetid in tweets_from_SQL:
-                #     d = tweets_from_SQL[origin_tweetid]
-                # else:
-                #     d = find_tweet(origin_tweetid)
-                d = find_tweet(origin_tweetid)
-                if d:
-                    tweet["user_id"] = str(d["user_id"])
-                    tweet["dt"] = d["datetime_EST"]
-                    # tweets_from_SQL[origin_tweetid] = d
+                try:
+                    tweet = {
+                        "tweet_id": origin_tweetid,
+                        "user_id": -1,
+                        "dt": "2000-01-01 00:00:00",
+                        # "is_first": -1,
+                        "is_source": 1,
+                        "is_IRA": -1,
+                        # "URL": self.tweets[tweetid]["URL"],
+                        # "hostname": self.tweets[tweetid]["hostname"],
+                        "c_alex": self.tweets[tweetid]["c_alex"],
+                        # "c_mbfc": self.tweets[tweetid]["c_mbfc"],
+                        # "c_sci_f": self.tweets[tweetid]["c_sci_f"],
+                        # "c_sci_s": self.tweets[tweetid]["c_sci_s"],
+                        "retweeted_id": 0
+                    }
+                    # d = {}
+                    # if origin_tweetid in tweets_from_SQL:
+                    #     d = tweets_from_SQL[origin_tweetid]
+                    # else:
+                    #     d = find_tweet(origin_tweetid)
+                    d = find_tweet(origin_tweetid)
+                    if d:
+                        tweet["user_id"] = str(d["user_id"])
+                        tweet["dt"] = d["datetime_EST"]
+                        # tweets_from_SQL[origin_tweetid] = d
 
-                self.tweets[origin_tweetid] = tweet
+                    self.tweets[origin_tweetid] = tweet
+                except KeyError as e:
+                    print(e)
 
             else:
                 self.tweets[origin_tweetid]["is_source"] = 1
@@ -290,7 +289,7 @@ class ALL_TWEET(object):
         putin = Are_you_IRA()
         print("补充IRA数据处理中 ...")
         cnt = 0
-        IRA_info = pd.read_csv("data/ira_tweets_csv_hashed.csv",
+        IRA_info = pd.read_csv("disk/ira_tweets_csv_hashed.csv",
                                usecols=["tweetid", "userid", "tweet_time", "retweet_userid", "retweet_tweetid"], dtype=str)
         for _, row in tqdm(IRA_info.iterrows()):
             tweetid = row["tweetid"]
@@ -506,7 +505,7 @@ class ALL_TWEET(object):
         print("*.csv文件保存中 ...")
         if not self.tweets_csv:
             self.tweets_csv = list(self.tweets.values())
-        pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets-v2.csv", index=None)
+        pd.DataFrame(self.tweets_csv).to_csv("disk/all-tweets.csv", index=None)
 
     def load_retweet_network(self):
         r_net = json.load(open("data/all_retweet_network.json"))
@@ -514,7 +513,7 @@ class ALL_TWEET(object):
 
     def load_all_tweets(self):
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets-v2.csv", dtype=str)
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str)
         self.tweets_csv = all_tweets.astype(
             {"is_IRA": int, "is_source": int, "dt": datetime})
         print("finished!")
@@ -525,7 +524,7 @@ class ALL_TWEET(object):
         # all_tweets = self.tweets_csv
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets-v2.csv", dtype=str).astype({"is_IRA": int, "is_source": int})
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "c_alex": int})
         # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
         # all_tweets.to_csv("disk/all-tweets-sf.csv")
 
@@ -541,7 +540,7 @@ class ALL_TWEET(object):
         #     "7": "extreme bias (left)"
         # }
 
-        labels = [
+        name_labels = [
             "fake",
             "extreme bias (right)",
             "right",
@@ -549,8 +548,11 @@ class ALL_TWEET(object):
             "center",
             "left leaning",
             "left",
-            "extreme bias (left)"
+            "extreme bias (left)",
+            "local",
         ]
+
+        labels = list(range(9))
 
         # mbfc_labels = [
         #     "fake",
@@ -568,12 +570,12 @@ class ALL_TWEET(object):
         # ]
 
         for _type in labels:
+            name = name_labels[_type]
             print(_type, "...")
             tweets = all_tweets[all_tweets["c_alex"] == _type]
-            # tweets = all_tweets[all_tweets["c_sci_f"] == _type]
-            user_count = pd.value_counts(tweets["user_id"]).rename(_type)
+            user_count = pd.value_counts(tweets["user_id"]).rename(name)
             user_sources_count = tweets["is_source"].groupby(
-                tweets["user_id"]).sum().rename(_type + "_source")
+                tweets["user_id"]).sum().rename(name + "_source")
             # user_first_count = tweets["is_first"].groupby(
             #     tweets["user_id"]).sum().rename(f_label + "_first")
             if users is None:
@@ -598,21 +600,22 @@ class ALL_TWEET(object):
         users.fillna(0, inplace=True)
         # save data
         users["user_id"] = users.index
-        users.to_csv("data/all-users-v2.csv", index=False)
+        users.to_csv("data/all-users.csv", index=False)
+
 
     def make_graph_for_CI(self):
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets-v2.csv", dtype=str, usecols=["user_id", "tweet_id", "c_alex"])
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["user_id", "tweet_id", "c_alex"]).astype({"c_alex": int})
         # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
         # all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
-        all_tweets = all_tweets[all_tweets.c_alex != "-1"]
+        # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
         print(len(all_tweets))
 
         self.load_retweet_network()
         print("loaded retweet network!")
 
-        labels = [
+        name_labels = [
             "fake",
             "extreme bias (right)",
             "right",
@@ -620,8 +623,11 @@ class ALL_TWEET(object):
             "center",
             "left leaning",
             "left",
-            "extreme bias (left)"
+            "extreme bias (left)",
+            "local",
         ]
+
+        labels = list(range(9))
 
         # labels = [
         #     "fake",
@@ -667,11 +673,11 @@ class ALL_TWEET(object):
             nx.write_gpickle(g, out_name)
             # print("finished!")
 
-        tweets = all_tweets[(all_tweets["c_alex"] == "fake") | (all_tweets["c_alex"] == "extreme bias (right)")]
-        save_network_nx(set(tweets.tweet_id), "disk/network/fake+extreme right_v2.gpickle")
+        # tweets = all_tweets[(all_tweets["c_alex"] == "fake") | (all_tweets["c_alex"] == "extreme bias (right)")]
+        # save_network_nx(set(tweets.tweet_id), "disk/network/fake+extreme right_v2.gpickle")
 
-        """
         for _type in labels:
+            name = name_labels[_type]
             print(_type, "...")
             tweets = all_tweets[all_tweets["c_alex"] == _type]
             # tweets = all_tweets[all_tweets["c_mbfc"] == _type]
@@ -681,9 +687,8 @@ class ALL_TWEET(object):
             # else:
             #     tweets = all_tweets[all_tweets["c_sci_f"] == _type]
 
-            save_network_nx(set(tweets.tweet_id),
-                            "disk/network/{}_v2.gpickle".format(_type.lower()))
-        """
+            save_network_nx(set(tweets.tweet_id), f"disk/network/{name}.gpickle")
+            
 
     def load_all_users(self):
         print("Loading all users ...")
@@ -783,7 +788,7 @@ class ALL_TWEET(object):
         # self.save_url_ts()
         # self.save_csv()
 
-        # self.make_users()
+        self.make_users()
         self.make_graph_for_CI()
 
         # 2019-02-05 遵照Hernan的指示，增加实验
