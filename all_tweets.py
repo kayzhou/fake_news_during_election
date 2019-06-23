@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:08 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/19 19:52:05 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/21 14:09:38 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,6 @@ class ALL_TWEET(object):
             "5": "left leaning",
             "6": "left",
             "7": "extreme bias (left)",
-            "8": "local"
         }
 
     def find_all_tweets(self):
@@ -49,28 +48,37 @@ class ALL_TWEET(object):
         Putin = Who_is_fake()
 
         # all
-        conn = sqlite3.connect(
-            "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
-        c = conn.cursor()
-        c.execute('''SELECT * FROM urls;''')
-        col_names = [t[0] for t in c.description]
+        # conn = sqlite3.connect(
+        #     "/home/alex/network_workdir/elections/databases/urls_db.sqlite")
+        # c = conn.cursor()
+        # c.execute('''SELECT * FROM urls;''')
+        # col_names = [t[0] for t in c.description]
+
+        # with open("disk/all_tweets_withURL.json", "w") as f:
+        #     print("start ...")
+        #     for d in tqdm(c.fetchall()):
+        #         if d[8]:
+        #             hostname = d[8].lower()
+        #             # print(hostname)
+        #             if hostname.startswith("www."):
+        #                 hostname = hostname[4:]
+        #             # media_type = Putin.identify(hostname)
+        #             # if media_type == -1:
+        #             #     continue
+        #             json_d = {k: v for k, v in zip(col_names, d)}
+        #             # json_d["media_type"] = media_type
+        #             f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
+        #             # self.tweet_ids.append(json_d["tweet_id"])
+        # conn.close()
 
         with open("disk/bingo_tweets.json", "w") as f:
-            print("start ...")
-            for d in tqdm(c.fetchall()):
-                if d[8]:
-                    hostname = d[8].lower()
-                    # print(hostname)
-                    if hostname.startswith("www."):
-                        hostname = hostname[4:]
-                    media_type = Putin.identify(hostname)
-                    if media_type == -1:
-                        continue
-                    json_d = {k: v for k, v in zip(col_names, d)}
-                    json_d["media_type"] = media_type
-                    f.write(json.dumps(json_d, ensure_ascii=False) + '\n')
-                    # self.tweet_ids.append(json_d["tweet_id"])
-        conn.close()
+            for line in tqdm(open("disk/all_tweets_withURL.json")):
+                d = json.loads(line.strip())
+                media_type = Putin.identify(d["final_hostname"])
+                if media_type == -1:
+                    continue
+                d["media_type"] = media_type
+                f.write(json.dumps(d, ensure_ascii=False) + '\n')
 
         # IRA
         with open("disk/all_IRA_tweets.json", "w") as f:
@@ -524,7 +532,7 @@ class ALL_TWEET(object):
         # all_tweets = self.tweets_csv
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int, "c_alex": int})
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str).astype({"is_IRA": int, "is_source": int})
         # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
         # all_tweets.to_csv("disk/all-tweets-sf.csv")
 
@@ -540,7 +548,7 @@ class ALL_TWEET(object):
         #     "7": "extreme bias (left)"
         # }
 
-        name_labels = [
+        labels = [
             "fake",
             "extreme bias (right)",
             "right",
@@ -550,9 +558,10 @@ class ALL_TWEET(object):
             "left",
             "extreme bias (left)",
             "local",
+            "radio",
         ]
 
-        labels = list(range(9))
+        # labels = list(range(9))
 
         # mbfc_labels = [
         #     "fake",
@@ -569,10 +578,10 @@ class ALL_TWEET(object):
         #     "Orange",
         # ]
 
-        for _type in labels:
-            name = name_labels[_type]
-            print(_type, "...")
-            tweets = all_tweets[all_tweets["c_alex"] == _type]
+        for name in labels:
+            # name = name_labels[_type]
+            print(name, "...")
+            tweets = all_tweets[all_tweets["c_alex"] == name]
             user_count = pd.value_counts(tweets["user_id"]).rename(name)
             user_sources_count = tweets["is_source"].groupby(
                 tweets["user_id"]).sum().rename(name + "_source")
@@ -606,7 +615,8 @@ class ALL_TWEET(object):
     def make_graph_for_CI(self):
 
         print("loading all tweets_csv ...")
-        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, usecols=["user_id", "tweet_id", "c_alex"]).astype({"c_alex": int})
+        all_tweets = pd.read_csv("disk/all-tweets.csv", dtype=str, 
+                        usecols=["user_id", "tweet_id", "c_alex"])
         # all_tweets = all_tweets[all_tweets.c_mbfc != "-1"]
         # all_tweets = all_tweets[all_tweets.c_sci_f != "-1"]
         # all_tweets = all_tweets[all_tweets.c_alex != "-1"]
@@ -615,7 +625,7 @@ class ALL_TWEET(object):
         self.load_retweet_network()
         print("loaded retweet network!")
 
-        name_labels = [
+        labels = [
             "fake",
             "extreme bias (right)",
             "right",
@@ -625,9 +635,8 @@ class ALL_TWEET(object):
             "left",
             "extreme bias (left)",
             "local",
+            "radio"
         ]
-
-        labels = list(range(9))
 
         # labels = [
         #     "fake",
@@ -676,10 +685,10 @@ class ALL_TWEET(object):
         # tweets = all_tweets[(all_tweets["c_alex"] == "fake") | (all_tweets["c_alex"] == "extreme bias (right)")]
         # save_network_nx(set(tweets.tweet_id), "disk/network/fake+extreme right_v2.gpickle")
 
-        for _type in labels:
-            name = name_labels[_type]
-            print(_type, "...")
-            tweets = all_tweets[all_tweets["c_alex"] == _type]
+        for name in labels:
+            # name = name_labels[_type]
+            print(name, "...")
+            tweets = all_tweets[all_tweets["c_alex"] == name]
             # tweets = all_tweets[all_tweets["c_mbfc"] == _type]
             
             # if _type == "Fake":
@@ -773,10 +782,10 @@ class ALL_TWEET(object):
         # self.find_all_tweets()
         # self.find_links()
 
-        # self.fill_tweets()
-        # self.fill_retweets()
-        # self.fill_IRA_info()
-        # self.save_csv()
+        self.fill_tweets()
+        self.fill_retweets()
+        self.fill_IRA_info()
+        self.save_csv()
 
         # 补充is_first
         # self.convert_url_timeseries()

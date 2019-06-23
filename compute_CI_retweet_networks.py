@@ -83,6 +83,7 @@ if __name__ == "__main__":
         "left",
         "extreme bias (left)",
         "local",
+        "radio",
     ]
 
     save_dir = 'disk/network'
