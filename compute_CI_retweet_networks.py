@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/19 21:56:16 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/06/28 10:44:39 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ def add_CI_to_graph(graph_file):
 
     # for direction in ['out', 'both', 'in']:
     # for direction in ['out', 'undir', 'in', 'both']:
-    for direction in ['in', 'out']:
+    for direction in ['undir', 'in', 'out']:
         print('pid ' + str(os.getpid()) + ' -- ' + direction)
         t0 = time.time()
         CIranks, CImap = CIcython.compute_graph_CI(graph, rad=2,
@@ -71,8 +71,6 @@ if __name__ == "__main__":
     #     if in_name.endswith("ALL.gt"):
     #         add_CI_to_graph(os.path.join(save_dir, in_name))
 
-
-
     name_labels = [
         "fake",
         "extreme bias (right)",
@@ -86,8 +84,8 @@ if __name__ == "__main__":
         "radio",
     ]
 
-    save_dir = 'disk/network'
-    for in_name in name_labels:
-        add_CI_to_graph(os.path.join(save_dir, in_name + ".gt"))
+    # save_dir = 'disk/network'
+    # for in_name in name_labels:
+    #     add_CI_to_graph(os.path.join(save_dir, in_name + ".gt"))
 
-
+    add_CI_to_graph("data/IRA_two_layers.gt")

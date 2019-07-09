@@ -91,6 +91,22 @@ def find_retweeted(_id):
     return new_d
 
 
+def find_hashtags():
+    conn1 = sqlite3.connect(DB1_NAME)
+    c1 = conn1.cursor()
+    c1.execute('''SELECT tweet_id, hashtag, user_id	FROM hashtag_tweet_user''')
+    for d in c1.fetchall():
+        yield d
+    conn1.close()
+
+    conn1 = sqlite3.connect(DB2_NAME)
+    c1 = conn1.cursor()
+    c1.execute('''SELECT tweet_id, hashtag, user_id	FROM hashtag_tweet_user''')
+    for d in c1.fetchall():
+        yield d
+    conn1.close()
+
+
 def find_tweets(tweet_ids):
 
     new_ds = []
@@ -190,9 +206,9 @@ def find_retweet_network(tweets_ids):
     return retweet_link
 
 
-def find_tweets_by_users(uids):
+def find_tweetid_by_users(uids):
     """
-    通过用户id找到与之相关的全部tweets
+    通过用户id找到与之相关的全部tweets_id
     """
     dict_uids_tweetids = defaultdict(list)
     conn1 = sqlite3.connect(DB1_NAME)
@@ -217,6 +233,54 @@ def find_tweets_by_users(uids):
     conn2.close()
     conn1.close()
     return dict_uids_tweetids
+
+
+def find_tweets_by_users(uids):
+    """
+    通过用户id找到与之相关的全部tweets
+    """
+    conn1 = sqlite3.connect(DB1_NAME)
+    conn2 = sqlite3.connect(DB2_NAME)
+    c1 = conn1.cursor()
+    c2 = conn2.cursor()
+
+    with open(f"disk/user_time.txt", "w") as f:
+        for _id in tqdm(uids):
+            set_tids = set()
+            c1.execute('''SELECT tweet_id, user_id, datetime_EST FROM retweeted_status WHERE user_id={}'''.format(_id))
+            for d in c1.fetchall():
+                if d in set_tids:
+                    continue
+                set_tids.add(d[0])
+                f.write(f"{d[0]} {d[1]} {d[2]}\n")
+
+            c1.execute('''SELECT tweet_id, user_id, datetime_EST FROM tweet WHERE user_id={}'''.format(_id))
+            for d in c1.fetchall():
+                if d in set_tids:
+                    continue
+                set_tids.add(d[0])
+                f.write(f"{d[0]} {d[1]} {d[2]}\n")
+
+            c2.execute('''SELECT tweet_id, user_id, datetime_EST FROM retweeted_status WHERE user_id={}'''.format(_id))
+            for d in c1.fetchall():
+                if d in set_tids:
+                    continue
+                set_tids.add(d[0])
+                f.write(f"{d[0]} {d[1]} {d[2]}\n")
+
+            c2.execute('''SELECT tweet_id, user_id, datetime_EST FROM tweet WHERE user_id={}'''.format(_id))
+            for d in c2.fetchall():
+                if d in set_tids:
+                    continue
+                set_tids.add(d[0])
+                f.write(f"{d[0]} {d[1]} {d[2]}\n")
+    conn2.close()
+    conn1.close()
+
+
+def find_time_series_IRA():
+    users = [u.strip() for u in open("data/two-layers-non-IRA.txt")]
+    find_tweets_by_users(users)
 
 
 def find_all_uids():
@@ -327,6 +391,15 @@ def find_original_tweetid(_id):
     conn2.close()
 
     return new_d
+
+
+def find_name(user_id):
+    conn = sqlite3.connect(DB1_NAME)
+    c = conn.cursor()
+    c.execute(f'''SELECT * FROM influencer_rank_date WHERE user_id={user_id};''')
+    d = c.fetchone()
+    conn.close()
+    return d
 
 
 def find_source(tweet_ids):
@@ -535,9 +608,11 @@ if __name__ == "__main__":
     # print(find_tweet("742417158429233152"))
     # opinion("742417158429233152")
     
-    Putin = Are_you_IRA()
-    uids = [u for u in Putin.IRA_user_set if len(u) != 64]
-    data = find_tweets_by_users(uids)
-    with open("IRA-tweets-id.txt", "w") as f:
-        json.dump(data, f, indent=4)
+    # Putin = Are_you_IRA()
+    # uids = [u for u in Putin.IRA_user_set if len(u) != 64]
+    # data = find_tweets_by_users(uids)
+    # with open("IRA-tweets-id.txt", "w") as f:
+    #     json.dump(data, f, indent=4)
+
+    find_time_series_IRA()
     

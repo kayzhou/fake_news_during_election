@@ -6,7 +6,7 @@
 #    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:29 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/19 22:04:12 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/02 17:05:27 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -293,62 +293,70 @@ def get_all_network_by_tweet(tweet_ids, out_file_pre):
 def get_all_network_by_user(user_ids, out_file_pre):
     # IRAs 针对用户id而构造网络
 
+    # second layer
+    f = open("disk/secord_layer_tweetids.txt", "w")
+
     set_user_ids = set(user_ids)
     # retweet
+    nets = set()
     net_1 = []
     for line in tqdm(open("disk/all-ret-links.txt")):
         w = line.strip().split()
         if w[1] in set_user_ids or w[2] in set_user_ids:
-            net_1.append((w[1], w[2]))
+            # net_1.append((w[1], w[2]))
+            # e = (w[1], w[2])
+            # if e not in nets:
+            #     nets.add(e)
+            f.write(f'{w[0]}\t{w[1]}\t{w[2]}\n')
 
     # quote
     net_2 = []
     for line in tqdm(open("disk/all-quo-links.txt")):
         w = line.strip().split()
         if w[1] in set_user_ids or w[2] in set_user_ids:
-            net_2.append((w[1], w[2]))
+            # net_2.append((w[1], w[2]))
+            # nets.add((w[1], w[2]))
+            f.write(f'{w[0]}\t{w[1]}\t{w[2]}\n')
 
     # reply
     net_3 = []
     for line in tqdm(open("disk/all-rep-links.txt")):
         w = line.strip().split()
         if w[1] in set_user_ids or w[2] in set_user_ids:
-            net_3.append((w[1], w[2]))
+            # net_3.append((w[1], w[2]))
+            # nets.add((w[1], w[2]))
+            f.write(f'{w[0]}\t{w[1]}\t{w[2]}\n')
 
     # mention
     net_4 = []
     for line in tqdm(open("disk/all-men-links.txt")):
         w = line.strip().split()
         if w[1] in set_user_ids or w[2] in set_user_ids:
-            net_4.append((w[2], w[1]))
+            # net_4.append((w[2], w[1]))
+            # nets.add((w[2], w[1]))
+            f.write(f'{w[0]}\t{w[2]}\t{w[1]}\n')
 
-    # json.dump(net_1, open(out_file_pre + "-ret.txt"))
-    # json.dump(net_2, open(out_file_pre + "-quo.txt"))
-    # json.dump(net_3, open(out_file_pre + "-rep.txt"))
-    # json.dump(net_4, open(out_file_pre + "-men.txt"))
+    f.close()
 
-    n_all = nx.DiGraph()
-    n_all.add_edges_from(net_1)
-    n_all.add_edges_from(net_2)
-    n_all.add_edges_from(net_3)
-    n_all.add_edges_from(net_4)
-    nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
+    # n_all = nx.DiGraph()
+    # n_all.add_edges_from(nets)
+    # nx.write_gpickle(n_all, out_file_pre + '-all.gpickle')
 
-    n1 = nx.DiGraph()
-    n1.add_edges_from(net_1)
-    nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
+    # n1 = nx.DiGraph()
+    # n1.add_edges_from(net_1)
+    # nx.write_gpickle(n1, out_file_pre + '-ret.gpickle')
 
-    n2 = nx.DiGraph()
-    n2.add_edges_from(net_2)
-    nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
+    # n2 = nx.DiGraph()
+    # n2.add_edges_from(net_2)
+    # nx.write_gpickle(n2, out_file_pre + '-quo.gpickle')
 
-    n3 = nx.DiGraph()
-    n3.add_edges_from(net_3)
-    nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
+    # n3 = nx.DiGraph()
+    # n3.add_edges_from(net_3)
+    # nx.write_gpickle(n3, out_file_pre + '-rep.gpickle')
 
-    n4 = nx.DiGraph()
-    n4.add_edges_from(net_4)
-    nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
+    # n4 = nx.DiGraph()
+    # n4.add_edges_from(net_4)
+    # nx.write_gpickle(n4, out_file_pre + '-men.gpickle')
 
 
 def make_all_network(out_file_pre):
@@ -626,6 +634,7 @@ def get_network_with_ira():
        'urls', 'user_mentions', 'poll_choices'],
       dtype='object')
     """
+
     men_file = open("disk/ira-men.txt", "w")
     ret_file = open("disk/ira-ret.txt", "w")
     rep_file = open("disk/ira-rep.txt", "w")
@@ -823,6 +832,7 @@ def merge_two_groups_link_to_graph():
 
 
 # abandon
+# find relation from raw data
 def build_networks_within_ira():
     ira_tweets = set(pd.read_csv("data/ira-tweets-ele.csv").tweetid)
     print("loaded ", len(ira_tweets))
@@ -909,18 +919,65 @@ def get_user_name_info():
             f.write("{},{},{},{}\n".format(k, v[0], v[1], v[2]))
 
 
-if __name__ == "__main__":
-    # Lebron = analyze_IRA_in_network()
-    # Lebron.run()
+def find_second_layer_touch_IRA():
+    hts = json.load(open("data/top-hashtags.json"))
+    hts = set([ht[0][1:] for ht in hts])
+    userids = set([int(line.strip()) for line in open("disk/have_touched_IRA.txt")])
 
-    # print("rep")
-    # get_ret_network("disk/all-ret-links.txt")
-    # print("ret")
-    # get_rep_network("disk/all-rep-links.txt")
-    # print("quo")
-    # get_quote_network("disk/all-quo-links.txt")
-    # print("men")
-    # get_mention_network("disk/all-men-links.txt")
+    from SQLite_handler import find_hashtags
+
+    data = {}
+    for d in tqdm(find_hashtags()):
+        if d[1] in hts and d[2] in userids:
+            _id = str(d[0])
+            if _id not in data:
+                data[_id] = {
+                    "#": [d[1]],
+                    "userid": d[2],
+                    "id": _id
+                }
+            else:
+                data[_id]["#"].append(d[1])
+
+    # retweet
+    for line in tqdm(open("disk/all-ret-links.txt")):
+        w = line.strip().split()
+        if w[0] in data:
+            data[w[0]]["n1"] = w[1]
+            data[w[0]]["n2"] = w[2]
+        elif w[3] in data:
+            data[w[3]]["n1"] = w[1]
+            data[w[3]]["n2"] = w[2]
+
+    # quote
+    for line in tqdm(open("disk/all-quo-links.txt")):
+        w = line.strip().split()
+        if w[0] in data:
+            data[w[0]]["n1"] = w[1]
+            data[w[0]]["n2"] = w[2]
+
+    # reply
+    for line in tqdm(open("disk/all-rep-links.txt")):
+        w = line.strip().split()
+        if w[0] in data:
+            data[w[0]]["n1"] = w[1]
+            data[w[0]]["n2"] = w[2]
+
+    # mention
+    for line in tqdm(open("disk/all-men-links.txt")):
+        w = line.strip().split()
+        if w[0] in data:
+            data[w[0]]["n1"] = w[1]
+            data[w[0]]["n2"] = w[2]
+
+
+    with open("disk/second_layer.txt", "w") as f:
+        for k, v in data.items():
+            if "n1" in v:
+                f.write(json.dumps(v) + "\n")
+
+
+if __name__ == "__main__":
 
     name_labels = [
         "fake",
@@ -935,12 +992,28 @@ if __name__ == "__main__":
         "radio",
     ]
 
-    save_dir = 'disk/network'
-    for in_name in name_labels:
-        print(in_name)
-        nt = nx.read_gpickle(os.path.join(save_dir, in_name + ".gpickle"))
-        _gt = nx2gt(nt)
-        _gt.save(os.path.join(save_dir, in_name + ".gt"))
+    
+    # Lebron = analyze_IRA_in_network()
+    # Lebron.run()
+
+    # print("rep")
+    # get_ret_network("disk/all-ret-links.txt")
+    # print("ret")
+    # get_rep_network("disk/all-rep-links.txt")
+    # print("quo")
+    # get_quote_network("disk/all-quo-links.txt")
+    # print("men")
+    # get_mention_network("disk/all-men-links.txt")
+
+    # change networks
+
+
+    # save_dir = 'disk/network'
+    # for in_name in name_labels:
+    #     print(in_name)
+    #     nt = nx.read_gpickle(os.path.join(save_dir, in_name + ".gpickle"))
+    #     _gt = nx2gt(nt)
+    #     _gt.save(os.path.join(save_dir, in_name + ".gt"))
 
     # 获取用户的详细信息；
     # get_user_name_info()
@@ -970,3 +1043,8 @@ if __name__ == "__main__":
     # get_network_with_ira()
     # get_ira_network_with_big_networks()
     # merge_two_groups_link_to_graph()
+
+    # 构造与IRA交互的第二层，根据hashtags
+    # userids = set([line.strip() for line in open("disk/first_layger_touch_IRA.txt")])
+    # get_all_network_by_user(userids, "disk/network/second-layer")
+    find_second_layer_touch_IRA()

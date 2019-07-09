@@ -105,6 +105,9 @@ class Are_you_IRA(object):
             uid = str(self._map[uid])
         return uid
 
+    def check(self, ht):
+        return ht in self.IRA_user_set
+
     def fuck(self, ht):
         return ht in self.IRA_user_set
 
