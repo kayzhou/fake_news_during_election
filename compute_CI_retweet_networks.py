@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    compute_CI_retweet_networks.py                     :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
+#    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/28 10:44:39 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/13 19:07:29 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ import os
 import sys
 import time
 from functools import partial
-from pathlib import Path
+from pathlib import Path, PurePath
 
 import graph_tool.all as gt
 import numpy as np
@@ -37,7 +37,7 @@ def add_CI_to_graph(graph_file):
 
     # for direction in ['out', 'both', 'in']:
     # for direction in ['out', 'undir', 'in', 'both']:
-    for direction in ['undir', 'in', 'out']:
+    for direction in ['undir', 'out']:
         print('pid ' + str(os.getpid()) + ' -- ' + direction)
         t0 = time.time()
         CIranks, CImap = CIcython.compute_graph_CI(graph, rad=2,
@@ -88,4 +88,7 @@ if __name__ == "__main__":
     # for in_name in name_labels:
     #     add_CI_to_graph(os.path.join(save_dir, in_name + ".gt"))
 
-    add_CI_to_graph("data/IRA_two_layers.gt")
+    # add_CI_to_graph("data/IRA_two_layers.gt")
+
+    for in_name in Path().rglob("data/louvain_2_layers/*.gt"):
+        add_CI_to_graph(str(in_name))

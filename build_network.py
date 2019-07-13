@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    build_network.py                                   :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
+#    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:29 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/07/02 17:05:27 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/13 18:41:19 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -417,9 +417,9 @@ def get_prop_type(value, key=None):
     If a key is provided, it also ensures the key is in a format that can be
     used with the PropertyMap. Returns a tuple, (type name, value, key)
     """
-    if isinstance(key, unicode):
-        # Encode the key as ASCII
-        key = key.encode('ascii', errors='replace')
+    # if isinstance(key, unicode):
+    #     # Encode the key as ASCII
+    #     key = key.encode('ascii', errors='replace')
 
     # Deal with the value
     if isinstance(value, bool):
@@ -432,9 +432,9 @@ def get_prop_type(value, key=None):
     elif isinstance(value, float):
         tname = 'float'
 
-    elif isinstance(value, unicode):
-        tname = 'string'
-        value = value.encode('ascii', errors='replace')
+    # elif isinstance(value, unicode):
+    #     tname = 'string'
+    #     value = value.encode('ascii', errors='replace')
 
     elif isinstance(value, dict):
         tname = 'object'
