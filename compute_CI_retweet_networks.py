@@ -6,7 +6,7 @@
 #    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/07/13 19:07:29 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/16 14:20:16 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,18 +71,18 @@ if __name__ == "__main__":
     #     if in_name.endswith("ALL.gt"):
     #         add_CI_to_graph(os.path.join(save_dir, in_name))
 
-    name_labels = [
-        "fake",
-        "extreme bias (right)",
-        "right",
-        "right leaning",
-        "center",
-        "left leaning",
-        "left",
-        "extreme bias (left)",
-        "local",
-        "radio",
-    ]
+    # name_labels = [
+    #     "fake",
+    #     "extreme bias (right)",
+    #     "right",
+    #     "right leaning",
+    #     "center",
+    #     "left leaning",
+    #     "left",
+    #     "extreme bias (left)",
+    #     "local",
+    #     "radio",
+    # ]
 
     # save_dir = 'disk/network'
     # for in_name in name_labels:
@@ -90,5 +90,5 @@ if __name__ == "__main__":
 
     # add_CI_to_graph("data/IRA_two_layers.gt")
 
-    for in_name in Path().rglob("data/louvain_2_layers/*.gt"):
+    for in_name in Path().rglob("disk/graph/*.gt"):
         add_CI_to_graph(str(in_name))

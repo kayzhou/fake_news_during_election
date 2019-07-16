@@ -6,7 +6,7 @@
 #    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:29 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/07/13 18:41:19 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/15 15:20:35 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -977,6 +977,92 @@ def find_second_layer_touch_IRA():
                 f.write(json.dumps(v) + "\n")
 
 
+def find_second_layer_by_communities():
+
+    louvain_rst = json.load(open("data/louvain_rst_4.json"))
+    from collections import defaultdict
+    
+    Putin = Are_you_IRA()
+
+    comm_nodes = defaultdict(set)
+
+    for n, c in louvain_rst.items():
+        if c == 0:
+            c = 1
+        elif c == 1:
+            c = 2
+        elif c == 3:
+            c = 3
+        else:
+            continue
+        
+        try:
+            comm_nodes[c].add(int(n))
+        except ValueError as e:
+            # print(e)
+            pass
+
+
+    for cN, userids in comm_nodes.items():
+        hts = json.load(open(f"data/hashtags/C{cN}.json"))
+        hts = set([ht[0] for ht in hts])
+        # print(hts)
+
+        from SQLite_handler import find_hashtags
+
+        # SELECT tweet_id, hashtag, user_id	FROM hashtag_tweet_user
+        data = {}
+        for d in tqdm(find_hashtags()):
+            if d[1] in hts and d[2] in userids:
+                _id = str(d[0])
+                if _id not in data:
+                    data[_id] = {
+                        "#": [d[1]],
+                        "userid": d[2],
+                        "id": _id
+                    }
+                else:
+                    data[_id]["#"].append(d[1])
+
+        # retweet
+        for line in tqdm(open("disk/all-ret-links.txt")):
+            w = line.strip().split()
+            if w[0] in data:
+                data[w[0]]["n1"] = w[1]
+                data[w[0]]["n2"] = w[2]
+            elif w[3] in data:
+                data[w[3]]["n1"] = w[1]
+                data[w[3]]["n2"] = w[2]
+
+        # quote
+        for line in tqdm(open("disk/all-quo-links.txt")):
+            w = line.strip().split()
+            if w[0] in data:
+                data[w[0]]["n1"] = w[1]
+                data[w[0]]["n2"] = w[2]
+
+        # reply
+        for line in tqdm(open("disk/all-rep-links.txt")):
+            w = line.strip().split()
+            if w[0] in data:
+                data[w[0]]["n1"] = w[1]
+                data[w[0]]["n2"] = w[2]
+
+        # mention
+        for line in tqdm(open("disk/all-men-links.txt")):
+            w = line.strip().split()
+            if w[0] in data:
+                data[w[0]]["n1"] = w[1]
+                data[w[0]]["n2"] = w[2]
+
+
+        with open(f"disk/second_layer_C{cN}.txt", "w") as f:
+            for k, v in data.items():
+                if "n1" in v:
+                    f.write(json.dumps(v) + "\n")
+
+
+
 if __name__ == "__main__":
 
     name_labels = [
@@ -1047,4 +1133,5 @@ if __name__ == "__main__":
     # 构造与IRA交互的第二层，根据hashtags
     # userids = set([line.strip() for line in open("disk/first_layger_touch_IRA.txt")])
     # get_all_network_by_user(userids, "disk/network/second-layer")
-    find_second_layer_touch_IRA()
+    # find_second_layer_touch_IRA()
+    find_second_layer_by_communities()
