@@ -12,8 +12,8 @@ import json
 from collections import defaultdict
 from fake_identify import Are_you_IRA
 
-DB1_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_db.sqlite"
-DB2_NAME = "/home/alex/network_workdir/elections/databases_ssd/complete_trump_vs_hillary_sep-nov_db.sqlite"
+DB1_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_db.sqlite"
+DB2_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_sep-nov_db.sqlite"
 
 
 def find_tweet(_id):

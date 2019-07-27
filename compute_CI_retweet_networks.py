@@ -6,7 +6,7 @@
 #    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/07/16 14:20:16 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/07/18 14:54:49 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,12 +23,11 @@ import graph_tool.all as gt
 import numpy as np
 from joblib import Parallel, delayed
 
-import CIcython
-
 PACKAGE_PARENT = '.'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(
     os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+import CIcython
 
 #%% add CI values to graph
 def add_CI_to_graph(graph_file):
@@ -90,5 +89,7 @@ if __name__ == "__main__":
 
     # add_CI_to_graph("data/IRA_two_layers.gt")
 
-    for in_name in Path().rglob("disk/graph/*.gt"):
+    print("Lets go!")
+    for in_name in Path().rglob("data/graph/*.gt"):
         add_CI_to_graph(str(in_name))
+
