@@ -12,6 +12,8 @@ import json
 from collections import defaultdict
 from fake_identify import Are_you_IRA
 
+# DB1_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_db.sqlite"
+# DB2_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_sep-nov_db.sqlite"
 DB1_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_db.sqlite"
 DB2_NAME = "/media/alex/data/election_data/data/complete_trump_vs_hillary_sep-nov_db.sqlite"
 
@@ -304,6 +306,39 @@ def find_all_uids():
     conn2.close()
 
     return uids
+
+
+def find_all_voters():
+    '''
+    找到所有的选民的倾向！
+    '''
+    users = {}
+
+    conn1 = sqlite3.connect(DB1_NAME)
+    c1 = conn1.cursor()
+    c1.execute('''SELECT user_id, p_pro_hillary_anti_trump FROM class_proba''')
+    for d in c1.fetchall():
+        if d[0] not in users:
+            users[d[0]] = [0, 0]
+        if d[1] > 0.5:
+            users[d[0]][0] += 1
+        else:
+            users[d[0]][1] += 1
+    conn1.close()
+
+    conn2 = sqlite3.connect(DB2_NAME)
+    c2 = conn2.cursor()
+    c2.execute('''SELECT user_id, p_pro_hillary_anti_trump FROM class_proba''')
+    for d in c2.fetchall():
+        if d[0] not in users:
+            users[d[0]] = [0, 0]
+        if d[1] > 0.5:
+            users[d[0]][0] += 1
+        else:
+            users[d[0]][1] += 1
+    conn2.close()
+
+    json.dump(users, open("disk/user_hillary_trump.json", "w"))
 
 
 def find_users(uids):
@@ -614,5 +649,6 @@ if __name__ == "__main__":
     # with open("IRA-tweets-id.txt", "w") as f:
     #     json.dump(data, f, indent=4)
 
-    find_time_series_IRA()
+    # find_time_series_IRA()
+    find_all_voters()
     
