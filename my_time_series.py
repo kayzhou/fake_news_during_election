@@ -8,6 +8,53 @@ from my_weapon import *
 默认15分钟的粒度
 """
 
+from pyloess import stl
+    
+# LOESS smoothing
+
+def calculate_resid():
+    """
+    消灭季节性特征
+    """
+    # remove seasonality and trend
+    stl_params = dict(
+        np = 96, # period of season
+        ns = 95, # seasonal smoothing
+        nt = None, # trend smooting int((1.5*np)/(1-(1.5/ns)))
+        nl = None, # low-pass filter leat odd integer >= np
+        isdeg=1,
+        itdeg=1,
+        ildeg=1,
+        robust=True,
+        ni = 1,
+        no = 5)
+
+    for i in range(1, 4):
+        tsts = pd.read_pickle(f"data/tsts/C{i}-one-layer-user.pickle")
+        print(tsts.index)
+        resid = pd.DataFrame(index=tsts.index)
+        print("Loaded!")
+        for col in ["ts", "non_ts", "T_ts", "C_ts"]:
+            print(col)
+            tsts[col] = tsts[col].fillna(0)
+            resid[col] = stl(tsts[col].values, **stl_params).residuals
+
+        resid.to_pickle(f"data/tsts/resid_C{i}-one-layer-user.pl")
+        print("saved!")
+        
+    for i in range(1, 4):
+        tsts = pd.read_pickle(f"data/tsts/C{i}-two-layer-user.pickle")
+        resid = pd.DataFrame(index=tsts.index)
+        print("Loaded!")
+        for col in ["ts", "non_ts", "T_ts", "C_ts"]:
+            print(col)
+            tsts[col] = tsts[col].fillna(0)
+            resid[col] = stl(tsts[col].values, **stl_params).residuals
+
+        resid.to_pickle(f"data/tsts/resid_C{i}-two-layer-user.pl")
+        print("saved!")
+
+
 def get_day(dt):
     return pendulum.parse(dt).format("YYYY-MM-DD 00:00:00")
 
@@ -17,20 +64,31 @@ def get_hour(dt):
 
 
 def get_15min(dt):
-    t0 = pendulum.parse(dt).format("YYYY-MM-DD HH:00:00")
+    _dt = pendulum.parse(dt)
+    t0 = pendulum.parse(_dt.format("YYYY-MM-DD HH:00:00"))
     t1 = t0.add(minutes=15)
-    t2 = t1.add(minutes=15)
-    t3 = t2.add(minutes=15)
+    t2 = t0.add(minutes=30)
+    t3 = t0.add(minutes=45)
 
-    if t0 <= dt < t1:
+    if t0 <= _dt < t1:
         return t0
-    elif dt < t2:
+    elif _dt < t2:
         return t1
-    elif dt < t3:
+    elif _dt < t3:
         return t2
     else:
         return t3
 
+
+def get_15min_file():
+    with open("disk/user_time_15Mins.txt", "w") as f:
+        for line in tqdm(open('disk/user_time.txt')):
+            w = line.strip().split()
+            u = w[1]
+            _dt = w[2] + " " + w[3]
+            _dt = get_15min(_dt).to_datetime_string()
+            f.write(f"{w[0]} {w[1]} {_dt}\n")
+    
 
 def cal_ts(dts, resolution="15Min"):
     """
@@ -122,6 +180,250 @@ def plot_48hours(i, url, sorted_dts, sorted_dts2=None, save=False):
     plt.close()
 
 
+# from stldecompose import decompose, forecast
+import matplotlib.ticker as ticker
+IRA_data = pd.read_csv("data/ira-tweets-ele.csv")
+
+def format_date(x, pos=None):
+    #保证下标不越界,很重要,越界会导致最终plot坐标轴label无显示
+    # thisind = np.clip(int(x+0.5), 0, N-1)
+    print(type(x), x)
+    return x.strftime('%Y-%m-%d')
+    
+import pendulum
+from datetime import datetime
+
+def load_should_remove():
+    should_remove_15Min = []
+    
+    for line in open("data/should_be_removed_in_timeseries.txt"):
+        _dt = line.strip()
+        _start = datetime.strptime(_dt, '%Y-%m-%d %H:%M:%S')
+        for _dt in pd.date_range(start=_start, periods=4 * 24, freq="15Min"):
+            should_remove_15Min.append(pd.to_datetime(_dt))
+
+    return should_remove_15Min
+
+should_remove_15Min = load_should_remove()
+user_support = json.load(open("disk/user_hillary_trump.json"))
+users_opinion = {}
+opinion = Counter()
+
+for uid, v in tqdm(user_support.items()):
+    if v[0] > v[1]:
+        users_opinion[uid] = "C"
+        opinion["C"] += 1
+    elif v[0] < v[1]:
+        users_opinion[uid] = "T"
+        opinion["T"] += 1
+    else:
+        users_opinion[uid] = "U"
+        opinion["U"] += 1
+        
+        
+def get_tsss(cN, layer="one"):
+    def get_ts(IRA_nodes):
+        dts = []
+        for i, row in tqdm(IRA_data.iterrows()):
+            u = Putin.uncover(row.userid)
+            if u in IRA_nodes:
+                _dt = row.tweet_time
+                _dt = pendulum.parse(_dt).add(hours=-4).to_datetime_string()
+                dts.append(_dt)
+        ts = pd.to_datetime(dts)
+        ts = ts.value_counts()
+        ts = ts.resample("15Min").sum()
+        ts = ts[(ts.index >= "2016-06-01") & (ts.index < "2016-11-09")]
+        ts = ts[~ts.index.isin(should_remove_15Min)]
+        return ts
+    
+    def get_non(non_IRA_nodes):
+        non_dts = []
+        for line in tqdm(open('disk/user_time.txt')):
+            w = line.strip().split()
+            uid = w[1]
+            _dt = w[2] + " " + w[3]
+            if uid in non_IRA_nodes:
+                non_dts.append(_dt)
+
+        non_ts = pd.to_datetime(non_dts)
+        non_ts = non_ts.value_counts()
+        non_ts = non_ts.resample("15Min").sum()
+        non_ts = non_ts[(non_ts.index >= "2016-06-01") & (non_ts.index < "2016-11-09")]
+        non_ts = non_ts[~non_ts.index.isin(should_remove_15Min)]
+        return non_ts
+
+    G = nx.read_gpickle(f"data/graph/C{cN}-{layer}-layer.gpickle")
+    IRA_nodes = set([n for n in G.nodes if Putin.check(n)])
+    non_IRA_nodes = set([n for n in G.nodes if not Putin.check(n)])
+    T_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "T"])
+    C_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "C"])
+    
+    ts = get_ts(IRA_nodes)
+    non_ts = get_non(non_IRA_nodes)
+    T_ts = get_non(T_IRA_nodes)
+    C_ts = get_non(C_IRA_nodes)
+
+    tsts = pd.DataFrame({"ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts})
+    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer.pickle")
+
+
+def get_tsss_user(cN, layer="one"):
+    def get_15min(dt):
+        _dt = pendulum.parse(dt)
+    t0 = pendulum.parse(_dt.format("YYYY-MM-DD HH:00:00"))
+    t1 = t0.add(minutes=15)
+    t2 = t0.add(minutes=30)
+    t3 = t0.add(minutes=45)
+
+    if t0 <= _dt < t1:
+        return t0
+    elif _dt < t2:
+        return t1
+    elif _dt < t3:
+        return t2
+    else:
+        return t3
+    
+    def get_ts(IRA_nodes):
+        user_set = set()
+        dts = []
+        for i, row in tqdm(IRA_data.iterrows()):
+            u = Putin.uncover(row.userid)
+            if u in IRA_nodes:
+                _dt = row.tweet_time
+                _dt = pendulum.parse(_dt).add(hours=-4).to_datetime_string()
+                _dt = get_15min(_dt).to_datetime_string()
+                if u + "~" + _dt not in user_set:
+                    user_set.add(u + "~" + _dt)
+                    dts.append(_dt)
+                    
+        ts = pd.to_datetime(dts)
+        ts = ts.value_counts()
+        ts = ts.resample("15Min").sum()
+        ts = ts[(ts.index >= "2016-06-01") & (ts.index < "2016-11-09")]
+        ts = ts[~ts.index.isin(should_remove_15Min)]
+        return ts
+    
+    def get_non(non_IRA_nodes):
+        user_set = set()
+        non_dts = []
+        for line in tqdm(open('disk/user_time_15Mins.txt')):
+            w = line.strip().split()
+            u = w[1]
+            _dt = w[2] + " " + w[3]
+            if uid in non_IRA_nodes:
+                if u + "~" + _dt not in user_set:
+                    user_set.add(u + "~" + _dt)
+                    non_dts.append(_dt)
+                    
+        non_ts = pd.to_datetime(non_dts)
+        non_ts = non_ts.value_counts()
+        non_ts = non_ts.resample("15Min").sum()
+        non_ts = non_ts[(non_ts.index >= "2016-06-01") & (non_ts.index < "2016-11-09")]
+        non_ts = non_ts[~non_ts.index.isin(should_remove_15Min)]
+        return non_ts
+
+    G = nx.read_gpickle(f"data/graph/C{cN}-{layer}-layer.gpickle")
+    IRA_nodes = set([n for n in G.nodes if Putin.check(n)])
+    non_IRA_nodes = set([n for n in G.nodes if not Putin.check(n)])
+    T_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "T"])
+    C_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "C"])
+    
+    ts = get_ts(IRA_nodes)
+    non_ts = get_non(non_IRA_nodes)
+    T_ts = get_non(T_IRA_nodes)
+    C_ts = get_non(C_IRA_nodes)
+
+    tsts = pd.DataFrame({"ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts})
+    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pickle")
+    
+    
+def analyze_ts_of_communities(cN, layer="one", user=False):
+    if user:
+        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pickle")
+    else:
+        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pickle")
+    # print(tsts)
+    sns.set(style="white", font_scale=1.2)
+    fig, ax1 = plt.subplots(figsize=(20, 6))
+    color = 'tab:red'
+    ax1.set_ylabel('IRA', color=color)  # we already handled the x-label with ax1
+    ax1.plot("ts", data=tsts, color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+    color = 'tab:blue'
+    ax2.set_ylabel('non-IRA', color=color)  # we already handled the x-label with ax1
+    ax2.plot("non_ts", data=tsts, color=color, lw=0.8)
+    ax2.tick_params(axis='y', labelcolor=color)
+    
+    # ax2.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+    # fig.autofmt_xdate()
+    
+    plt.savefig(f"fig/c{cN}-{layer}-layer-ts.pdf", dpi=300)
+    plt.show()
+    plt.close()
+    
+    if user:
+        tsts_resid = pd.read_pickle(f"data/tsts/resid_C{cN}-{layer}-layer-user.pl")
+    else:
+        tsts_resid = pd.read_pickle(f"data/tsts/resid_C{cN}-{layer}-layer.pl")
+        
+    # print(tsts_resid)
+    sns.set(style="white", font_scale=1.2)
+    fig, ax1 = plt.subplots(figsize=(20, 6))
+    color = 'tab:red'
+    ax1.set_ylabel('IRA (residuals)', color=color)  # we already handled the x-label with ax1
+    # ax1.set_ylim((-600, 600))
+    ax1.plot("ts", data=tsts_resid, color=color, lw=1)
+    ax1.tick_params(axis='y', labelcolor=color)
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+    color = 'tab:blue'
+    ax2.set_ylabel("non-IRA (residuals)", color=color)  # we already handled the x-label with ax1
+    # ax2.set_ylim((-20000, 20000))
+    ax2.plot("non_ts", data=tsts_resid, color=color, lw=1)
+    ax2.tick_params(axis='y', labelcolor=color)
+    plt.savefig(f"fig/c{cN}-{layer}-layer-resid.pdf", dpi=300)
+    plt.show()
+    plt.close()
+    
+    sns.set(style="white")
+    # 相关性分析
+#     f = plt.figure(figsize=(7, 6))
+#     plt.matshow(tsts.corr(), fignum=f.number, cmap='Purples')
+#     plt.xticks(range(tsts.shape[1]), tsts.columns, fontsize=11, rotation=45)
+#     plt.yticks(range(tsts.shape[1]), tsts.columns, fontsize=11)
+#     cb = plt.colorbar()
+#     cb.ax.tick_params(labelsize=14)
+#     # plt.title('Correlation Matrix', fontsize=16)
+
+    print(tsts.corr())
+#     ax = sns.heatmap(tsts.corr())
+#     plt.close()
+    print(tsts_resid.corr())
+#     ax = sns.heatmap(tsts_resid.corr())
+#     plt.show()
+#     plt.close()
+    
+    # 因果分析
+    from statsmodels.tsa.stattools import grangercausalitytests
+    
+    # print(tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna())
+    for_gra = np.array([tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna()]).T
+    # print(for_gra)
+    
+    print(" ---------------------- IRA causes non-IRA ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r1.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+              
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.non_ts.dropna()]).T
+    print(" ---------------------- non-IRA causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+        
+        
 class Kay_best_ts(object):
     def __init__(self):
         pass
@@ -132,4 +434,6 @@ class Kay_best_ts(object):
 
 
 if __name__ == "__main__":
-    Lebron = Kay_best_ts()
+    # Lebron = Kay_best_ts()
+    calculate_resid()
+    # get_15min_file()
