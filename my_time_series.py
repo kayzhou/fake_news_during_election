@@ -11,50 +11,6 @@ from my_weapon import *
 from pyloess import stl
     
 # LOESS smoothing
-
-def calculate_resid():
-    """
-    消灭季节性特征
-    """
-    # remove seasonality and trend
-    stl_params = dict(
-        np = 96, # period of season
-        ns = 95, # seasonal smoothing
-        nt = None, # trend smooting int((1.5*np)/(1-(1.5/ns)))
-        nl = None, # low-pass filter leat odd integer >= np
-        isdeg=1,
-        itdeg=1,
-        ildeg=1,
-        robust=True,
-        ni = 1,
-        no = 5)
-
-    for i in range(1, 4):
-        tsts = pd.read_pickle(f"data/tsts/C{i}-one-layer-user.pickle")
-        print(tsts.index)
-        resid = pd.DataFrame(index=tsts.index)
-        print("Loaded!")
-        for col in ["ts", "non_ts", "T_ts", "C_ts"]:
-            print(col)
-            tsts[col] = tsts[col].fillna(0)
-            resid[col] = stl(tsts[col].values, **stl_params).residuals
-
-        resid.to_pickle(f"data/tsts/resid_C{i}-one-layer-user.pl")
-        print("saved!")
-        
-    for i in range(1, 4):
-        tsts = pd.read_pickle(f"data/tsts/C{i}-two-layer-user.pickle")
-        resid = pd.DataFrame(index=tsts.index)
-        print("Loaded!")
-        for col in ["ts", "non_ts", "T_ts", "C_ts"]:
-            print(col)
-            tsts[col] = tsts[col].fillna(0)
-            resid[col] = stl(tsts[col].values, **stl_params).residuals
-
-        resid.to_pickle(f"data/tsts/resid_C{i}-two-layer-user.pl")
-        print("saved!")
-
-
 def get_day(dt):
     return pendulum.parse(dt).format("YYYY-MM-DD 00:00:00")
 
@@ -204,6 +160,7 @@ def load_should_remove():
 
     return should_remove_15Min
 
+# 载入一些需要的数据
 should_remove_15Min = load_should_remove()
 user_support = json.load(open("disk/user_hillary_trump.json"))
 users_opinion = {}
@@ -219,15 +176,24 @@ for uid, v in tqdm(user_support.items()):
     else:
         users_opinion[uid] = "U"
         opinion["U"] += 1
-        
+
+
+from fake_identify import Are_you_IRA
+
+Putin = Are_you_IRA()
+
         
 def get_tsss(cN, layer="one"):
+    """
+    获取IRA和non-IRA的活动时间序列
+    """
     def get_ts(IRA_nodes):
         dts = []
         for i, row in tqdm(IRA_data.iterrows()):
             u = Putin.uncover(row.userid)
             if u in IRA_nodes:
                 _dt = row.tweet_time
+                # Move to EST
                 _dt = pendulum.parse(_dt).add(hours=-4).to_datetime_string()
                 dts.append(_dt)
         ts = pd.to_datetime(dts)
@@ -256,16 +222,53 @@ def get_tsss(cN, layer="one"):
     G = nx.read_gpickle(f"data/graph/C{cN}-{layer}-layer.gpickle")
     IRA_nodes = set([n for n in G.nodes if Putin.check(n)])
     non_IRA_nodes = set([n for n in G.nodes if not Putin.check(n)])
-    T_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "T"])
-    C_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion and users_opinion[n] == "C"])
+    print("IRA and non-IRA:", len(IRA_nodes), len(non_IRA_nodes))
     
-    ts = get_ts(IRA_nodes)
-    non_ts = get_non(non_IRA_nodes)
-    T_ts = get_non(T_IRA_nodes)
-    C_ts = get_non(C_IRA_nodes)
+    influ = {line.strip() for line in open(f"data/influencers/C{cN}-uid.txt")}
+    non_IRA_influ_nodes = set([n for n in G.nodes 
+                              if not Putin.check(n) and n in influ])
+    non_IRA_non_influ_nodes = set([n for n in G.nodes 
+                                  if not Putin.check(n) and n not in influ])
+    print("non-IRA influ and non-influ:", len(non_IRA_influ_nodes), len(non_IRA_non_influ_nodes))
+    
+    T_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                       and users_opinion[n] == "T"])
+    C_IRA_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                       and users_opinion[n] == "C"])
+    print("Trump & Clinton:", len(T_IRA_nodes), len(C_IRA_nodes))
 
-    tsts = pd.DataFrame({"ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts})
-    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer.pickle")
+    T_flu_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                       and users_opinion[n] == "T" and n in influ])
+    C_flu_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                       and users_opinion[n] == "C" and n in influ])
+    print("Trump & Clinton (flu):", len(T_flu_nodes), len(C_flu_nodes))
+    
+    T_nonflu_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                          and users_opinion[n] == "T" and n not in influ])
+    C_nonflu_nodes = set([n for n in G.nodes if not Putin.check(n) and n in users_opinion
+                          and users_opinion[n] == "C" and n not in influ])
+    print("Trump & Clinton (non flu):", len(T_nonflu_nodes), len(C_nonflu_nodes))    
+    
+    
+    # ts = get_ts(IRA_nodes)
+    # non_ts = get_non(non_IRA_nodes)
+    # influ_ts = get_non(non_IRA_influ_nodes)
+    # non_influ_ts = get_non(non_IRA_non_influ_nodes)
+    
+    # T_ts = get_non(T_IRA_nodes)
+    # C_ts = get_non(C_IRA_nodes)
+    # T_flu_ts = get_non(T_flu_nodes)
+    # C_flu_ts = get_non(C_flu_nodes)    
+    # T_nonflu_ts = get_non(T_nonflu_nodes)
+    # C_nonflu_ts = get_non(C_nonflu_nodes)
+    
+    # tsts = pd.DataFrame({
+    #     "ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts,
+    #     "influ_ts": influ_ts, "non_influ_ts": non_influ_ts,
+    #     "T_flu_ts": T_flu_ts, "C_flu_ts": C_flu_ts,
+    #     "T_nonflu_ts": T_nonflu_ts, "C_nonflu_ts": C_nonflu_ts,
+    # })
+    # tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
 
 
 def get_tsss_user(cN, layer="one"):
@@ -336,14 +339,44 @@ def get_tsss_user(cN, layer="one"):
     C_ts = get_non(C_IRA_nodes)
 
     tsts = pd.DataFrame({"ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts})
-    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pickle")
+    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pl")
     
-    
+
+def calculate_resid(cN, layer="two"):
+    """
+    消灭季节性特征
+    """
+    # remove seasonality and trend
+    stl_params = dict(
+        np = 96, # period of season
+        ns = 95, # seasonal smoothing
+        nt = None, # trend smooting int((1.5*np)/(1-(1.5/ns)))
+        nl = None, # low-pass filter leat odd integer >= np
+        isdeg=1,
+        itdeg=1,
+        ildeg=1,
+        robust=True,
+        ni = 1,
+        no = 5)
+         
+    tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
+    resid = pd.DataFrame(index=tsts.index)
+    print("Loaded!")
+    for col in ["ts", "non_ts", "T_ts", "C_ts", "influ_ts", "non_influ_ts",
+                "T_flu_ts", "C_flu_ts", "T_nonflu_ts", "C_nonflu_ts"]:
+        print(col)
+        tsts[col] = tsts[col].fillna(0)
+        resid[col] = stl(tsts[col].values, **stl_params).residuals
+
+    resid.to_pickle(f"data/tsts/resid_C{cN}-{layer}-layer.pl")
+    print("saved!")
+        
+        
 def analyze_ts_of_communities(cN, layer="one", user=False):
     if user:
-        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pickle")
+        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pl")
     else:
-        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pickle")
+        tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
     # print(tsts)
     sns.set(style="white", font_scale=1.2)
     fig, ax1 = plt.subplots(figsize=(20, 6))
@@ -361,7 +394,7 @@ def analyze_ts_of_communities(cN, layer="one", user=False):
     # fig.autofmt_xdate()
     
     plt.savefig(f"fig/c{cN}-{layer}-layer-ts.pdf", dpi=300)
-    plt.show()
+    # plt.show()
     plt.close()
     
     if user:
@@ -384,10 +417,10 @@ def analyze_ts_of_communities(cN, layer="one", user=False):
     ax2.plot("non_ts", data=tsts_resid, color=color, lw=1)
     ax2.tick_params(axis='y', labelcolor=color)
     plt.savefig(f"fig/c{cN}-{layer}-layer-resid.pdf", dpi=300)
-    plt.show()
+    # plt.show()
     plt.close()
     
-    sns.set(style="white")
+    # sns.set(style="white")
     # 相关性分析
 #     f = plt.figure(figsize=(7, 6))
 #     plt.matshow(tsts.corr(), fignum=f.number, cmap='Purples')
@@ -423,17 +456,85 @@ def analyze_ts_of_communities(cN, layer="one", user=False):
     for _k, v in r2.items():
         print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
         
+
+def analyze_ts_TC(cN, layer):
+    # read
+    tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
+
+    sns.set(style="white", font_scale=1.2)
+    fig, ax1 = plt.subplots(figsize=(20, 6))
+    color = 'tab:red'
+    ax1.set_ylabel('IRA', color=color)  # we already handled the x-label with ax1
+    ax1.plot("ts", data=tsts, color=color, label="IRA")
+    ax1.tick_params(axis='y', labelcolor=color)
+    
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+    ax2.set_ylabel('non-IRA')  # we already handled the x-label with ax1
+    ax2.plot("T_ts", data=tsts, color='tab:green', alpha=0.7, lw=0.8, label="Trump supporters")
+    ax2.plot("C_ts", data=tsts, color='tab:blue', alpha=0.7, lw=0.8, label="Clinton supporters")
+    plt.savefig(f"fig/c{cN}-{layer}-layer-TC-ts.pdf", dpi=300)
+    plt.legend()
+    # plt.show()
+    plt.close()
+    
+    # read
+
+    tsts_resid = pd.read_pickle(f"data/tsts/resid_C{cN}-{layer}-layer.pl")
+    sns.set(style="white", font_scale=1.2)
+    fig, ax1 = plt.subplots(figsize=(20, 6))
+    color = 'tab:red'
+    ax1.set_ylabel('IRA (residuals)', color=color)  # we already handled the x-label with ax1
+    # ax1.set_ylim((-600, 600))
+    ax1.plot("ts", data=tsts_resid, color=color, lw=1, label="IRA")
+    ax1.tick_params(axis='y', labelcolor=color)
+#     ax1.legend()
+    
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+    ax2.set_ylabel("non-IRA (residuals)")  # we already handled the x-label with ax1
+    # ax2.set_ylim((-20000, 20000))
+    ax2.plot("T_ts", data=tsts_resid, color='tab:green', alpha=0.7, lw=1, label="Trump supporters")
+    ax2.plot("C_ts", data=tsts_resid, color='tab:blue', alpha=0.7,  lw=1, label="Clinton supporters")
+#     ax2.legend()
+    plt.legend()
+    plt.savefig(f"fig/c{cN}-{layer}-layer-TC-resid.pdf", dpi=300)
+    # plt.show()
+    plt.close()
+    
+    # 因果分析
+    from statsmodels.tsa.stattools import grangercausalitytests
+    
+    # print(tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna())
+    
+    for_gra = np.array([tsts_resid.T_ts.dropna(), tsts_resid.ts.dropna()]).T
+    # print(for_gra)
+    print(" ---------------------- IRA causes Trump supporters ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=16, verbose=False)
+    for _k, v in r1.items():
+        print(f"lag={_k}\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.T_ts.dropna()]).T
+    print(" ---------------------- Trump supporters causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=16, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k}\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+              
+    for_gra = np.array([tsts_resid.C_ts.dropna(), tsts_resid.ts.dropna()]).T
+    # print(for_gra)
+    print(" ---------------------- IRA causes Clinton supporters ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=16, verbose=False)
+    for _k, v in r1.items():
+        print(f"lag={_k}\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.C_ts.dropna()]).T
+    print(" ---------------------- Clinton supporters causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=16, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k}\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
         
-class Kay_best_ts(object):
-    def __init__(self):
-        pass
-
-    def load_url_ts(self):
-        pass
-        # self.url_ts = json.loads()
-
-
+        
 if __name__ == "__main__":
-    # Lebron = Kay_best_ts()
-    calculate_resid()
-    # get_15min_file()
+    for i in range(1, 4):
+        get_tsss(i, "two")
+        # calculate_resid(i, "two")
+        # analyze_ts_of_communities(i, "two")
+        # analyze_ts_TC(i, "two")

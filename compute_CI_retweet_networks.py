@@ -6,7 +6,7 @@
 #    By: Kay Zhou <kayzhou.mail@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:27:34 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/07/18 14:54:49 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2019/09/02 18:01:09 by Kay Zhou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ def add_CI_to_graph(graph_file):
 
     # for direction in ['out', 'both', 'in']:
     # for direction in ['out', 'undir', 'in', 'both']:
-    for direction in ['undir', 'out']:
+    for direction in ['undir', 'out', 'in']:
         print('pid ' + str(os.getpid()) + ' -- ' + direction)
         t0 = time.time()
         CIranks, CImap = CIcython.compute_graph_CI(graph, rad=2,
