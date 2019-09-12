@@ -308,37 +308,58 @@ def find_all_uids():
     return uids
 
 
-def find_all_voters():
+def find_all_probs():
+    '''
+    找到所有的选民的倾向！
+    '''
+    probs = []
+
+    with open("/home/alex/kayzhou/Argentina_election/data/p_pro_hillary_anti_trump.txt", "w") as f:
+        conn1 = sqlite3.connect(DB1_NAME)
+        c1 = conn1.cursor()
+        c1.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba''')
+        for d in c1.fetchall():
+            f.write(str(d[0]) + "\n")
+        conn1.close()
+
+        conn2 = sqlite3.connect(DB2_NAME)
+        c2 = conn2.cursor()
+        c2.execute('''SELECT p_pro_hillary_anti_trump FROM class_proba''')
+        for d in c2.fetchall():
+            f.write(str(d[0]) + "\n")
+        conn2.close()
+    
+    
+def find_all_voters(p=0.5):
     '''
     找到所有的选民的倾向！
     '''
     users = {}
-
     conn1 = sqlite3.connect(DB1_NAME)
     c1 = conn1.cursor()
     c1.execute('''SELECT user_id, p_pro_hillary_anti_trump FROM class_proba''')
-    for d in c1.fetchall():
+    for d in tqdm(c1.fetchall()):
         if d[0] not in users:
             users[d[0]] = [0, 0]
-        if d[1] > 0.5:
+        if d[1] >= p:
             users[d[0]][0] += 1
-        else:
+        elif d[1] < 1-p:
             users[d[0]][1] += 1
     conn1.close()
 
     conn2 = sqlite3.connect(DB2_NAME)
     c2 = conn2.cursor()
     c2.execute('''SELECT user_id, p_pro_hillary_anti_trump FROM class_proba''')
-    for d in c2.fetchall():
+    for d in tqdm(c2.fetchall()):
         if d[0] not in users:
             users[d[0]] = [0, 0]
-        if d[1] > 0.5:
+        if d[1] >= p:
             users[d[0]][0] += 1
-        else:
+        elif d[1] < 1-p:
             users[d[0]][1] += 1
     conn2.close()
 
-    json.dump(users, open("disk/user_hillary_trump.json", "w"))
+    json.dump(users, open(f"disk/user_hillary_trump-{p}.json", "w"))
 
 
 def find_users(uids):
@@ -650,5 +671,13 @@ if __name__ == "__main__":
     #     json.dump(data, f, indent=4)
 
     # find_time_series_IRA()
-    find_all_voters()
+    # find_all_voters()
+    # find_all_probs()
+    
+    find_all_voters(0.5)
+    find_all_voters(0.55)
+    find_all_voters(0.6)  
+    find_all_voters(0.65)  
+    find_all_voters(0.7)  
+    find_all_voters(0.75)  
     

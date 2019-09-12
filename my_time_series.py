@@ -249,26 +249,25 @@ def get_tsss(cN, layer="one"):
                           and users_opinion[n] == "C" and n not in influ])
     print("Trump & Clinton (non flu):", len(T_nonflu_nodes), len(C_nonflu_nodes))    
     
+    ts = get_ts(IRA_nodes)
+    non_ts = get_non(non_IRA_nodes)
+    influ_ts = get_non(non_IRA_influ_nodes)
+    non_influ_ts = get_non(non_IRA_non_influ_nodes)
     
-    # ts = get_ts(IRA_nodes)
-    # non_ts = get_non(non_IRA_nodes)
-    # influ_ts = get_non(non_IRA_influ_nodes)
-    # non_influ_ts = get_non(non_IRA_non_influ_nodes)
+    T_ts = get_non(T_IRA_nodes)
+    C_ts = get_non(C_IRA_nodes)
+    T_flu_ts = get_non(T_flu_nodes)
+    C_flu_ts = get_non(C_flu_nodes)    
+    T_nonflu_ts = get_non(T_nonflu_nodes)
+    C_nonflu_ts = get_non(C_nonflu_nodes)
     
-    # T_ts = get_non(T_IRA_nodes)
-    # C_ts = get_non(C_IRA_nodes)
-    # T_flu_ts = get_non(T_flu_nodes)
-    # C_flu_ts = get_non(C_flu_nodes)    
-    # T_nonflu_ts = get_non(T_nonflu_nodes)
-    # C_nonflu_ts = get_non(C_nonflu_nodes)
-    
-    # tsts = pd.DataFrame({
-    #     "ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts,
-    #     "influ_ts": influ_ts, "non_influ_ts": non_influ_ts,
-    #     "T_flu_ts": T_flu_ts, "C_flu_ts": C_flu_ts,
-    #     "T_nonflu_ts": T_nonflu_ts, "C_nonflu_ts": C_nonflu_ts,
-    # })
-    # tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
+    tsts = pd.DataFrame({
+        "ts": ts, "non_ts": non_ts, "T_ts": T_ts, "C_ts": C_ts,
+        "influ_ts": influ_ts, "non_influ_ts": non_influ_ts,
+        "T_flu_ts": T_flu_ts, "C_flu_ts": C_flu_ts,
+        "T_nonflu_ts": T_nonflu_ts, "C_nonflu_ts": C_nonflu_ts,
+    })
+    tsts.to_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
 
 
 def get_tsss_user(cN, layer="one"):
@@ -377,6 +376,7 @@ def analyze_ts_of_communities(cN, layer="one", user=False):
         tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer-user.pl")
     else:
         tsts = pd.read_pickle(f"data/tsts/C{cN}-{layer}-layer.pl")
+    
     # print(tsts)
     sns.set(style="white", font_scale=1.2)
     fig, ax1 = plt.subplots(figsize=(20, 6))
@@ -442,19 +442,68 @@ def analyze_ts_of_communities(cN, layer="one", user=False):
     from statsmodels.tsa.stattools import grangercausalitytests
     
     # print(tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna())
-    for_gra = np.array([tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna()]).T
-    # print(for_gra)
-    
-    print(" ---------------------- IRA causes non-IRA ----------------------")
+    # for_gra = np.array([tsts_resid.non_ts.dropna(), tsts_resid.ts.dropna()]).T
+    # # print(for_gra)
+    # print(" ---------------------- IRA causes non-IRA ----------------------")
+    # r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    # for _k, v in r1.items():
+    #     print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+              
+    # for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.non_ts.dropna()]).T
+    # print(" ---------------------- non-IRA causes IRA ----------------------")
+    # r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    # for _k, v in r2.items():
+    #     print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+
+    # "ts", "non_ts", "T_ts", "C_ts", "influ_ts", "non_influ_ts",
+    # "T_flu_ts", "C_flu_ts", "T_nonflu_ts", "C_nonflu_ts"
+    for_gra = np.array([tsts_resid.T_flu_ts.dropna(), tsts_resid.ts.dropna()]).T
+    print(" ---------------------- IRA causes T flu ----------------------")
     r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
     for _k, v in r1.items():
         print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
-              
-    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.non_ts.dropna()]).T
-    print(" ---------------------- non-IRA causes IRA ----------------------")
+            
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.T_flu_ts.dropna()]).T
+    print(" ---------------------- T flu causes IRA ----------------------")
     r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
     for _k, v in r2.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")        
+
+    for_gra = np.array([tsts_resid.C_flu_ts.dropna(), tsts_resid.ts.dropna()]).T
+    print(" ---------------------- IRA causes C flu ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r1.items():
         print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+            
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.C_flu_ts.dropna()]).T
+    print(" ---------------------- C flu causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")  
+        
+    for_gra = np.array([tsts_resid.T_nonflu_ts.dropna(), tsts_resid.ts.dropna()]).T
+    print(" ---------------------- IRA causes T nonflu ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r1.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+            
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.T_nonflu_ts.dropna()]).T
+    print(" ---------------------- T nonflu causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")  
+        
+    for_gra = np.array([tsts_resid.C_nonflu_ts.dropna(), tsts_resid.ts.dropna()]).T
+    print(" ---------------------- IRA causes C nonflu ----------------------")
+    r1 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r1.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")
+            
+    for_gra = np.array([tsts_resid.ts.dropna(), tsts_resid.C_nonflu_ts.dropna()]).T
+    print(" ---------------------- C nonflu causes IRA ----------------------")
+    r2 = grangercausalitytests(for_gra, maxlag=24, verbose=False)
+    for _k, v in r2.items():
+        print(f"lag={_k} *15Mins\tF={v[0]['ssr_ftest'][0]:.4f}\tp-value={v[0]['ssr_ftest'][1]:.4f}")  
         
 
 def analyze_ts_TC(cN, layer):
@@ -535,6 +584,6 @@ def analyze_ts_TC(cN, layer):
 if __name__ == "__main__":
     for i in range(1, 4):
         get_tsss(i, "two")
-        # calculate_resid(i, "two")
+        calculate_resid(i, "two")
         # analyze_ts_of_communities(i, "two")
         # analyze_ts_TC(i, "two")
