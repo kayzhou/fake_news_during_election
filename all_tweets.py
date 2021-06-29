@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    all_tweets.py                                      :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Kay Zhou <zhenkun91@outlook.com>           +#+  +:+       +#+         #
+#    By: Zhenkun Zhou <zhenkun91@outlook.com>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/06/07 20:25:08 by Kay Zhou          #+#    #+#              #
-#    Updated: 2019/06/21 14:09:38 by Kay Zhou         ###   ########.fr        #
+#    Updated: 2021/06/02 11:06:23 by Zhenkun Zho      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
