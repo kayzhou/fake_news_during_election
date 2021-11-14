@@ -1,6 +1,6 @@
 # IRA during 20216 US election
 
-美国2016年总统大选俄罗斯水军的行为研究
+## 美国2016年总统大选俄罗斯水军的行为研究
 
 analyze_init.ipynb 初步分析，包括发表推文时间等 
 
