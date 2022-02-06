@@ -5,10 +5,6 @@
 <html style="height: 100%">
     <head>
         <meta charset="utf-8">
-    </head>
-    <body style="height: 100%; margin: 0">
-        <div id="container" style="height: 100%"></div>
-
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/echarts.min.js"></script>
         <!-- Uncomment this line if you want to dataTool extension
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/extension/dataTool.min.js"></script>
@@ -27,63 +23,14 @@
         <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=<Your Key Here>"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-nightly@5.1.2-dev.20210512/dist/extension/bmap.min.js"></script>
         -->
-
-        <script type="text/javascript">
-var dom = document.getElementById("container");
-var myChart = echarts.init(dom);
-var app = {};
-
-var option;
-
-option = {
-    // title: {
-    //    text: '基础雷达图'
-    // },
-    color: [
-        "#FF0000", "#5B60D8"
-    ],
-    textStyle: {
-        color: "black",
-        fontSize: 20
-    },
-    legend: {
-        data: ['IRA', 'non-IRA'],
-        bottom: 80
-    },
-    radar: {
-        // shape: 'circle',
-        indicator: [
-            { name: 'fake', max: 15000},
-            { name: 'extreme bias (right)', max: 16000},
-            { name: 'right', max: 30000},
-            { name: 'right leaning', max: 38000},
-            { name: 'center', max: 52000},
-            { name: 'left leaning', max: 25000},
-            { name: 'left', max: 25000},
-            { name: 'extreme bias (left)', max: 25000},
-        ]
-    },
-    series: [{
-        // name: '预算 vs 开销（Budget vs spending）',
-        type: 'radar',
-        data: [
-            {
-                value: [4200, 3000, 20000, 35000, 50000, 18000, 18000, 18000],
-                name: 'IRA',
-            },
-            {
-                value: [5000, 14000, 28000, 26000, 42000, 21000, 21000, 21000],
-                name: 'non-IRA',
-            }
-        ]
-    }]
-};
-
-if (option && typeof option === 'object') {
-    myChart.setOption(option);
-}
-
-        </script>
+    </head>
+    <body style="height: 100%; margin: 0">
+        <div id="container-c1pt" style="height: 100%"></div>
+        <script type="text/javascript" src="radar-c1pt.js"></script>
+        <div id="container-c2pt" style="height: 100%"></div>
+        <script type="text/javascript" src="radar-c2pt.js"></script>
+        <div id="container-c3pt" style="height: 100%"></div>
+        <script type="text/javascript" src="radar-c3pt.js"></script>    
     </body>
 </html>
     
